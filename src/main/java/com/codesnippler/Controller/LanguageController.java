@@ -17,7 +17,7 @@ import java.util.List;
 
 
 @RestController
-@RequestMapping("/languages")
+@RequestMapping("/language")
 public class LanguageController {
 
     private final LanguageRepository langRepo;
