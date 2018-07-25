@@ -29,5 +29,7 @@ dependencies {
     compile('org.springframework.boot:spring-boot-starter-web')
     compile('org.springframework.boot:spring-boot-starter-data-mongodb')
 	compile('org.springframework.security:spring-security-crypto')
+	compile('javax.json:javax.json-api:1.0')
+    compile('org.glassfish:javax.json:1.1')
 	testCompile('org.springframework.boot:spring-boot-starter-test')
 }

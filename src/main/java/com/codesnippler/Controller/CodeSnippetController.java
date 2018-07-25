@@ -17,7 +17,7 @@ import java.util.List;
 
 
 @RestController
-@RequestMapping("/snippet")
+@RequestMapping("/api/snippet")
 public class CodeSnippetController {
     private final CodeSnippetRepository codeSnippetRepo;
 

@@ -17,7 +17,7 @@ import java.util.List;
 
 
 @RestController
-@RequestMapping("/language")
+@RequestMapping("/api/language")
 public class LanguageController {
 
     private final LanguageRepository langRepo;
@@ -27,11 +27,6 @@ public class LanguageController {
         this.langRepo = langRepo;
     }
 
-
-    @RequestMapping("/")
-    public String index() {
-        return "Greetings from Spring Boot!";
-    }
 
     @PostMapping
     Language add(HttpServletRequest request) {

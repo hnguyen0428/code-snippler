@@ -1,14 +1,17 @@
 package com.codesnippler.Model;
 
+import com.codesnippler.Utility.JsonUtility;
 import org.springframework.data.annotation.Id;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.format.annotation.DateTimeFormat.ISO;
 
-import java.util.Date;
-import java.util.HashMap;
+import javax.json.Json;
+import javax.json.JsonObject;
+import javax.json.JsonObjectBuilder;
+import java.util.*;
 
 
-public class User {
+public class User extends JsonModel {
     @Id
     private String id;
 
@@ -20,6 +23,8 @@ public class User {
 
     @DateTimeFormat(iso = ISO.DATE_TIME)
     private Date createdDate;
+
+    public User() {}
 
     public User(String username, String password, String apiKey, HashMap<String, Boolean> savedSnippets,
                 HashMap<String, Boolean> createdSnippets, Date createdDate) {
@@ -41,6 +46,10 @@ public class User {
         this.createdSnippets = new HashMap<>();
     }
 
+    @Override
+    public String toString() {
+        return String.format("{ \"username\": \"%s\", \"apiKey\": \"%s\", \"createdDate\": \"%s\" }", username, apiKey, createdDate);
+    }
 
     public String getUsername() {
         return username;
@@ -88,5 +97,49 @@ public class User {
 
     public void setCreatedDate(Date createdDate) {
         this.createdDate = createdDate;
+    }
+
+
+    @Override
+    public JsonObject toJson() {
+        return Json.createObjectBuilder()
+                .add("_id", id)
+                .add("username", username)
+                .add("password", password)
+                .add("apiKey", apiKey)
+                .add("createdDate", createdDate.toString())
+                .add("savedSnippets", JsonUtility.booleanMapToJson(savedSnippets))
+                .add("createdSnippets", JsonUtility.booleanMapToJson(createdSnippets))
+                .build();
+    }
+
+    @Override
+    public JsonObject toJson(Collection<String> hidden) {
+        HashSet<String> keys = new HashSet< >(hidden);
+        JsonObjectBuilder result = Json.createObjectBuilder();
+
+        if (!keys.contains("id")) {
+            result.add("_id", id);
+        }
+        if (!keys.contains("username")) {
+            result.add("username", username);
+        }
+        if (!keys.contains("password")) {
+            result.add("password", password);
+        }
+        if (!keys.contains("apiKey")) {
+            result.add("apiKey", apiKey);
+        }
+        if (!keys.contains("createdDate")) {
+            result.add("createdDate", createdDate.toString());
+        }
+        if (!keys.contains("savedSnippets")) {
+            result.add("savedSnippets", JsonUtility.booleanMapToJson(savedSnippets));
+        }
+        if (!keys.contains("createdSnippets")) {
+            result.add("createdSnippets", JsonUtility.booleanMapToJson(createdSnippets));
+        }
+
+        return result.build();
     }
 }
