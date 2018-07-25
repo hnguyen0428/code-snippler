@@ -3,7 +3,6 @@ package com.codesnippler.Model;
 import org.springframework.data.annotation.Id;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.format.annotation.DateTimeFormat.ISO;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -32,15 +31,14 @@ public class User {
         this.createdDate = createdDate;
     }
 
-    public User(String username, String password, Date createdDate) {
+    public User(String username, String password, String apiKey, Date createdDate) {
         this.username = username;
         this.password = password;
+        this.apiKey = apiKey;
         this.createdDate = createdDate;
 
         this.savedSnippets = new HashMap<>();
         this.createdSnippets = new HashMap<>();
-
-        // TODO Encrypt password and generate random apiKey
     }
 
 
