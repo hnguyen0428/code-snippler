@@ -5,6 +5,7 @@ import com.codesnippler.Repository.UserRepository;
 import com.codesnippler.Exceptions.ErrorTypes;
 import com.codesnippler.Utility.ResponseBuilder;
 import com.codesnippler.Utility.RandomKeyGenerator;
+import com.codesnippler.Validators.Authorized;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -75,14 +76,8 @@ public class UserController {
     }
 
     @GetMapping(value = "/{userId}", produces = "application/json")
-    String getUser(@PathVariable(value = "userId") String userId,
-                   @RequestHeader(value = "Authorization") String apiKey) {
-        User requestUser = this.userRepo.findByApiKey(apiKey);
-        if (requestUser == null) {
-            JsonObject error = ResponseBuilder.createErrorObject("Unauthorized Request", ErrorTypes.INV_AUTH_ERROR);
-            return ResponseBuilder.createErrorResponse(error).toString();
-        }
-
+    String getUser(@Authorized HttpServletRequest request,
+                   @PathVariable(value = "userId") String userId) {
         Optional<User> user = this.userRepo.findById(userId);
         if (!user.isPresent()) {
             JsonObject error = ResponseBuilder.createErrorObject("User cannot be found", ErrorTypes.INV_PARAM_ERROR);

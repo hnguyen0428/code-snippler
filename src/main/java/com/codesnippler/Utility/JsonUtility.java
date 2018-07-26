@@ -60,7 +60,7 @@ public class JsonUtility {
         else if (value instanceof JsonModel) {
             json = json.add(key, ((JsonModel)value).toJson());
         }
-        else {
+        else if (value != null) {
             json = json.add(key, value.toString());
         }
         return json;
@@ -86,7 +86,7 @@ public class JsonUtility {
         else if (value instanceof JsonModel) {
             json = json.add(((JsonModel)value).toJson());
         }
-        else {
+        else if (value != null) {
             json = json.add(value.toString());
         }
         return json;
