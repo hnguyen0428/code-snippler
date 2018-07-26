@@ -7,7 +7,7 @@ import org.springframework.format.annotation.DateTimeFormat.ISO;
 import java.util.Date;
 
 
-public class CodeSnippet {
+public class CodeSnippet extends JsonModel {
     @Id
     private String id;
 
@@ -59,7 +59,7 @@ public class CodeSnippet {
         return savedCount;
     }
 
-    public void setSavedCount(int savedCount) {
+    public void setSavedCount(long savedCount) {
         this.savedCount = savedCount;
     }
 
@@ -67,7 +67,7 @@ public class CodeSnippet {
         return downvotes;
     }
 
-    public void setDownvotes(int downvotes) {
+    public void setDownvotes(long downvotes) {
         this.downvotes = downvotes;
     }
 
@@ -75,7 +75,7 @@ public class CodeSnippet {
         return upvotes;
     }
 
-    public void setUpvotes(int upvotes) {
+    public void setUpvotes(long upvotes) {
         this.upvotes = upvotes;
     }
 
@@ -99,7 +99,7 @@ public class CodeSnippet {
         return viewsCount;
     }
 
-    public void setViewsCount(int viewsCount) {
+    public void setViewsCount(long viewsCount) {
         this.viewsCount = viewsCount;
     }
 
@@ -133,5 +133,9 @@ public class CodeSnippet {
 
     public void setCreatedDate(Date createdDate) {
         this.createdDate = createdDate;
+    }
+
+    public String getId() {
+        return id;
     }
 }

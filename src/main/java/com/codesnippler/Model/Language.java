@@ -48,4 +48,8 @@ public class Language extends JsonModel {
     public String getType() {
         return type;
     }
+
+    public Date getCreatedDate() {
+        return createdDate;
+    }
 }

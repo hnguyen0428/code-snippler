@@ -13,6 +13,7 @@ import javax.json.JsonObject;
 import javax.servlet.http.HttpServletRequest;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.Optional;
 
 
 @RestController
@@ -28,16 +29,14 @@ public class UserController {
     }
 
     @PostMapping(value = "/register", produces = "application/json")
-    String register(HttpServletRequest request) {
-        String username = request.getParameter("username");
-
+    String register(HttpServletRequest request, @RequestParam(value = "username") String username,
+                    @RequestParam(value = "password") String password) {
         User user = this.userRepo.findByUsername(username);
         if (user != null) {
             JsonObject error = ResponseBuilder.createErrorObject("Username already exists", ErrorTypes.INV_USERNAME_ERROR);
             return ResponseBuilder.createErrorResponse(error).toString();
         }
 
-        String password = request.getParameter("password");
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
         String hashedPw = encoder.encode(password);
 
@@ -50,16 +49,14 @@ public class UserController {
     }
 
     @PostMapping(value = "/login", produces = "application/json")
-    String login(HttpServletRequest request) {
-        String username = request.getParameter("username");
-
+    String login(HttpServletRequest request, @RequestParam(value = "username") String username,
+                 @RequestParam(value = "password") String password) {
         User user = this.userRepo.findByUsername(username);
         if (user == null) {
             JsonObject error = ResponseBuilder.createErrorObject("Username cannot be found", ErrorTypes.INV_AUTH_ERROR);
             return ResponseBuilder.createErrorResponse(error).toString();
         }
 
-        String password = request.getParameter("password");
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
 
         if (encoder.matches(password, user.getPassword())) {
@@ -70,5 +67,23 @@ public class UserController {
             JsonObject error = ResponseBuilder.createErrorObject("Password is incorrect", ErrorTypes.INV_AUTH_ERROR);
             return ResponseBuilder.createErrorResponse(error).toString();
         }
+    }
+
+    @GetMapping(value = "/{userId}", produces = "application/json")
+    String getUser(@PathVariable(value = "userId") String userId,
+                   @RequestHeader(value = "Authorization") String apiKey) {
+        User requestUser = this.userRepo.findByApiKey(apiKey);
+        if (requestUser == null) {
+            JsonObject error = ResponseBuilder.createErrorObject("Unauthorized Request", ErrorTypes.INV_AUTH_ERROR);
+            return ResponseBuilder.createErrorResponse(error).toString();
+        }
+
+        Optional<User> user = this.userRepo.findById(userId);
+        if (!user.isPresent()) {
+            JsonObject error = ResponseBuilder.createErrorObject("User cannot be found", ErrorTypes.INV_PARAM_ERROR);
+            return ResponseBuilder.createErrorResponse(error).toString();
+        }
+
+        return ResponseBuilder.createDataResponse(user.get().toJson()).toString();
     }
 }

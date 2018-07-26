@@ -4,12 +4,7 @@ import com.codesnippler.Model.Language;
 import com.codesnippler.Repository.LanguageRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
@@ -29,11 +24,9 @@ public class LanguageController {
 
 
     @PostMapping
-    Language add(HttpServletRequest request) {
-        String language = request.getParameter("name");
-        String type = request.getParameter("type");
-        Language newLang = this.langRepo.save(new Language(language, type, new Date()));
-        return newLang;
+    Language create(HttpServletRequest request, @RequestParam(value = "name") String name,
+                 @RequestParam(value = "type") String type) {
+        return this.langRepo.save(new Language(name, type, new Date()));
     }
 
     @GetMapping("/all")

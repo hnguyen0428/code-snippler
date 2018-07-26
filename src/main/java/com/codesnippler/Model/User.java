@@ -8,6 +8,7 @@ import org.springframework.format.annotation.DateTimeFormat.ISO;
 import javax.json.Json;
 import javax.json.JsonObject;
 import javax.json.JsonObjectBuilder;
+import javax.validation.constraints.NotNull;
 import java.util.*;
 
 
@@ -19,6 +20,7 @@ public class User extends JsonModel {
 
     private String username;
     private String password;
+
     private String apiKey;
     private HashMap<String, Boolean> savedSnippets;
     private HashMap<String, Boolean> createdSnippets;
@@ -93,6 +95,10 @@ public class User extends JsonModel {
         this.createdSnippets = createdSnippets;
     }
 
+    public void addToCreatedSnippets(String snippetId) {
+        this.createdSnippets.put(snippetId, true);
+    }
+
     public Date getCreatedDate() {
         return createdDate;
     }
@@ -104,5 +110,9 @@ public class User extends JsonModel {
     @Override
     public JsonObject toJson() {
         return super.toJson(hidden);
+    }
+
+    public String getId() {
+        return id;
     }
 }
