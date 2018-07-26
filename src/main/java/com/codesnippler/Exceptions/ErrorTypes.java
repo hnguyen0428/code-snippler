@@ -1,4 +1,4 @@
-package com.codesnippler.Utility;
+package com.codesnippler.Exceptions;
 
 
 public class ErrorTypes {

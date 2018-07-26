@@ -24,7 +24,7 @@ public class LanguageController {
 
 
     @PostMapping
-    Language create(HttpServletRequest request, @RequestParam(value = "name") String name,
+    Language create(@RequestParam(value = "name") String name,
                  @RequestParam(value = "type") String type) {
         return this.langRepo.save(new Language(name, type, new Date()));
     }

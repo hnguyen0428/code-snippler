@@ -2,21 +2,24 @@ package com.codesnippler.Controller;
 
 import com.codesnippler.Model.User;
 import com.codesnippler.Repository.UserRepository;
-import com.codesnippler.Utility.ErrorTypes;
+import com.codesnippler.Exceptions.ErrorTypes;
 import com.codesnippler.Utility.ResponseBuilder;
 import com.codesnippler.Utility.RandomKeyGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import javax.json.JsonObject;
 import javax.servlet.http.HttpServletRequest;
-import java.util.Arrays;
+import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Size;
 import java.util.Date;
 import java.util.Optional;
 
 
 @RestController
+@Validated
 @RequestMapping("/api/user")
 public class UserController {
     public static final int API_KEY_LENGTH = 64;
@@ -29,8 +32,10 @@ public class UserController {
     }
 
     @PostMapping(value = "/register", produces = "application/json")
-    String register(HttpServletRequest request, @RequestParam(value = "username") String username,
-                    @RequestParam(value = "password") String password) {
+    String register(@RequestParam(value = "username") @Size(min=6, max=20)
+                    @Pattern(regexp = "^[a-zA-Z0-9_]*$") String username,
+                    @RequestParam(value = "password") @Size(min=6, max=20)
+                    @Pattern(regexp = "^[a-zA-Z0-9]*$") String password) {
         User user = this.userRepo.findByUsername(username);
         if (user != null) {
             JsonObject error = ResponseBuilder.createErrorObject("Username already exists", ErrorTypes.INV_USERNAME_ERROR);
@@ -49,7 +54,7 @@ public class UserController {
     }
 
     @PostMapping(value = "/login", produces = "application/json")
-    String login(HttpServletRequest request, @RequestParam(value = "username") String username,
+    String login(@RequestParam(value = "username") String username,
                  @RequestParam(value = "password") String password) {
         User user = this.userRepo.findByUsername(username);
         if (user == null) {

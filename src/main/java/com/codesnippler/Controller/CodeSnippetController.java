@@ -6,16 +6,13 @@ import com.codesnippler.Model.User;
 import com.codesnippler.Repository.CodeSnippetRepository;
 import com.codesnippler.Repository.LanguageRepository;
 import com.codesnippler.Repository.UserRepository;
-import com.codesnippler.Utility.ErrorTypes;
+import com.codesnippler.Exceptions.ErrorTypes;
 import com.codesnippler.Utility.ResponseBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.json.JsonObject;
-import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
-import java.util.List;
 import java.util.Optional;
 
 
