@@ -87,6 +87,10 @@ public class User extends JsonModel {
         this.savedSnippets = savedSnippets;
     }
 
+    public void addToSavedSnippets(String snippetId) {
+        savedSnippets.put(snippetId, true);
+    }
+
     public HashMap<String, Boolean> getCreatedSnippets() {
         return createdSnippets;
     }

@@ -10,6 +10,8 @@ import com.codesnippler.Exceptions.ErrorTypes;
 import com.codesnippler.Utility.ResponseBuilder;
 import com.codesnippler.Validators.Authorized;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -38,17 +40,18 @@ public class CodeSnippetController {
     }
 
     @PostMapping(produces = "application/json")
-    String create(@Authorized HttpServletRequest request,
-                  @RequestParam(value = "title") String title,
-                  @RequestParam(value = "description", required = false) String description,
-                  @RequestParam(value = "code") String code,
-                  @RequestParam(value = "language") String languageName) {
+    ResponseEntity create(@Authorized HttpServletRequest request,
+                          @RequestParam(value = "title") String title,
+                          @RequestParam(value = "description", required = false) String description,
+                          @RequestParam(value = "code") String code,
+                          @RequestParam(value = "language") String languageName) {
         User user = (User)request.getAttribute("authorizedUser");
 
         Language language = this.langRepo.findByName(languageName);
         if (language == null) {
             JsonObject error = ResponseBuilder.createErrorObject("Invalid Language", ErrorTypes.INV_PARAM_ERROR);
-            return ResponseBuilder.createErrorResponse(error).toString();
+            String response = ResponseBuilder.createErrorResponse(error).toString();
+            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
         }
 
         CodeSnippet snippet = new CodeSnippet(title, description, code, user.getId(), language.getId(), new Date());
@@ -56,17 +59,19 @@ public class CodeSnippetController {
         user.addToCreatedSnippets(snippet.getId());
         this.userRepo.save(user);
 
-        return ResponseBuilder.createDataResponse(snippet.toJson()).toString();
+        String response = ResponseBuilder.createDataResponse(snippet.toJson()).toString();
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
 
     @GetMapping(value = "/{snippetId}", produces = "application/json")
-    String getSnippet(@PathVariable(value = "snippetId") String snippetId,
-                      @RequestParam(value = "increaseViewcount", required = false) boolean shouldIncrease) {
+    ResponseEntity getSnippet(@PathVariable(value = "snippetId") String snippetId,
+                              @RequestParam(value = "increaseViewcount", required = false) boolean shouldIncrease) {
         Optional<CodeSnippet> snippetOpt = this.codeSnippetRepo.findById(snippetId);
         if (!snippetOpt.isPresent()) {
             JsonObject error = ResponseBuilder.createErrorObject("Invalid Snippet Id", ErrorTypes.INV_PARAM_ERROR);
-            return ResponseBuilder.createErrorResponse(error).toString();
+            String response = ResponseBuilder.createErrorResponse(error).toString();
+            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
         }
 
         CodeSnippet snippet = snippetOpt.get();
@@ -85,6 +90,65 @@ public class CodeSnippetController {
 
         JsonObject snippetJson = snippet.toJson(addOns);
 
-        return ResponseBuilder.createDataResponse(snippetJson).toString();
+        String response = ResponseBuilder.createDataResponse(snippetJson).toString();
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+
+    @PatchMapping(value = "/{snippetId}/upvote", produces = "application/json")
+    ResponseEntity upvote(@Authorized HttpServletRequest request,
+                          @PathVariable(value = "snippetId") String snippetId) {
+        Optional<CodeSnippet> snippetOpt = this.codeSnippetRepo.findById(snippetId);
+        if (!snippetOpt.isPresent()) {
+            JsonObject error = ResponseBuilder.createErrorObject("Invalid Snippet Id", ErrorTypes.INV_PARAM_ERROR);
+            String response = ResponseBuilder.createErrorResponse(error).toString();
+            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+        }
+
+        User authorizedUser = (User)request.getAttribute("authorizedUser");
+
+        CodeSnippet snippet = snippetOpt.get();
+        HashMap<String, Boolean> upvoters = snippet.getUpvoters();
+
+        if (!upvoters.containsKey(authorizedUser.getId())) {
+            snippet.addToUpvoters(authorizedUser.getId());
+            snippet = this.codeSnippetRepo.save(snippet);
+            String response = ResponseBuilder.createDataResponse(snippet.toJson()).toString();
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        }
+        else {
+            JsonObject error = ResponseBuilder.createErrorObject("User has already upvoted the Snippet", ErrorTypes.INV_REQUEST_ERROR);
+            String response = ResponseBuilder.createErrorResponse(error).toString();
+            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+        }
+    }
+
+
+    @PatchMapping(value = "/{snippetId}/downvote", produces = "application/json")
+    ResponseEntity downvote(@Authorized HttpServletRequest request,
+                            @PathVariable(value = "snippetId") String snippetId) {
+        Optional<CodeSnippet> snippetOpt = this.codeSnippetRepo.findById(snippetId);
+        if (!snippetOpt.isPresent()) {
+            JsonObject error = ResponseBuilder.createErrorObject("Invalid Snippet Id", ErrorTypes.INV_PARAM_ERROR);
+            String response = ResponseBuilder.createErrorResponse(error).toString();
+            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+        }
+
+        User authorizedUser = (User)request.getAttribute("authorizedUser");
+
+        CodeSnippet snippet = snippetOpt.get();
+        HashMap<String, Boolean> downvoters = snippet.getDownvoters();
+
+        if (!downvoters.containsKey(authorizedUser.getId())) {
+            snippet.addToDownvoters(authorizedUser.getId());
+            snippet = this.codeSnippetRepo.save(snippet);
+            String response = ResponseBuilder.createDataResponse(snippet.toJson()).toString();
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        }
+        else {
+            JsonObject error = ResponseBuilder.createErrorObject("User has already upvoted the Snippet", ErrorTypes.INV_REQUEST_ERROR);
+            String response = ResponseBuilder.createErrorResponse(error).toString();
+            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+        }
     }
 }
