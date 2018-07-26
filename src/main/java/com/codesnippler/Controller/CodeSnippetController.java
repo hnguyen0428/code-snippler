@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.json.JsonObject;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 
@@ -74,6 +76,15 @@ public class CodeSnippetController {
             snippet = this.codeSnippetRepo.save(snippet);
         }
 
-        return ResponseBuilder.createDataResponse(snippet.toJson()).toString();
+        // Declare add on key value pairs to the JSON response
+        Map<String, String> addOns = new HashMap<>();
+        Optional<Language> language = this.langRepo.findById(snippet.getLanguageId());
+        if (language.isPresent()) {
+            addOns.put("language", language.get().getName());
+        }
+
+        JsonObject snippetJson = snippet.toJson(addOns);
+
+        return ResponseBuilder.createDataResponse(snippetJson).toString();
     }
 }

@@ -66,4 +66,39 @@ public abstract class JsonModel {
         return json.build();
     }
 
+
+    public JsonObject toJson(Map<String, ?> addOns) {
+        Class<?> objClass = this.getClass();
+        Field[] fields = objClass.getDeclaredFields();
+
+        JsonObjectBuilder json = Json.createObjectBuilder();
+
+        for (Field field : fields) {
+            if (Modifier.isStatic(field.getModifiers()))
+                continue;
+
+            field.setAccessible(true);
+            String key = field.getName();
+
+            try {
+                Object value = field.get(this);
+                json = JsonUtility.addJsonValue(json, key, value);
+
+            } catch (IllegalAccessException | ClassCastException e) {
+                System.out.println("Unable to Serialize Object");
+                return null;
+            }
+        }
+
+        Iterator itr = addOns.entrySet().iterator();
+        while (itr.hasNext()) {
+            Map.Entry pair = (Map.Entry)itr.next();
+            String key = (String)pair.getKey();
+            Object value = pair.getValue();
+            json = JsonUtility.addJsonValue(json, key, value);
+        }
+
+        return json.build();
+    }
+
 }
