@@ -25,16 +25,16 @@ public class JsonUtility {
 
         for (String key : keys) {
             switch (map.get(key).getClass().getName()) {
-                case "Byte":
-                case "Short":
-                case "Integer":
-                case "Long":
-                case "AtomicInteger":
-                case "AtomicLong":
+                case "java.lang.Byte":
+                case "java.lang.Short":
+                case "java.lang.Integer":
+                case "java.lang.Long":
+                case "java.lang.AtomicInteger":
+                case "java.lang.AtomicLong":
                     result = result.add(key, map.get(key).longValue());
                     break;
-                case "Float":
-                case "Double":
+                case "java.lang.Float":
+                case "java.lang.Double":
                     result = result.add(key, map.get(key).doubleValue());
                     break;
             }

@@ -4,10 +4,12 @@ import org.springframework.data.annotation.Id;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.format.annotation.DateTimeFormat.ISO;
 
+import javax.json.JsonObject;
+import java.util.Collection;
 import java.util.Date;
 
 
-public class Comment {
+public class Comment extends JsonModel {
     @Id
     private String id;
 
@@ -94,5 +96,15 @@ public class Comment {
 
     public void setCreatedDate(Date createdDate) {
         this.createdDate = createdDate;
+    }
+
+    @Override
+    public JsonObject toJson() {
+        return null;
+    }
+
+    @Override
+    public JsonObject toJson(Collection<String> hidden) {
+        return null;
     }
 }
