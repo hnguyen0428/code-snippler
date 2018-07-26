@@ -48,35 +48,4 @@ public class Language extends JsonModel {
     public String getType() {
         return type;
     }
-
-    @Override
-    public JsonObject toJson() {
-        return Json.createObjectBuilder()
-                .add("_id", id)
-                .add("name", name)
-                .add("type", type)
-                .add("createdDate", createdDate.toString())
-                .build();
-    }
-
-    @Override
-    public JsonObject toJson(Collection<String> hidden) {
-        HashSet<String> keys = new HashSet<>(hidden);
-        JsonObjectBuilder result = Json.createObjectBuilder();
-
-        if (!keys.contains("id")) {
-            result.add("_id", id);
-        }
-        if (!keys.contains("name")) {
-            result.add("name", name);
-        }
-        if (!keys.contains("type")) {
-            result.add("type", type);
-        }
-        if (!keys.contains("createdDate")) {
-            result.add("createdDate", createdDate.toString());
-        }
-
-        return result.build();
-    }
 }

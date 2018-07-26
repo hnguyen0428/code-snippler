@@ -44,7 +44,7 @@ public class UserController {
         String apiKey = RandomKeyGenerator.generateApiKey(API_KEY_LENGTH);
 
         User newUser = this.userRepo.save(new User(username, hashedPw, apiKey, new Date()));
-        JsonObject userJson = newUser.toJson(Arrays.asList("password"));
+        JsonObject userJson = newUser.toJson();
 
         return ResponseBuilder.createDataResponse(userJson).toString();
     }
@@ -63,7 +63,7 @@ public class UserController {
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
 
         if (encoder.matches(password, user.getPassword())) {
-            JsonObject userJson = user.toJson(Arrays.asList("password"));
+            JsonObject userJson = user.toJson();
             return ResponseBuilder.createDataResponse(userJson).toString();
         }
         else {

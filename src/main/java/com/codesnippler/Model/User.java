@@ -12,6 +12,8 @@ import java.util.*;
 
 
 public class User extends JsonModel {
+    public static List<String> hidden = Arrays.asList("password");
+
     @Id
     private String id;
 
@@ -99,47 +101,8 @@ public class User extends JsonModel {
         this.createdDate = createdDate;
     }
 
-
     @Override
     public JsonObject toJson() {
-        return Json.createObjectBuilder()
-                .add("_id", id)
-                .add("username", username)
-                .add("password", password)
-                .add("apiKey", apiKey)
-                .add("createdDate", createdDate.toString())
-                .add("savedSnippets", JsonUtility.booleanMapToJson(savedSnippets))
-                .add("createdSnippets", JsonUtility.booleanMapToJson(createdSnippets))
-                .build();
-    }
-
-    @Override
-    public JsonObject toJson(Collection<String> hidden) {
-        HashSet<String> keys = new HashSet< >(hidden);
-        JsonObjectBuilder result = Json.createObjectBuilder();
-
-        if (!keys.contains("id")) {
-            result.add("_id", id);
-        }
-        if (!keys.contains("username")) {
-            result.add("username", username);
-        }
-        if (!keys.contains("password")) {
-            result.add("password", password);
-        }
-        if (!keys.contains("apiKey")) {
-            result.add("apiKey", apiKey);
-        }
-        if (!keys.contains("createdDate")) {
-            result.add("createdDate", createdDate.toString());
-        }
-        if (!keys.contains("savedSnippets")) {
-            result.add("savedSnippets", JsonUtility.booleanMapToJson(savedSnippets));
-        }
-        if (!keys.contains("createdSnippets")) {
-            result.add("createdSnippets", JsonUtility.booleanMapToJson(createdSnippets));
-        }
-
-        return result.build();
+        return super.toJson(hidden);
     }
 }

@@ -24,6 +24,7 @@ public class CodeSnippet {
     @DateTimeFormat(iso = ISO.DATE_TIME)
     private Date createdDate;
 
+    public CodeSnippet() {}
 
     public CodeSnippet(String title, String description, String code, String userId, String languageId, long viewsCount,
                        long upvotes, long downvotes, long savedCount, Date date) {

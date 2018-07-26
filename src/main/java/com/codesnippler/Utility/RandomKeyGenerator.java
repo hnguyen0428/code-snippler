@@ -1,6 +1,5 @@
 package com.codesnippler.Utility;
 
-import javax.xml.bind.DatatypeConverter;
 import java.security.SecureRandom;
 import java.util.Base64;
 

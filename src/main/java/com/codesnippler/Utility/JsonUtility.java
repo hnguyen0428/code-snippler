@@ -3,84 +3,93 @@ package com.codesnippler.Utility;
 import com.codesnippler.Model.JsonModel;
 
 import javax.json.*;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 public class JsonUtility {
-    public static JsonObject stringMapToJson(Map<String, String> map) {
-        Set<String> keys = map.keySet();
-        JsonObjectBuilder result = Json.createObjectBuilder();
-
-        for (String key : keys) {
-            result = result.add(key, map.get(key));
-        }
-
-        return result.build();
-    }
-
-    public static JsonObject numberMapToJson(Map<String, ? extends Number> map) {
-        Set<String> keys = map.keySet();
-        JsonObjectBuilder result = Json.createObjectBuilder();
-
-        for (String key : keys) {
-            switch (map.get(key).getClass().getName()) {
-                case "java.lang.Byte":
-                case "java.lang.Short":
-                case "java.lang.Integer":
-                case "java.lang.Long":
-                case "java.lang.AtomicInteger":
-                case "java.lang.AtomicLong":
-                    result = result.add(key, map.get(key).longValue());
-                    break;
-                case "java.lang.Float":
-                case "java.lang.Double":
-                    result = result.add(key, map.get(key).doubleValue());
-                    break;
+    public static JsonArray listToJson(List<Object> list) {
+        JsonArrayBuilder result = Json.createArrayBuilder();
+        for (Object value : list) {
+            try {
+                result = addJsonValue(result, value);
+            } catch (ClassCastException e) {
+                return null;
             }
         }
 
         return result.build();
     }
 
-    public static JsonObject booleanMapToJson(Map<String, Boolean> map) {
-        Set<String> keys = map.keySet();
+    public static JsonObject mapToJson(Map<String, Object> map) {
+        Iterator itr = map.entrySet().iterator();
         JsonObjectBuilder result = Json.createObjectBuilder();
 
-        for (String key : keys) {
-            result = result.add(key, map.get(key));
+        while (itr.hasNext()) {
+            Map.Entry pair = (Map.Entry)itr.next();
+            String key = (String)pair.getKey();
+            Object value = pair.getValue();
+
+            try {
+                result = addJsonValue(result, key, value);
+            } catch (ClassCastException e) {
+                return null;
+            }
         }
 
         return result.build();
     }
 
-    public static JsonObject modelMapToJson(Map<String, ? extends JsonModel> map) {
-        Set<String> keys = map.keySet();
-        JsonObjectBuilder result = Json.createObjectBuilder();
-
-        for (String key : keys) {
-            result = result.add(key, map.get(key).toJson());
+    public static JsonObjectBuilder addJsonValue(JsonObjectBuilder json, String key, Object value) throws ClassCastException {
+        if (value instanceof String) {
+            json = json.add(key, (String)value);
         }
-
-        return result.build();
+        else if (value instanceof Byte || value instanceof Short
+                || value instanceof Integer || value instanceof Long) {
+            json = json.add(key, (Long)value);
+        }
+        else if (value instanceof Float || value instanceof Double) {
+            json = json.add(key, (Double)value);
+        }
+        else if (value instanceof Map) {
+            json = json.add(key, JsonUtility.mapToJson((Map)value));
+        }
+        else if (value instanceof List) {
+            json = json.add(key, JsonUtility.listToJson((List)value));
+        }
+        else if (value instanceof JsonModel) {
+            json = json.add(key, ((JsonModel)value).toJson());
+        }
+        else {
+            json = json.add(key, value.toString());
+        }
+        return json;
     }
 
-    public static JsonArray modelListToJson(List<JsonModel> list) {
-        JsonArrayBuilder result = Json.createArrayBuilder();
-        for (JsonModel model : list) {
-            result = result.add(model.toJson());
+    public static JsonArrayBuilder addJsonValue(JsonArrayBuilder json, Object value) throws ClassCastException {
+        if (value instanceof String) {
+            json = json.add((String)value);
         }
-
-        return result.build();
-    }
-
-    public static JsonArray modelListToJson(List<JsonModel> list, List<String> hidden) {
-        JsonArrayBuilder result = Json.createArrayBuilder();
-        for (JsonModel model : list) {
-            result = result.add(model.toJson(hidden));
+        else if (value instanceof Byte || value instanceof Short
+                || value instanceof Integer || value instanceof Long) {
+            json = json.add((Long)value);
         }
-
-        return result.build();
+        else if (value instanceof Float || value instanceof Double) {
+            json = json.add((Double)value);
+        }
+        else if (value instanceof Map) {
+            json = json.add(JsonUtility.mapToJson((Map)value));
+        }
+        else if (value instanceof List) {
+            json = json.add(JsonUtility.listToJson((List)value));
+        }
+        else if (value instanceof JsonModel) {
+            json = json.add(((JsonModel)value).toJson());
+        }
+        else {
+            json = json.add(value.toString());
+        }
+        return json;
     }
 
 }

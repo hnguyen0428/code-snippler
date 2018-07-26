@@ -22,6 +22,8 @@ public class Comment extends JsonModel {
     @DateTimeFormat(iso = ISO.DATE_TIME)
     private Date createdDate;
 
+    public Comment() {}
+
     public Comment(String content, String userId, String snippetId, long upvotes, long downvotes, Date createdDate) {
         this.content = content;
         this.userId = userId;
@@ -96,15 +98,5 @@ public class Comment extends JsonModel {
 
     public void setCreatedDate(Date createdDate) {
         this.createdDate = createdDate;
-    }
-
-    @Override
-    public JsonObject toJson() {
-        return null;
-    }
-
-    @Override
-    public JsonObject toJson(Collection<String> hidden) {
-        return null;
     }
 }
