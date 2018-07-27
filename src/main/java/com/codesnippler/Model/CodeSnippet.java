@@ -76,6 +76,10 @@ public class CodeSnippet extends JsonModel {
         this.savedCount = savedCount;
     }
 
+    public void incrementSavedCount() {
+        this.savedCount += 1;
+    }
+
     public long getDownvotes() {
         return downvotes;
     }
@@ -114,6 +118,10 @@ public class CodeSnippet extends JsonModel {
 
     public void setViewsCount(long viewsCount) {
         this.viewsCount = viewsCount;
+    }
+
+    public void incrementViewsCount() {
+        this.viewsCount += 1;
     }
 
     public String getCode() {
@@ -161,6 +169,11 @@ public class CodeSnippet extends JsonModel {
         upvotes += 1;
     }
 
+    public void removeFromUpvoters(String userId) {
+        upvoters.remove(userId);
+        upvotes -= 1;
+    }
+
     public HashMap<String, Boolean> getDownvoters() {
         return downvoters;
     }
@@ -168,6 +181,11 @@ public class CodeSnippet extends JsonModel {
     public void addToDownvoters(String userId) {
         downvoters.put(userId, true);
         downvotes += 1;
+    }
+
+    public void removeFromDownvoters(String userId) {
+        downvoters.remove(userId);
+        downvotes -= 1;
     }
 
     @Override

@@ -77,7 +77,7 @@ public class CodeSnippetController {
         CodeSnippet snippet = snippetOpt.get();
 
         if (shouldIncrease) {
-            snippet.setViewsCount(snippet.getViewsCount() + 1);
+            snippet.incrementViewsCount();
             snippet = this.codeSnippetRepo.save(snippet);
         }
 
@@ -112,8 +112,14 @@ public class CodeSnippetController {
 
         if (!upvoters.containsKey(authorizedUser.getId())) {
             snippet.addToUpvoters(authorizedUser.getId());
-            snippet = this.codeSnippetRepo.save(snippet);
-            String response = ResponseBuilder.createDataResponse(snippet.toJson()).toString();
+
+            // Remove this user from downvoters if he downvoted the snippet before
+            if (snippet.getDownvoters().get(authorizedUser.getId()) != null) {
+                snippet.removeFromDownvoters(authorizedUser.getId());
+            }
+
+            this.codeSnippetRepo.save(snippet);
+            String response = ResponseBuilder.createSuccessResponse().toString();
             return new ResponseEntity<>(response, HttpStatus.OK);
         }
         else {
@@ -141,12 +147,49 @@ public class CodeSnippetController {
 
         if (!downvoters.containsKey(authorizedUser.getId())) {
             snippet.addToDownvoters(authorizedUser.getId());
-            snippet = this.codeSnippetRepo.save(snippet);
-            String response = ResponseBuilder.createDataResponse(snippet.toJson()).toString();
+
+            // Remove this user from upvoters if he upvoted the snippet before
+            if (snippet.getUpvoters().get(authorizedUser.getId()) != null) {
+                snippet.removeFromUpvoters(authorizedUser.getId());
+            }
+
+            this.codeSnippetRepo.save(snippet);
+            String response = ResponseBuilder.createSuccessResponse().toString();
             return new ResponseEntity<>(response, HttpStatus.OK);
         }
         else {
-            JsonObject error = ResponseBuilder.createErrorObject("User has already upvoted the Snippet", ErrorTypes.INV_REQUEST_ERROR);
+            JsonObject error = ResponseBuilder.createErrorObject("User has already downvoted the Snippet", ErrorTypes.INV_REQUEST_ERROR);
+            String response = ResponseBuilder.createErrorResponse(error).toString();
+            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+        }
+    }
+
+
+    @PatchMapping(value = "/{snippetId}/save", produces = "application/json")
+    ResponseEntity saveSnippet(@Authorized HttpServletRequest request,
+                               @PathVariable(value = "snippetId") String snippetId) {
+        Optional<CodeSnippet> snippetOpt = this.codeSnippetRepo.findById(snippetId);
+        if (!snippetOpt.isPresent()) {
+            JsonObject error = ResponseBuilder.createErrorObject("Invalid Snippet Id", ErrorTypes.INV_PARAM_ERROR);
+            String response = ResponseBuilder.createErrorResponse(error).toString();
+            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+        }
+
+        User authorizedUser = (User)request.getAttribute("authorizedUser");
+
+        CodeSnippet snippet = snippetOpt.get();
+        HashMap<String, Boolean> savedSnippets = authorizedUser.getSavedSnippets();
+
+        if (!savedSnippets.containsKey(snippetId)) {
+            authorizedUser.addToSavedSnippets(snippetId);
+            snippet.incrementSavedCount();
+            this.codeSnippetRepo.save(snippet);
+            this.userRepo.save(authorizedUser);
+            String response = ResponseBuilder.createSuccessResponse().toString();
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        }
+        else {
+            JsonObject error = ResponseBuilder.createErrorObject("User has already saved the Snippet", ErrorTypes.INV_REQUEST_ERROR);
             String response = ResponseBuilder.createErrorResponse(error).toString();
             return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
         }
