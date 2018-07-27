@@ -6,9 +6,10 @@ import javax.json.*;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Collection;
 
 public class JsonUtility {
-    public static JsonArray listToJson(List<Object> list) {
+    public static JsonArray listToJson(Iterable<Object> list) {
         JsonArrayBuilder result = Json.createArrayBuilder();
         for (Object value : list) {
             try {

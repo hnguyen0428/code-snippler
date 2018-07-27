@@ -19,6 +19,14 @@ public class ResponseBuilder {
                 .build();
     }
 
+    public static JsonObject createErrorResponse(String message, String type) {
+        JsonObject error = createErrorObject(message, type);
+        return Json.createObjectBuilder()
+                .add("success", false)
+                .add("error", error)
+                .build();
+    }
+
     public static JsonObject createDataResponse(JsonObject data) {
         return Json.createObjectBuilder()
                 .add("data", data)

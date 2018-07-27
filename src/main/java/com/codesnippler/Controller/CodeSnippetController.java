@@ -27,14 +27,14 @@ import java.util.Optional;
 @RequestMapping("/api/snippet")
 @Validated
 public class CodeSnippetController {
-    private final CodeSnippetRepository codeSnippetRepo;
+    private final CodeSnippetRepository snippetRepo;
     private final UserRepository userRepo;
     private final LanguageRepository langRepo;
 
     @Autowired
-    public CodeSnippetController(CodeSnippetRepository codeSnippetRepo, UserRepository userRepo,
+    public CodeSnippetController(CodeSnippetRepository snippetRepo, UserRepository userRepo,
                                  LanguageRepository langRepo) {
-        this.codeSnippetRepo = codeSnippetRepo;
+        this.snippetRepo = snippetRepo;
         this.userRepo = userRepo;
         this.langRepo = langRepo;
     }
@@ -49,13 +49,12 @@ public class CodeSnippetController {
 
         Language language = this.langRepo.findByName(languageName);
         if (language == null) {
-            JsonObject error = ResponseBuilder.createErrorObject("Invalid Language", ErrorTypes.INV_PARAM_ERROR);
-            String response = ResponseBuilder.createErrorResponse(error).toString();
+            String response = ResponseBuilder.createErrorResponse("Invalid Language", ErrorTypes.INV_PARAM_ERROR).toString();
             return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
         }
 
         CodeSnippet snippet = new CodeSnippet(title, description, code, user.getId(), language.getId(), new Date());
-        snippet = this.codeSnippetRepo.save(snippet);
+        snippet = this.snippetRepo.save(snippet);
         user.addToCreatedSnippets(snippet.getId());
         this.userRepo.save(user);
 
@@ -64,13 +63,44 @@ public class CodeSnippetController {
     }
 
 
+    @PatchMapping(value = "/{snippetId}", produces = "application/json")
+    ResponseEntity update(@Authorized HttpServletRequest request,
+                          @RequestParam(value = "title", required = false) String title,
+                          @RequestParam(value = "description", required = false) String description,
+                          @RequestParam(value = "code", required = false) String code,
+                          @RequestParam(value = "language", required = false) String languageName,
+                          @PathVariable(value = "snippetId") String snippetId) {
+        Optional<CodeSnippet> snippetOpt = this.snippetRepo.findById(snippetId);
+        if (!snippetOpt.isPresent()) {
+            String response = ResponseBuilder.createErrorResponse("Invalid Snippet Id", ErrorTypes.INV_PARAM_ERROR).toString();
+            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+        }
+
+        CodeSnippet snippet = snippetOpt.get();
+        if (title != null) snippet.setTitle(title);
+        if (description != null) snippet.setDescription(description);
+        if (code != null) snippet.setCode(code);
+        if (languageName != null) {
+            Language language = this.langRepo.findByName(languageName);
+            if (language == null) {
+                String response = ResponseBuilder.createErrorResponse("Unsupported Language Name",
+                        ErrorTypes.INV_PARAM_ERROR).toString();
+                return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+            }
+            snippet.setLanguageId(language.getId());
+        }
+        snippet = this.snippetRepo.save(snippet);
+        String response = ResponseBuilder.createDataResponse(snippet.toJson()).toString();
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+
     @GetMapping(value = "/{snippetId}", produces = "application/json")
     ResponseEntity getSnippet(@PathVariable(value = "snippetId") String snippetId,
                               @RequestParam(value = "increaseViewcount", required = false) boolean shouldIncrease) {
-        Optional<CodeSnippet> snippetOpt = this.codeSnippetRepo.findById(snippetId);
+        Optional<CodeSnippet> snippetOpt = this.snippetRepo.findById(snippetId);
         if (!snippetOpt.isPresent()) {
-            JsonObject error = ResponseBuilder.createErrorObject("Invalid Snippet Id", ErrorTypes.INV_PARAM_ERROR);
-            String response = ResponseBuilder.createErrorResponse(error).toString();
+            String response = ResponseBuilder.createErrorResponse("Invalid Snippet Id", ErrorTypes.INV_PARAM_ERROR).toString();
             return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
         }
 
@@ -78,7 +108,7 @@ public class CodeSnippetController {
 
         if (shouldIncrease) {
             snippet.incrementViewsCount();
-            snippet = this.codeSnippetRepo.save(snippet);
+            snippet = this.snippetRepo.save(snippet);
         }
 
         // Declare add on key value pairs to the JSON response
@@ -98,10 +128,9 @@ public class CodeSnippetController {
     @PatchMapping(value = "/{snippetId}/upvote", produces = "application/json")
     ResponseEntity upvote(@Authorized HttpServletRequest request,
                           @PathVariable(value = "snippetId") String snippetId) {
-        Optional<CodeSnippet> snippetOpt = this.codeSnippetRepo.findById(snippetId);
+        Optional<CodeSnippet> snippetOpt = this.snippetRepo.findById(snippetId);
         if (!snippetOpt.isPresent()) {
-            JsonObject error = ResponseBuilder.createErrorObject("Invalid Snippet Id", ErrorTypes.INV_PARAM_ERROR);
-            String response = ResponseBuilder.createErrorResponse(error).toString();
+            String response = ResponseBuilder.createErrorResponse("Invalid Snippet Id", ErrorTypes.INV_PARAM_ERROR).toString();
             return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
         }
 
@@ -118,13 +147,12 @@ public class CodeSnippetController {
                 snippet.removeFromDownvoters(authorizedUser.getId());
             }
 
-            this.codeSnippetRepo.save(snippet);
+            this.snippetRepo.save(snippet);
             String response = ResponseBuilder.createSuccessResponse().toString();
             return new ResponseEntity<>(response, HttpStatus.OK);
         }
         else {
-            JsonObject error = ResponseBuilder.createErrorObject("User has already upvoted the Snippet", ErrorTypes.INV_REQUEST_ERROR);
-            String response = ResponseBuilder.createErrorResponse(error).toString();
+            String response = ResponseBuilder.createErrorResponse("User has already upvoted the Snippet", ErrorTypes.INV_REQUEST_ERROR).toString();
             return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
         }
     }
@@ -133,10 +161,9 @@ public class CodeSnippetController {
     @PatchMapping(value = "/{snippetId}/downvote", produces = "application/json")
     ResponseEntity downvote(@Authorized HttpServletRequest request,
                             @PathVariable(value = "snippetId") String snippetId) {
-        Optional<CodeSnippet> snippetOpt = this.codeSnippetRepo.findById(snippetId);
+        Optional<CodeSnippet> snippetOpt = this.snippetRepo.findById(snippetId);
         if (!snippetOpt.isPresent()) {
-            JsonObject error = ResponseBuilder.createErrorObject("Invalid Snippet Id", ErrorTypes.INV_PARAM_ERROR);
-            String response = ResponseBuilder.createErrorResponse(error).toString();
+            String response = ResponseBuilder.createErrorResponse("Invalid Snippet Id", ErrorTypes.INV_PARAM_ERROR).toString();
             return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
         }
 
@@ -153,13 +180,12 @@ public class CodeSnippetController {
                 snippet.removeFromUpvoters(authorizedUser.getId());
             }
 
-            this.codeSnippetRepo.save(snippet);
+            this.snippetRepo.save(snippet);
             String response = ResponseBuilder.createSuccessResponse().toString();
             return new ResponseEntity<>(response, HttpStatus.OK);
         }
         else {
-            JsonObject error = ResponseBuilder.createErrorObject("User has already downvoted the Snippet", ErrorTypes.INV_REQUEST_ERROR);
-            String response = ResponseBuilder.createErrorResponse(error).toString();
+            String response = ResponseBuilder.createErrorResponse("User has already downvoted the Snippet", ErrorTypes.INV_REQUEST_ERROR).toString();
             return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
         }
     }
@@ -168,10 +194,9 @@ public class CodeSnippetController {
     @PatchMapping(value = "/{snippetId}/save", produces = "application/json")
     ResponseEntity saveSnippet(@Authorized HttpServletRequest request,
                                @PathVariable(value = "snippetId") String snippetId) {
-        Optional<CodeSnippet> snippetOpt = this.codeSnippetRepo.findById(snippetId);
+        Optional<CodeSnippet> snippetOpt = this.snippetRepo.findById(snippetId);
         if (!snippetOpt.isPresent()) {
-            JsonObject error = ResponseBuilder.createErrorObject("Invalid Snippet Id", ErrorTypes.INV_PARAM_ERROR);
-            String response = ResponseBuilder.createErrorResponse(error).toString();
+            String response = ResponseBuilder.createErrorResponse("Invalid Snippet Id", ErrorTypes.INV_PARAM_ERROR).toString();
             return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
         }
 
@@ -183,14 +208,13 @@ public class CodeSnippetController {
         if (!savedSnippets.containsKey(snippetId)) {
             authorizedUser.addToSavedSnippets(snippetId);
             snippet.incrementSavedCount();
-            this.codeSnippetRepo.save(snippet);
+            this.snippetRepo.save(snippet);
             this.userRepo.save(authorizedUser);
             String response = ResponseBuilder.createSuccessResponse().toString();
             return new ResponseEntity<>(response, HttpStatus.OK);
         }
         else {
-            JsonObject error = ResponseBuilder.createErrorObject("User has already saved the Snippet", ErrorTypes.INV_REQUEST_ERROR);
-            String response = ResponseBuilder.createErrorResponse(error).toString();
+            String response = ResponseBuilder.createErrorResponse("User has already saved the Snippet", ErrorTypes.INV_REQUEST_ERROR).toString();
             return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
         }
     }
