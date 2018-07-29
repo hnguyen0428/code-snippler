@@ -27,7 +27,7 @@ import java.util.*;
 @Validated
 @RequestMapping("/api/user")
 public class UserController {
-    public static final int API_KEY_LENGTH = 64;
+    public static final int API_KEY_LENGTH = 128;
 
     private final UserRepository userRepo;
     private final CodeSnippetRepository snippetRepo;
@@ -53,7 +53,8 @@ public class UserController {
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
         String hashedPw = encoder.encode(password);
 
-        String apiKey = RandomKeyGenerator.generateApiKey(API_KEY_LENGTH);
+        RandomKeyGenerator keyGen = new RandomKeyGenerator(userRepo);
+        String apiKey = keyGen.generateApiKey(API_KEY_LENGTH);
 
         User newUser = this.userRepo.save(new User(username, hashedPw, apiKey, new Date()));
         JsonObject userJson = newUser.toJson();

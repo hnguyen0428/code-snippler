@@ -1,12 +1,15 @@
 package com.codesnippler.Controller;
 
 import com.codesnippler.Model.CodeSnippet;
+import com.codesnippler.Model.Comment;
 import com.codesnippler.Model.Language;
 import com.codesnippler.Model.User;
 import com.codesnippler.Repository.CodeSnippetRepository;
+import com.codesnippler.Repository.CommentRepository;
 import com.codesnippler.Repository.LanguageRepository;
 import com.codesnippler.Repository.UserRepository;
 import com.codesnippler.Exceptions.ErrorTypes;
+import com.codesnippler.Utility.JsonUtility;
 import com.codesnippler.Utility.ResponseBuilder;
 import com.codesnippler.Validators.Authorized;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,12 +18,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import javax.json.JsonArray;
 import javax.json.JsonObject;
+import javax.json.JsonObjectBuilder;
 import javax.servlet.http.HttpServletRequest;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 
 @RestController
@@ -30,13 +32,15 @@ public class CodeSnippetController {
     private final CodeSnippetRepository snippetRepo;
     private final UserRepository userRepo;
     private final LanguageRepository langRepo;
+    private final CommentRepository commentRepo;
 
     @Autowired
     public CodeSnippetController(CodeSnippetRepository snippetRepo, UserRepository userRepo,
-                                 LanguageRepository langRepo) {
+                                 LanguageRepository langRepo, CommentRepository commentRepo) {
         this.snippetRepo = snippetRepo;
         this.userRepo = userRepo;
         this.langRepo = langRepo;
+        this.commentRepo = commentRepo;
     }
 
     @PostMapping(produces = "application/json")
@@ -97,7 +101,8 @@ public class CodeSnippetController {
 
     @GetMapping(value = "/{snippetId}", produces = "application/json")
     ResponseEntity getSnippet(@PathVariable(value = "snippetId") String snippetId,
-                              @RequestParam(value = "increaseViewcount", required = false) boolean shouldIncrease) {
+                              @RequestParam(value = "increaseViewcount", required = false) boolean shouldIncrease,
+                              @RequestParam(value = "showCommentDetails", required = false) boolean showCommentDetails) {
         Optional<CodeSnippet> snippetOpt = this.snippetRepo.findById(snippetId);
         if (!snippetOpt.isPresent()) {
             String response = ResponseBuilder.createErrorResponse("Invalid Snippet Id", ErrorTypes.INV_PARAM_ERROR).toString();
@@ -118,9 +123,16 @@ public class CodeSnippetController {
             addOns.put("language", language.get().getName());
         }
 
-        JsonObject snippetJson = snippet.toJson(addOns);
+        JsonObjectBuilder snippetJsonBuilder = snippet.toJsonBuilder(addOns);
 
-        String response = ResponseBuilder.createDataResponse(snippetJson).toString();
+        if (showCommentDetails) {
+            List<String> commentIds = snippet.getComments();
+            Iterable comments = this.commentRepo.findAllById(commentIds);
+            JsonArray commentsJsonArray = JsonUtility.listToJson(comments);
+            snippetJsonBuilder.add("comments", commentsJsonArray);
+        }
+
+        String response = ResponseBuilder.createDataResponse(snippetJsonBuilder.build()).toString();
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
@@ -217,5 +229,56 @@ public class CodeSnippetController {
             String response = ResponseBuilder.createErrorResponse("User has already saved the Snippet", ErrorTypes.INV_REQUEST_ERROR).toString();
             return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
         }
+    }
+
+
+    @PostMapping(value = "/{snippetId}/comment", produces = "application/json")
+    ResponseEntity createComment(@Authorized HttpServletRequest request,
+                                 @RequestParam(value = "content") String content,
+                                 @PathVariable(value = "snippetId") String snippetId) {
+        Optional<CodeSnippet> snippetOpt = this.snippetRepo.findById(snippetId);
+        if (!snippetOpt.isPresent()) {
+            String response = ResponseBuilder.createErrorResponse("Invalid Snippet Id", ErrorTypes.INV_PARAM_ERROR).toString();
+            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+        }
+
+        User authorizedUser = (User)request.getAttribute("authorizedUser");
+
+        CodeSnippet snippet = snippetOpt.get();
+        Comment comment = new Comment(content, authorizedUser.getId(), snippetId, new Date());
+        comment = this.commentRepo.save(comment);
+
+        snippet.addToComments(comment.getId());
+        this.snippetRepo.save(snippet);
+
+        String response = ResponseBuilder.createDataResponse(comment.toJson()).toString();
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+
+    @GetMapping(value = "/{snippetId}/comments", produces = "application/json")
+    ResponseEntity getComments(@PathVariable(value = "snippetId") String snippetId,
+                               @RequestParam(value = "showDetails", required = false) boolean showDetails) {
+        Optional<CodeSnippet> snippetOpt = this.snippetRepo.findById(snippetId);
+        if (!snippetOpt.isPresent()) {
+            String response = ResponseBuilder.createErrorResponse("Invalid Snippet Id", ErrorTypes.INV_PARAM_ERROR).toString();
+            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+        }
+
+        CodeSnippet snippet = snippetOpt.get();
+        List commentIds = snippet.getComments();
+        JsonArray data;
+
+        if (showDetails) {
+            Iterable comments = this.commentRepo.findAllById(commentIds);
+            data = JsonUtility.listToJson(comments);
+
+        }
+        else {
+            data = JsonUtility.listToJson(commentIds);
+        }
+
+        String response = ResponseBuilder.createDataResponse(data).toString();
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 }

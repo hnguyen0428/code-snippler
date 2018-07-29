@@ -13,6 +13,11 @@ import java.util.*;
 
 public abstract class JsonModel {
     public JsonObject toJson() {
+        return toJsonBuilder().build();
+    }
+
+
+    public JsonObjectBuilder toJsonBuilder() {
         Class<?> objClass = this.getClass();
         Field[] fields = objClass.getDeclaredFields();
 
@@ -35,11 +40,11 @@ public abstract class JsonModel {
             }
         }
 
-        return json.build();
+        return json;
     }
 
 
-    public JsonObject toJson(Collection<String> hidden) {
+    public JsonObjectBuilder toJsonBuilder(Collection<String> hidden) {
         HashSet<String> hiddenKeys = new HashSet<>(hidden);
         Class<?> objClass = this.getClass();
         Field[] fields = objClass.getDeclaredFields();
@@ -63,11 +68,21 @@ public abstract class JsonModel {
             }
         }
 
-        return json.build();
+        return json;
+    }
+
+
+    public JsonObject toJson(Collection<String> hidden) {
+        return toJsonBuilder(hidden).build();
     }
 
 
     public JsonObject toJson(Map<String, ?> addOns) {
+        return toJsonBuilder(addOns).build();
+    }
+
+
+    public JsonObjectBuilder toJsonBuilder(Map<String, ?> addOns) {
         Class<?> objClass = this.getClass();
         Field[] fields = objClass.getDeclaredFields();
 
@@ -98,7 +113,7 @@ public abstract class JsonModel {
             json = JsonUtility.addJsonValue(json, key, value);
         }
 
-        return json.build();
+        return json;
     }
 
 }

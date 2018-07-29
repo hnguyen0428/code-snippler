@@ -64,6 +64,9 @@ public class JsonUtility {
         else if (value != null) {
             json = json.add(key, value.toString());
         }
+        else {
+            json = json.addNull(key);
+        }
         return json;
     }
 
