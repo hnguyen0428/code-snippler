@@ -12,6 +12,7 @@ import javax.validation.ConstraintValidatorContext;
 public class AuthorizationValidator implements ConstraintValidator<Authorized, HttpServletRequest> {
 
     private final UserRepository userRepo;
+    private boolean required;
 
     @Autowired
     public AuthorizationValidator(UserRepository userRepo) {
@@ -20,17 +21,22 @@ public class AuthorizationValidator implements ConstraintValidator<Authorized, H
 
 
     @Override
-    public void initialize(Authorized constraintAnnotation) {}
+    public void initialize(Authorized constraintAnnotation) {
+        required = constraintAnnotation.required();
+    }
 
 
     @Override
     public boolean isValid(HttpServletRequest value, ConstraintValidatorContext context) {
         String apiKey = value.getHeader("Authorization");
+        if (!required && apiKey == null) {
+            return true;
+        }
 
         User user = this.userRepo.findByApiKey(apiKey);
 
         if (user == null) {
-            return false;
+            return !required;
         }
         else {
             // Inject user object into the request

@@ -15,4 +15,6 @@ public @interface Authorized {
     Class<?>[] groups() default {};
 
     Class<? extends Payload>[] payload() default {};
+
+    boolean required() default true;
 }

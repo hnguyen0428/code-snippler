@@ -80,34 +80,30 @@ public class User extends JsonModel {
     }
 
     public HashMap<String, Boolean> getSavedSnippets() {
-        return savedSnippets;
-    }
-
-    public void setSavedSnippets(HashMap<String, Boolean> savedSnippets) {
-        this.savedSnippets = savedSnippets;
+        return savedSnippets != null ? savedSnippets : new HashMap<>();
     }
 
     public void addToSavedSnippets(String snippetId) {
+        savedSnippets = getSavedSnippets();
         savedSnippets.put(snippetId, true);
     }
 
     public void removeFromSavedSnippets(String snippetId) {
+        savedSnippets = getSavedSnippets();
         savedSnippets.remove(snippetId);
     }
 
     public HashMap<String, Boolean> getCreatedSnippets() {
-        return createdSnippets;
-    }
-
-    public void setCreatedSnippets(HashMap<String, Boolean> createdSnippets) {
-        this.createdSnippets = createdSnippets;
+        return createdSnippets != null ? createdSnippets : new HashMap<>();
     }
 
     public void addToCreatedSnippets(String snippetId) {
-        this.createdSnippets.put(snippetId, true);
+        createdSnippets = getCreatedSnippets();
+        createdSnippets.put(snippetId, true);
     }
 
     public void removeFromCreatedSnippets(String snippetId) {
+        createdSnippets = getCreatedSnippets();
         createdSnippets.remove(snippetId);
     }
 

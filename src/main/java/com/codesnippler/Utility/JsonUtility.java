@@ -52,6 +52,9 @@ public class JsonUtility {
         else if (value instanceof Float || value instanceof Double) {
             json = json.add(key, (Double)value);
         }
+        else if (value instanceof Boolean) {
+            json = json.add(key, (boolean)value);
+        }
         else if (value instanceof Map) {
             json = json.add(key, JsonUtility.mapToJson((Map)value));
         }
@@ -90,6 +93,9 @@ public class JsonUtility {
         }
         else if (value instanceof Float || value instanceof Double) {
             json = json.add((Double)value);
+        }
+        else if (value instanceof Boolean) {
+            json = json.add((boolean)value);
         }
         else if (value instanceof Map) {
             json = json.add(JsonUtility.mapToJson((Map)value));

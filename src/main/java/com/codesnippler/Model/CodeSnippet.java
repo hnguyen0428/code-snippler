@@ -2,6 +2,7 @@ package com.codesnippler.Model;
 
 import com.codesnippler.Utility.JsonUtility;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Transient;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.format.annotation.DateTimeFormat.ISO;
 
@@ -29,7 +30,15 @@ public class CodeSnippet extends JsonModel {
     private Long savedCount;
     private HashMap<String, Boolean> savers;
     private List<String> comments;
+
+    @Transient
     private Long popularityScore;
+
+    @Transient
+    private Boolean upvoted;
+
+    @Transient
+    private Boolean downvoted;
 
 
     @DateTimeFormat(iso = ISO.DATE_TIME)
@@ -175,12 +184,13 @@ public class CodeSnippet extends JsonModel {
     }
 
     public void addToUpvoters(String userId) {
-        upvoters = upvoters != null ? upvoters : new HashMap<>();
+        upvoters = getUpvoters();
         upvoters.put(userId, true);
         upvotes += 1;
     }
 
     public void removeFromUpvoters(String userId) {
+        upvoters = getUpvoters();
         upvoters.remove(userId);
         upvotes -= 1;
     }
@@ -190,12 +200,13 @@ public class CodeSnippet extends JsonModel {
     }
 
     public void addToDownvoters(String userId) {
-        downvoters = downvoters != null ? downvoters : new HashMap<>();
+        downvoters = getDownvoters();
         downvoters.put(userId, true);
         downvotes += 1;
     }
 
     public void removeFromDownvoters(String userId) {
+        downvoters = getDownvoters();
         downvoters.remove(userId);
         downvotes -= 1;
     }
@@ -205,28 +216,33 @@ public class CodeSnippet extends JsonModel {
     }
 
     public void addToComments(String commentId) {
-        this.comments = this.comments != null ? this.comments : new ArrayList<>();
+        this.comments = getComments();
         this.comments.add(commentId);
     }
 
     public void removeFromComments(String commentId) {
-        if (comments != null) {
-            comments.remove(commentId);
-        }
+        this.comments = getComments();
+        comments.remove(commentId);
     }
 
     public HashMap<String, Boolean> getSavers() {
-        return savers;
-    }
-
-    public void setSavers(HashMap<String, Boolean> savers) {
-        this.savers = savers;
+        return savers != null ? savers : new HashMap<>();
     }
 
     public void addToSavers(String userId) {
-        savers = savers != null ? savers : new HashMap<>();
+        savers = getSavers();
         savers.put(userId, true);
         incrementSavedCount();
+    }
+
+    public void setUpvoted(User user) {
+        upvoters = getUpvoters();
+        upvoted = upvoters.containsKey(user.getId());
+    }
+
+    public void setDownvoted(User user) {
+        downvoters = getDownvoters();
+        downvoted = downvoters.containsKey(user.getId());
     }
 
     @Override

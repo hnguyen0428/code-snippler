@@ -152,7 +152,8 @@ public class CodeSnippetController {
 
 
     @GetMapping(value = "/{snippetId}", produces = "application/json")
-    ResponseEntity getSnippet(@PathVariable(value = "snippetId") String snippetId,
+    ResponseEntity getSnippet(@Authorized(required = false) HttpServletRequest request,
+                              @PathVariable(value = "snippetId") String snippetId,
                               @RequestParam(value = "increaseViewcount", required = false) boolean shouldIncrease,
                               @RequestParam(value = "showCommentDetails", required = false) boolean showCommentDetails) {
         Optional<CodeSnippet> snippetOpt = this.snippetRepo.findById(snippetId);
@@ -175,12 +176,28 @@ public class CodeSnippetController {
             addOns.put("language", language.get().getName());
         }
 
+        User authorizedUser = (User) request.getAttribute("authorizedUser");
+        if (authorizedUser != null) {
+            snippet.setUpvoted(authorizedUser);
+            snippet.setDownvoted(authorizedUser);
+        }
+
         JsonObjectBuilder snippetJsonBuilder = snippet.toJsonBuilder(addOns);
 
         if (showCommentDetails) {
             List<String> commentIds = snippet.getComments();
-            Iterable comments = this.commentRepo.findAllById(commentIds);
-            JsonArray commentsJsonArray = JsonUtility.listToJson(comments);
+            Iterable<Comment> comments = this.commentRepo.findAllById(commentIds);
+
+            List<JsonObject> jsons = new ArrayList<>();
+            comments.forEach(comment -> {
+                if (authorizedUser != null) {
+                    comment.setUpvoted(authorizedUser);
+                    comment.setDownvoted(authorizedUser);
+                }
+                jsons.add(comment.toJson());
+            });
+
+            JsonArray commentsJsonArray = JsonUtility.listToJson(jsons);
             snippetJsonBuilder.add("comments", commentsJsonArray);
         }
 
@@ -191,7 +208,8 @@ public class CodeSnippetController {
 
     @PatchMapping(value = "/{snippetId}/upvote", produces = "application/json")
     ResponseEntity upvote(@Authorized HttpServletRequest request,
-                          @PathVariable(value = "snippetId") String snippetId) {
+                          @PathVariable(value = "snippetId") String snippetId,
+                          @RequestParam(value = "upvote") boolean upvote) {
         Optional<CodeSnippet> snippetOpt = this.snippetRepo.findById(snippetId);
         if (!snippetOpt.isPresent()) {
             String response = ResponseBuilder.createErrorResponse("Invalid Snippet Id", ErrorTypes.INV_PARAM_ERROR).toString();
@@ -203,28 +221,33 @@ public class CodeSnippetController {
         CodeSnippet snippet = snippetOpt.get();
         HashMap<String, Boolean> upvoters = snippet.getUpvoters();
 
-        if (!upvoters.containsKey(authorizedUser.getId())) {
-            snippet.addToUpvoters(authorizedUser.getId());
+        if (upvote) {
+            if (!upvoters.containsKey(authorizedUser.getId())) {
+                snippet.addToUpvoters(authorizedUser.getId());
 
-            // Remove this user from downvoters if he downvoted the snippet before
-            if (snippet.getDownvoters().get(authorizedUser.getId()) != null) {
-                snippet.removeFromDownvoters(authorizedUser.getId());
+                // Remove this user from downvoters if he downvoted the snippet before
+                if (snippet.getDownvoters().get(authorizedUser.getId()) != null) {
+                    snippet.removeFromDownvoters(authorizedUser.getId());
+                }
+
+                this.snippetRepo.save(snippet);
             }
-
-            this.snippetRepo.save(snippet);
-            String response = ResponseBuilder.createSuccessResponse().toString();
-            return new ResponseEntity<>(response, HttpStatus.OK);
         }
         else {
-            String response = ResponseBuilder.createErrorResponse("User has already upvoted the Snippet", ErrorTypes.INV_REQUEST_ERROR).toString();
-            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+            if (upvoters.containsKey(authorizedUser.getId())) {
+                snippet.removeFromUpvoters(authorizedUser.getId());
+                this.snippetRepo.save(snippet);
+            }
         }
+        String response = ResponseBuilder.createSuccessResponse().toString();
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
 
     @PatchMapping(value = "/{snippetId}/downvote", produces = "application/json")
     ResponseEntity downvote(@Authorized HttpServletRequest request,
-                            @PathVariable(value = "snippetId") String snippetId) {
+                            @PathVariable(value = "snippetId") String snippetId,
+                            @RequestParam(value = "downvote") boolean downvote) {
         Optional<CodeSnippet> snippetOpt = this.snippetRepo.findById(snippetId);
         if (!snippetOpt.isPresent()) {
             String response = ResponseBuilder.createErrorResponse("Invalid Snippet Id", ErrorTypes.INV_PARAM_ERROR).toString();
@@ -236,22 +259,26 @@ public class CodeSnippetController {
         CodeSnippet snippet = snippetOpt.get();
         HashMap<String, Boolean> downvoters = snippet.getDownvoters();
 
-        if (!downvoters.containsKey(authorizedUser.getId())) {
-            snippet.addToDownvoters(authorizedUser.getId());
+        if (downvote) {
+            if (!downvoters.containsKey(authorizedUser.getId())) {
+                snippet.addToDownvoters(authorizedUser.getId());
 
-            // Remove this user from upvoters if he upvoted the snippet before
-            if (snippet.getUpvoters().get(authorizedUser.getId()) != null) {
-                snippet.removeFromUpvoters(authorizedUser.getId());
+                // Remove this user from upvoters if he upvoted the snippet before
+                if (snippet.getUpvoters().get(authorizedUser.getId()) != null) {
+                    snippet.removeFromUpvoters(authorizedUser.getId());
+                }
+
+                this.snippetRepo.save(snippet);
             }
-
-            this.snippetRepo.save(snippet);
-            String response = ResponseBuilder.createSuccessResponse().toString();
-            return new ResponseEntity<>(response, HttpStatus.OK);
         }
         else {
-            String response = ResponseBuilder.createErrorResponse("User has already downvoted the Snippet", ErrorTypes.INV_REQUEST_ERROR).toString();
-            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+            if (downvoters.containsKey(authorizedUser.getId())) {
+                snippet.removeFromDownvoters(authorizedUser.getId());
+                this.snippetRepo.save(snippet);
+            }
         }
+        String response = ResponseBuilder.createSuccessResponse().toString();
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
 
@@ -309,7 +336,8 @@ public class CodeSnippetController {
 
 
     @GetMapping(value = "/{snippetId}/comments", produces = "application/json")
-    ResponseEntity getComments(@PathVariable(value = "snippetId") String snippetId,
+    ResponseEntity getComments(@Authorized(required = false) HttpServletRequest request,
+                               @PathVariable(value = "snippetId") String snippetId,
                                @RequestParam(value = "showUserDetails", required = false) boolean showUserDetails,
                                @RequestParam(value = "page", required = false, defaultValue = "0") int page,
                                @RequestParam(value = "pageSize", required = false, defaultValue = "10") int pageSize) {
@@ -318,6 +346,8 @@ public class CodeSnippetController {
             String response = ResponseBuilder.createErrorResponse("Invalid Snippet Id", ErrorTypes.INV_PARAM_ERROR).toString();
             return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
         }
+
+        User authorizedUser = (User)request.getAttribute("authorizedUser");
 
         CodeSnippet snippet = snippetOpt.get();
         List<String> commentIds = snippet.getComments();
@@ -328,6 +358,7 @@ public class CodeSnippetController {
 
         Iterable<Comment> comments = this.commentRepo.findAllById(commentIds);
 
+        List<JsonObject> jsons = new ArrayList<>();
         if (showUserDetails) {
             Map<String, User> usersMap = new HashMap<>();
             List<String> usersToFind = new ArrayList<>();
@@ -338,16 +369,27 @@ public class CodeSnippetController {
             Iterable<User> users = this.userRepo.findAllById(usersToFind);
             users.forEach(user -> usersMap.put(user.getId(), user));
 
-            List<JsonObject> jsons = new ArrayList<>();
             comments.forEach(comment -> {
+                if (authorizedUser != null) {
+                    comment.setUpvoted(authorizedUser);
+                    comment.setDownvoted(authorizedUser);
+                }
                 JsonObjectBuilder builder = comment.toJsonBuilder();
                 User user = usersMap.get(comment.getUserId());
                 builder.add("user", user.toJson());
+
                 jsons.add(builder.build());
             });
             data = JsonUtility.listToJson(jsons);
         }
         else {
+            comments.forEach(comment -> {
+                if (authorizedUser != null) {
+                    comment.setUpvoted(authorizedUser);
+                    comment.setDownvoted(authorizedUser);
+                }
+                jsons.add(comment.toJson());
+            });
             data = JsonUtility.listToJson(comments);
         }
 

@@ -16,6 +16,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.HashMap;
 import java.util.Optional;
 
 @RestController
@@ -87,6 +88,83 @@ public class CommentController {
         }
         this.commentRepo.delete(comment);
 
+        String response = ResponseBuilder.createSuccessResponse().toString();
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+
+    @PatchMapping(value = "/{commentId}/upvote", produces = "application/json")
+    ResponseEntity upvote(@Authorized HttpServletRequest request,
+                          @PathVariable(value = "commentId") String commentId,
+                          @RequestParam(value = "upvote") boolean upvote) {
+        Optional<Comment> commentOpt = this.commentRepo.findById(commentId);
+        if (!commentOpt.isPresent()) {
+            String response = ResponseBuilder.createErrorResponse("Invalid Comment Id", ErrorTypes.INV_PARAM_ERROR).toString();
+            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+        }
+
+        User authorizedUser = (User)request.getAttribute("authorizedUser");
+
+        Comment comment = commentOpt.get();
+        HashMap<String, Boolean> upvoters = comment.getUpvoters();
+
+        if (upvote) {
+            if (!upvoters.containsKey(authorizedUser.getId())) {
+                comment.addToUpvoters(authorizedUser.getId());
+
+                // Remove this user from downvoters if he downvoted the snippet before
+                if (comment.getDownvoters().get(authorizedUser.getId()) != null) {
+                    comment.removeFromDownvoters(authorizedUser.getId());
+                }
+
+                this.commentRepo.save(comment);
+            }
+        }
+        else {
+            if (upvoters.containsKey(authorizedUser.getId())) {
+                comment.removeFromUpvoters(authorizedUser.getId());
+                this.commentRepo.save(comment);
+            }
+        }
+
+        String response = ResponseBuilder.createSuccessResponse().toString();
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+
+    @PatchMapping(value = "/{commentId}/downvote", produces = "application/json")
+    ResponseEntity downvote(@Authorized HttpServletRequest request,
+                            @PathVariable(value = "commentId") String commentId,
+                            @RequestParam(value = "downvote") boolean downvote) {
+        Optional<Comment> commentOpt = this.commentRepo.findById(commentId);
+        if (!commentOpt.isPresent()) {
+            String response = ResponseBuilder.createErrorResponse("Invalid Comment Id", ErrorTypes.INV_PARAM_ERROR).toString();
+            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+        }
+
+        User authorizedUser = (User)request.getAttribute("authorizedUser");
+
+        Comment comment = commentOpt.get();
+        HashMap<String, Boolean> downvoters = comment.getDownvoters();
+
+        if (downvote) {
+            if (!downvoters.containsKey(authorizedUser.getId())) {
+                comment.addToDownvoters(authorizedUser.getId());
+
+                // Remove this user from downvoters if he downvoted the snippet before
+                if (comment.getUpvoters().get(authorizedUser.getId()) != null) {
+                    comment.removeFromUpvoters(authorizedUser.getId());
+                }
+
+                this.commentRepo.save(comment);
+            }
+        }
+        else {
+            if (downvoters.containsKey(authorizedUser.getId())) {
+                comment.removeFromDownvoters(authorizedUser.getId());
+                this.commentRepo.save(comment);
+            }
+        }
         String response = ResponseBuilder.createSuccessResponse().toString();
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
