@@ -16,15 +16,15 @@ public class Comment extends JsonModel {
     private String content;
     private String userId;
     private String snippetId;
-    private long upvotes;
-    private long downvotes;
+    private Long upvotes;
+    private Long downvotes;
 
     @DateTimeFormat(iso = ISO.DATE_TIME)
     private Date createdDate;
 
     public Comment() {}
 
-    public Comment(String content, String userId, String snippetId, long upvotes, long downvotes, Date createdDate) {
+    public Comment(String content, String userId, String snippetId, Long upvotes, Long downvotes, Date createdDate) {
         this.content = content;
         this.userId = userId;
         this.snippetId = snippetId;
@@ -40,8 +40,8 @@ public class Comment extends JsonModel {
         this.snippetId = snippetId;
         this.createdDate = createdDate;
 
-        this.upvotes = 0;
-        this.downvotes = 0;
+        this.upvotes = (long)0;
+        this.downvotes = (long)0;
     }
 
     public String getId() {
@@ -76,7 +76,7 @@ public class Comment extends JsonModel {
         this.snippetId = snippetId;
     }
 
-    public long getUpvotes() {
+    public Long getUpvotes() {
         return upvotes;
     }
 
@@ -84,7 +84,7 @@ public class Comment extends JsonModel {
         this.upvotes = upvotes;
     }
 
-    public long getDownvotes() {
+    public Long getDownvotes() {
         return downvotes;
     }
 

@@ -41,4 +41,20 @@ public class GeneralUtility {
         }
         return result;
     }
+
+
+    public static List paginate(List list, int page, int pageSize) {
+        int begIndex = page * pageSize;
+        int endIndex = page * pageSize + pageSize;
+
+        if (begIndex < 0 || begIndex > list.size() - 1 || endIndex < 0 || endIndex <= begIndex)
+            return new ArrayList<>();
+
+        if (endIndex <= list.size()) {
+            return list.subList(begIndex, endIndex);
+        }
+        else {
+            return list.subList(begIndex, list.size());
+        }
+    }
 }

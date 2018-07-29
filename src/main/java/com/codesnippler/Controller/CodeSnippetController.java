@@ -312,7 +312,9 @@ public class CodeSnippetController {
 
     @GetMapping(value = "/{snippetId}/comments", produces = "application/json")
     ResponseEntity getComments(@PathVariable(value = "snippetId") String snippetId,
-                               @RequestParam(value = "showDetails", required = false) boolean showDetails) {
+                               @RequestParam(value = "showDetails", required = false) boolean showDetails,
+                               @RequestParam(value = "page", required = false, defaultValue = "0") int page,
+                               @RequestParam(value = "pageSize", required = false, defaultValue = "10") int pageSize) {
         Optional<CodeSnippet> snippetOpt = this.snippetRepo.findById(snippetId);
         if (!snippetOpt.isPresent()) {
             String response = ResponseBuilder.createErrorResponse("Invalid Snippet Id", ErrorTypes.INV_PARAM_ERROR).toString();
@@ -321,6 +323,9 @@ public class CodeSnippetController {
 
         CodeSnippet snippet = snippetOpt.get();
         List<String> commentIds = snippet.getComments();
+        // Pagination
+        commentIds = GeneralUtility.paginate(commentIds, page, pageSize);
+
         JsonArray data;
 
         if (showDetails) {
