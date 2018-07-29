@@ -91,6 +91,10 @@ public class User extends JsonModel {
         savedSnippets.put(snippetId, true);
     }
 
+    public void removeFromSavedSnippets(String snippetId) {
+        savedSnippets.remove(snippetId);
+    }
+
     public HashMap<String, Boolean> getCreatedSnippets() {
         return createdSnippets;
     }
@@ -101,6 +105,10 @@ public class User extends JsonModel {
 
     public void addToCreatedSnippets(String snippetId) {
         this.createdSnippets.put(snippetId, true);
+    }
+
+    public void removeFromCreatedSnippets(String snippetId) {
+        createdSnippets.remove(snippetId);
     }
 
     public Date getCreatedDate() {

@@ -1,15 +1,17 @@
 package com.codesnippler.Model;
 
+import com.codesnippler.Utility.JsonUtility;
 import org.springframework.data.annotation.Id;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.format.annotation.DateTimeFormat.ISO;
 
 import javax.json.JsonObject;
+import javax.json.JsonObjectBuilder;
 import java.util.*;
 
 
 public class CodeSnippet extends JsonModel {
-    private static List<String> hidden = Arrays.asList("upvoters", "downvoters");
+    private static List<String> hidden = Arrays.asList("upvoters", "downvoters", "savers");
 
     @Id
     private String id;
@@ -19,13 +21,16 @@ public class CodeSnippet extends JsonModel {
     private String code;
     private String userId;
     private String languageId;
-    private long viewsCount;
-    private long upvotes;
+    private Long viewsCount;
+    private Long upvotes;
     private HashMap<String, Boolean> upvoters;
-    private long downvotes;
+    private Long downvotes;
     private HashMap<String, Boolean> downvoters;
-    private long savedCount;
+    private Long savedCount;
+    private HashMap<String, Boolean> savers;
     private List<String> comments;
+    private Long popularityScore;
+
 
     @DateTimeFormat(iso = ISO.DATE_TIME)
     private Date createdDate;
@@ -34,7 +39,8 @@ public class CodeSnippet extends JsonModel {
 
     public CodeSnippet(String title, String description, String code, String userId, String languageId, long viewsCount,
                        long upvotes, HashMap<String, Boolean> upvoters, long downvotes,
-                       HashMap<String, Boolean> downvoters, long savedCount, Date date, ArrayList<String> comments) {
+                       HashMap<String, Boolean> downvoters, long savedCount, Date date, ArrayList<String> comments,
+                       HashMap<String, Boolean> savers) {
         this.title = title;
         this.description = description;
         this.code = code;
@@ -48,6 +54,8 @@ public class CodeSnippet extends JsonModel {
         this.savedCount = savedCount;
         this.createdDate = date;
         this.comments = comments;
+        this.savers = savers;
+        this.popularityScore = null;
     }
 
 
@@ -57,18 +65,20 @@ public class CodeSnippet extends JsonModel {
         this.code = code;
         this.userId = userId;
         this.languageId = languageId;
-        this.viewsCount = 0;
-        this.upvotes = 0;
+        this.viewsCount = (long)0;
+        this.upvotes = (long)0;
         this.upvoters = new HashMap<>();
-        this.downvotes = 0;
+        this.downvotes = (long)0;
         this.downvoters = new HashMap<>();
-        this.savedCount = 0;
+        this.savedCount = (long)0;
         this.createdDate = date;
         this.comments = new ArrayList<>();
+        this.savers = new HashMap<>();
+        this.popularityScore = null;
     }
 
 
-    public long getSavedCount() {
+    public Long getSavedCount() {
         return savedCount;
     }
 
@@ -80,7 +90,7 @@ public class CodeSnippet extends JsonModel {
         this.savedCount += 1;
     }
 
-    public long getDownvotes() {
+    public Long getDownvotes() {
         return downvotes;
     }
 
@@ -88,7 +98,7 @@ public class CodeSnippet extends JsonModel {
         this.downvotes = downvotes;
     }
 
-    public long getUpvotes() {
+    public Long getUpvotes() {
         return upvotes;
     }
 
@@ -112,7 +122,7 @@ public class CodeSnippet extends JsonModel {
         this.userId = userId;
     }
 
-    public long getViewsCount() {
+    public Long getViewsCount() {
         return viewsCount;
     }
 
@@ -165,7 +175,7 @@ public class CodeSnippet extends JsonModel {
     }
 
     public void addToUpvoters(String userId) {
-        this.upvoters = this.upvoters != null ? this.upvoters : new HashMap<>();
+        upvoters = upvoters != null ? upvoters : new HashMap<>();
         upvoters.put(userId, true);
         upvotes += 1;
     }
@@ -180,7 +190,7 @@ public class CodeSnippet extends JsonModel {
     }
 
     public void addToDownvoters(String userId) {
-        this.downvoters = this.downvoters != null ? this.downvoters : new HashMap<>();
+        downvoters = downvoters != null ? downvoters : new HashMap<>();
         downvoters.put(userId, true);
         downvotes += 1;
     }
@@ -190,11 +200,6 @@ public class CodeSnippet extends JsonModel {
         downvotes -= 1;
     }
 
-    @Override
-    public JsonObject toJson() {
-        return super.toJson(hidden);
-    }
-
     public List<String> getComments() {
         return comments != null ? comments : new ArrayList<>();
     }
@@ -202,5 +207,43 @@ public class CodeSnippet extends JsonModel {
     public void addToComments(String commentId) {
         this.comments = this.comments != null ? this.comments : new ArrayList<>();
         this.comments.add(commentId);
+    }
+
+    public void removeFromComments(String commentId) {
+        if (comments != null) {
+            comments.remove(commentId);
+        }
+    }
+
+    public HashMap<String, Boolean> getSavers() {
+        return savers;
+    }
+
+    public void setSavers(HashMap<String, Boolean> savers) {
+        this.savers = savers;
+    }
+
+    public void addToSavers(String userId) {
+        savers = savers != null ? savers : new HashMap<>();
+        savers.put(userId, true);
+        incrementSavedCount();
+    }
+
+    @Override
+    public JsonObject toJson() {
+        return super.toJson(hidden);
+    }
+
+    @Override
+    public JsonObject toJson(Map<String, ?> addOns) {
+        JsonObjectBuilder result = super.toJsonBuilder(hidden);
+        result = JsonUtility.addJsonValues(result, addOns);
+        return result.build();
+    }
+
+    @Override
+    public JsonObjectBuilder toJsonBuilder(Map<String, ?> addOns) {
+        JsonObjectBuilder result = super.toJsonBuilder(hidden);
+        return JsonUtility.addJsonValues(result, addOns);
     }
 }

@@ -9,7 +9,7 @@ import java.util.Map;
 import java.util.Collection;
 
 public class JsonUtility {
-    public static JsonArray listToJson(Iterable<Object> list) {
+    public static JsonArray listToJson(Iterable<?> list) {
         JsonArrayBuilder result = Json.createArrayBuilder();
         for (Object value : list) {
             try {
@@ -22,7 +22,7 @@ public class JsonUtility {
         return result.build();
     }
 
-    public static JsonObject mapToJson(Map<String, Object> map) {
+    public static JsonObject mapToJson(Map<String, ?> map) {
         Iterator itr = map.entrySet().iterator();
         JsonObjectBuilder result = Json.createObjectBuilder();
 
@@ -64,11 +64,18 @@ public class JsonUtility {
         else if (value != null) {
             json = json.add(key, value.toString());
         }
-        else {
-            json = json.addNull(key);
+        return json;
+    }
+
+    public static JsonObjectBuilder addJsonValues(JsonObjectBuilder json, Map<String, ?> map) {
+        Iterator itr = map.entrySet().iterator();
+        while (itr.hasNext()) {
+            Map.Entry pair = (Map.Entry)itr.next();
+            json = addJsonValue(json, (String)(pair.getKey()), pair.getValue());
         }
         return json;
     }
+
 
     public static JsonArrayBuilder addJsonValue(JsonArrayBuilder json, Object value) throws ClassCastException {
         if (value instanceof String) {
