@@ -25,9 +25,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import javax.json.JsonArray;
-import javax.json.JsonObject;
-import javax.json.JsonObjectBuilder;
+import javax.json.*;
 import javax.servlet.http.HttpServletRequest;
 import java.util.*;
 import java.util.stream.Stream;
@@ -312,7 +310,7 @@ public class CodeSnippetController {
 
     @GetMapping(value = "/{snippetId}/comments", produces = "application/json")
     ResponseEntity getComments(@PathVariable(value = "snippetId") String snippetId,
-                               @RequestParam(value = "showDetails", required = false) boolean showDetails,
+                               @RequestParam(value = "showUserDetails", required = false) boolean showUserDetails,
                                @RequestParam(value = "page", required = false, defaultValue = "0") int page,
                                @RequestParam(value = "pageSize", required = false, defaultValue = "10") int pageSize) {
         Optional<CodeSnippet> snippetOpt = this.snippetRepo.findById(snippetId);
@@ -328,13 +326,29 @@ public class CodeSnippetController {
 
         JsonArray data;
 
-        if (showDetails) {
-            Iterable comments = this.commentRepo.findAllById(commentIds);
-            data = JsonUtility.listToJson(comments);
+        Iterable<Comment> comments = this.commentRepo.findAllById(commentIds);
 
+        if (showUserDetails) {
+            Map<String, User> usersMap = new HashMap<>();
+            List<String> usersToFind = new ArrayList<>();
+            comments.forEach(comment -> {
+                String userId = comment.getUserId();
+                usersToFind.add(userId);
+            });
+            Iterable<User> users = this.userRepo.findAllById(usersToFind);
+            users.forEach(user -> usersMap.put(user.getId(), user));
+
+            List<JsonObject> jsons = new ArrayList<>();
+            comments.forEach(comment -> {
+                JsonObjectBuilder builder = comment.toJsonBuilder();
+                User user = usersMap.get(comment.getUserId());
+                builder.add("user", user.toJson());
+                jsons.add(builder.build());
+            });
+            data = JsonUtility.listToJson(jsons);
         }
         else {
-            data = JsonUtility.listToJson(commentIds);
+            data = JsonUtility.listToJson(comments);
         }
 
         String response = ResponseBuilder.createDataResponse(data).toString();

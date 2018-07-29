@@ -61,6 +61,9 @@ public class JsonUtility {
         else if (value instanceof JsonModel) {
             json = json.add(key, ((JsonModel)value).toJson());
         }
+        else if (value instanceof JsonValue) {
+            json = json.add(key, (JsonValue)value);
+        }
         else if (value != null) {
             json = json.add(key, value.toString());
         }
@@ -96,6 +99,9 @@ public class JsonUtility {
         }
         else if (value instanceof JsonModel) {
             json = json.add(((JsonModel)value).toJson());
+        }
+        else if (value instanceof JsonValue) {
+            json = json.add((JsonValue)value);
         }
         else if (value != null) {
             json = json.add(value.toString());
