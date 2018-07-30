@@ -8,6 +8,7 @@ import com.codesnippler.Utility.JsonUtility;
 import com.codesnippler.Utility.ResponseBuilder;
 import com.codesnippler.Utility.RandomKeyGenerator;
 import com.codesnippler.Validators.Authorized;
+import com.codesnippler.Validators.ValidUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -65,14 +66,10 @@ public class UserController {
 
 
     @PostMapping(value = "/login", produces = "application/json")
-    ResponseEntity login(@RequestParam(value = "username") String username,
+    ResponseEntity login(HttpServletRequest request,
+                         @RequestParam(value = "username") @ValidUser(type = "username") String username,
                          @RequestParam(value = "password") String password) {
-        User user = this.userRepo.findByUsername(username);
-        if (user == null) {
-            String response = ResponseBuilder.createErrorResponse("Username cannot be found", ErrorTypes.INV_AUTH_ERROR).toString();
-            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
-        }
-
+        User user = (User)request.getAttribute("validUser");
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
 
         if (encoder.matches(password, user.getPassword())) {
@@ -89,14 +86,9 @@ public class UserController {
 
     @GetMapping(value = "/{userId}", produces = "application/json")
     ResponseEntity getUser(@Authorized HttpServletRequest request,
-                           @PathVariable(value = "userId") String userId) {
-        Optional<User> user = this.userRepo.findById(userId);
-        if (!user.isPresent()) {
-            String response = ResponseBuilder.createErrorResponse("User cannot be found", ErrorTypes.INV_PARAM_ERROR).toString();
-            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
-        }
-
-        String response = ResponseBuilder.createDataResponse(user.get().toJson()).toString();
+                           @PathVariable(value = "userId") @ValidUser String userId) {
+        User user = (User)request.getAttribute("validUser");
+        String response = ResponseBuilder.createDataResponse(user.toJson()).toString();
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 

@@ -11,6 +11,7 @@ import com.codesnippler.Utility.JsonUtility;
 import com.codesnippler.Utility.ResponseBuilder;
 import com.codesnippler.Utility.StringParser;
 import com.codesnippler.Validators.Authorized;
+import com.codesnippler.Validators.ValidLanguageName;
 import com.codesnippler.Validators.ValidSnippet;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -56,14 +57,9 @@ public class CodeSnippetController {
                           @RequestParam(value = "title") String title,
                           @RequestParam(value = "description", required = false) String description,
                           @RequestParam(value = "code") String code,
-                          @RequestParam(value = "language") String languageName) {
+                          @RequestParam(value = "language") @ValidLanguageName String languageName) {
         User user = (User)request.getAttribute("authorizedUser");
-
-        Language language = this.langRepo.findByName(languageName);
-        if (language == null) {
-            String response = ResponseBuilder.createErrorResponse("Invalid Language", ErrorTypes.INV_PARAM_ERROR).toString();
-            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
-        }
+        Language language = (Language)request.getAttribute("validLanguage");
 
         CodeSnippet snippet = new CodeSnippet(title, description, code, user.getId(), language.getId(), new Date());
         snippet = this.snippetRepo.save(snippet);
@@ -80,7 +76,7 @@ public class CodeSnippetController {
                           @RequestParam(value = "title", required = false) String title,
                           @RequestParam(value = "description", required = false) String description,
                           @RequestParam(value = "code", required = false) String code,
-                          @RequestParam(value = "language", required = false) String languageName,
+                          @RequestParam(value = "language", required = false) @ValidLanguageName String languageName,
                           @PathVariable(value = "snippetId") @ValidSnippet String snippetId) {
         CodeSnippet snippet = (CodeSnippet)request.getAttribute("validSnippet");
 
@@ -88,12 +84,7 @@ public class CodeSnippetController {
         if (description != null) snippet.setDescription(description);
         if (code != null) snippet.setCode(code);
         if (languageName != null) {
-            Language language = this.langRepo.findByName(languageName);
-            if (language == null) {
-                String response = ResponseBuilder.createErrorResponse("Unsupported Language Name",
-                        ErrorTypes.INV_PARAM_ERROR).toString();
-                return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
-            }
+            Language language = (Language)request.getAttribute("validLanguage");
             snippet.setLanguageId(language.getId());
         }
         snippet = this.snippetRepo.save(snippet);
