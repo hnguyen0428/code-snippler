@@ -4,9 +4,11 @@ import com.codesnippler.Model.Language;
 import com.codesnippler.Repository.LanguageRepository;
 import com.codesnippler.Utility.JsonUtility;
 import com.codesnippler.Utility.ResponseBuilder;
+import com.codesnippler.Validators.ClientAuthorized;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.json.JsonArray;
@@ -18,6 +20,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/language")
+@Validated
 public class LanguageController {
 
     private final LanguageRepository langRepo;
@@ -29,6 +32,7 @@ public class LanguageController {
 
 
     @PostMapping(produces = "application/json")
+    @ClientAuthorized
     ResponseEntity create(@RequestParam(value = "name") String name,
                           @RequestParam(value = "type") String type) {
         Language language = this.langRepo.save(new Language(name, type, new Date()));
