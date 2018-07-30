@@ -4,6 +4,7 @@ import com.codesnippler.Model.Language;
 import com.codesnippler.Repository.LanguageRepository;
 import com.codesnippler.Utility.JsonUtility;
 import com.codesnippler.Utility.ResponseBuilder;
+import com.codesnippler.Validators.AdminAuthorized;
 import com.codesnippler.Validators.ClientAuthorized;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -32,7 +33,7 @@ public class LanguageController {
 
 
     @PostMapping(produces = "application/json")
-    @ClientAuthorized
+    @AdminAuthorized
     ResponseEntity create(@RequestParam(value = "name") String name,
                           @RequestParam(value = "type") String type) {
         Language language = this.langRepo.save(new Language(name, type, new Date()));
