@@ -352,7 +352,7 @@ public class CodeSnippetController {
     @GetMapping(value = "/popular", produces = "application/json")
     ResponseEntity getPopular(@RequestParam(value = "limit", required = false, defaultValue = "10") int limit,
                               @RequestParam(value = "fields", required = false,
-                                      defaultValue = "title,description") String fieldsString) {
+                                      defaultValue = "title,description,upvotes,downvotes,viewsCount,savedCount") String fieldsString) {
         String[] fieldsArray = fieldsString.split(",");
         List<String> fieldsList = new ArrayList<>(Arrays.asList(fieldsArray));
 
