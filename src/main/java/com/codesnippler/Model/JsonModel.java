@@ -2,6 +2,7 @@ package com.codesnippler.Model;
 
 
 import com.codesnippler.Utility.JsonUtility;
+import org.springframework.data.annotation.Transient;
 
 import javax.json.Json;
 import javax.json.JsonObject;
@@ -114,6 +115,17 @@ public abstract class JsonModel {
         }
 
         return json;
+    }
+
+    public static Set<String> getModelAttributes(Class cls) {
+        Field[] fields = cls.getDeclaredFields();
+        Set<String> result = new HashSet<>();
+        for (Field field : fields) {
+            if (!Modifier.isStatic(field.getModifiers()) && field.getAnnotation(Transient.class) == null) {
+                result.add(field.getName());
+            }
+        }
+        return result;
     }
 
 }

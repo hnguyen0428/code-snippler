@@ -1,9 +1,6 @@
 package com.codesnippler.Controller;
 
-import com.codesnippler.Model.CodeSnippet;
-import com.codesnippler.Model.Comment;
-import com.codesnippler.Model.Language;
-import com.codesnippler.Model.User;
+import com.codesnippler.Model.*;
 import com.codesnippler.Repository.CodeSnippetRepository;
 import com.codesnippler.Repository.CommentRepository;
 import com.codesnippler.Repository.LanguageRepository;
@@ -176,11 +173,13 @@ public class CodeSnippetController {
             addOns.put("language", language.get().getName());
         }
 
-        User authorizedUser = (User) request.getAttribute("authorizedUser");
+        User authorizedUser = (User)request.getAttribute("authorizedUser");
         if (authorizedUser != null) {
             snippet.setUpvoted(authorizedUser);
             snippet.setDownvoted(authorizedUser);
+            snippet.setSaved(authorizedUser);
         }
+        snippet.setPopularityScore();
 
         JsonObjectBuilder snippetJsonBuilder = snippet.toJsonBuilder(addOns);
 
@@ -284,7 +283,8 @@ public class CodeSnippetController {
 
     @PatchMapping(value = "/{snippetId}/save", produces = "application/json")
     ResponseEntity saveSnippet(@Authorized HttpServletRequest request,
-                               @PathVariable(value = "snippetId") String snippetId) {
+                               @PathVariable(value = "snippetId") String snippetId,
+                               @RequestParam(value = "save") boolean save) {
         Optional<CodeSnippet> snippetOpt = this.snippetRepo.findById(snippetId);
         if (!snippetOpt.isPresent()) {
             String response = ResponseBuilder.createErrorResponse("Invalid Snippet Id", ErrorTypes.INV_PARAM_ERROR).toString();
@@ -296,18 +296,24 @@ public class CodeSnippetController {
         CodeSnippet snippet = snippetOpt.get();
         HashMap<String, Boolean> savedSnippets = authorizedUser.getSavedSnippets();
 
-        if (!savedSnippets.containsKey(snippetId)) {
-            authorizedUser.addToSavedSnippets(snippetId);
-            snippet.addToSavers(authorizedUser.getId());
-            this.snippetRepo.save(snippet);
-            this.userRepo.save(authorizedUser);
-            String response = ResponseBuilder.createSuccessResponse().toString();
-            return new ResponseEntity<>(response, HttpStatus.OK);
+        if (save) {
+            if (!savedSnippets.containsKey(snippetId)) {
+                authorizedUser.addToSavedSnippets(snippetId);
+                snippet.addToSavers(authorizedUser.getId());
+                this.snippetRepo.save(snippet);
+                this.userRepo.save(authorizedUser);
+            }
         }
         else {
-            String response = ResponseBuilder.createErrorResponse("User has already saved the Snippet", ErrorTypes.INV_REQUEST_ERROR).toString();
-            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+            if (savedSnippets.containsKey(snippetId)) {
+                authorizedUser.removeFromSavedSnippets(snippetId);
+                snippet.removeFromSavers(authorizedUser.getId());
+                this.snippetRepo.save(snippet);
+                this.userRepo.save(authorizedUser);
+            }
         }
+        String response = ResponseBuilder.createSuccessResponse().toString();
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
 
@@ -406,7 +412,7 @@ public class CodeSnippetController {
         List<String> fieldsList = new ArrayList<>(Arrays.asList(fieldsArray));
 
         // Filter out fields to only contain class instance variables
-        Set<String> snippetFields = GeneralUtility.getClassInstanceVars(CodeSnippet.class);
+        Set<String> snippetFields = JsonModel.getModelAttributes(CodeSnippet.class);
         Stream<String> stream = fieldsList.stream().filter(snippetFields::contains);
 
         Object[] streamArray = stream.toArray();
@@ -416,7 +422,7 @@ public class CodeSnippetController {
 
         Aggregation aggregation = Aggregation.newAggregation(
                 Aggregation.project(fields)
-                        .andExpression("add(viewsCount, subtract(upvotes, downvotes))")
+                        .andExpression("add(add(viewsCount, subtract(upvotes, downvotes)), savedCount)")
                         .as("popularityScore"),
                 Aggregation.sort(new Sort(Sort.Direction.DESC, "popularityScore")),
                 Aggregation.limit(limit)

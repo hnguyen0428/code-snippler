@@ -40,6 +40,9 @@ public class CodeSnippet extends JsonModel {
     @Transient
     private Boolean downvoted;
 
+    @Transient
+    private Boolean saved;
+
 
     @DateTimeFormat(iso = ISO.DATE_TIME)
     private Date createdDate;
@@ -235,6 +238,12 @@ public class CodeSnippet extends JsonModel {
         incrementSavedCount();
     }
 
+    public void removeFromSavers(String userId) {
+        savers = getSavers();
+        savers.remove(userId);
+        savedCount -= 1;
+    }
+
     public void setUpvoted(User user) {
         upvoters = getUpvoters();
         upvoted = upvoters.containsKey(user.getId());
@@ -243,6 +252,15 @@ public class CodeSnippet extends JsonModel {
     public void setDownvoted(User user) {
         downvoters = getDownvoters();
         downvoted = downvoters.containsKey(user.getId());
+    }
+
+    public void setSaved(User user) {
+        savers = getSavers();
+        saved = savers.containsKey(user.getId());
+    }
+
+    public void setPopularityScore() {
+        popularityScore = savedCount + viewsCount + upvotes - downvotes;
     }
 
     @Override
