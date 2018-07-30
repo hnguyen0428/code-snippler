@@ -9,6 +9,7 @@ import com.codesnippler.Repository.CodeSnippetRepository;
 import com.codesnippler.Repository.CommentRepository;
 import com.codesnippler.Utility.ResponseBuilder;
 import com.codesnippler.Validators.Authorized;
+import com.codesnippler.Validators.ValidComment;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -37,15 +38,9 @@ public class CommentController {
     @PatchMapping(value = "/{commentId}", produces = "application/json")
     ResponseEntity update(@Authorized HttpServletRequest request,
                           @RequestParam(value = "content") String content,
-                          @PathVariable(value = "commentId") String commentId) {
-        Optional<Comment> commentOpt = this.commentRepo.findById(commentId);
-        if (!commentOpt.isPresent()) {
-            String response = ResponseBuilder.createErrorResponse("Invalid Comment Id", ErrorTypes.INV_PARAM_ERROR).toString();
-            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
-        }
-
+                          @PathVariable(value = "commentId") @ValidComment String commentId) {
         User authorizedUser = (User)request.getAttribute("authorizedUser");
-        Comment comment = commentOpt.get();
+        Comment comment = (Comment)request.getAttribute("validComment");
 
         if (!comment.getUserId().equals(authorizedUser.getId())) {
             String response = ResponseBuilder.createErrorResponse("User is not authorized to update this comment",
@@ -63,15 +58,9 @@ public class CommentController {
 
     @DeleteMapping(value = "/{commentId}", produces = "application/json")
     ResponseEntity delete(@Authorized HttpServletRequest request,
-                          @PathVariable(value = "commentId") String commentId) {
-        Optional<Comment> commentOpt = this.commentRepo.findById(commentId);
-        if (!commentOpt.isPresent()) {
-            String response = ResponseBuilder.createErrorResponse("Invalid Comment Id", ErrorTypes.INV_PARAM_ERROR).toString();
-            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
-        }
-
+                          @PathVariable(value = "commentId") @ValidComment String commentId) {
         User authorizedUser = (User)request.getAttribute("authorizedUser");
-        Comment comment = commentOpt.get();
+        Comment comment = (Comment)request.getAttribute("validComment");
 
         if (!comment.getUserId().equals(authorizedUser.getId())) {
             String response = ResponseBuilder.createErrorResponse("User is not authorized to update this comment",
@@ -95,17 +84,11 @@ public class CommentController {
 
     @PatchMapping(value = "/{commentId}/upvote", produces = "application/json")
     ResponseEntity upvote(@Authorized HttpServletRequest request,
-                          @PathVariable(value = "commentId") String commentId,
+                          @PathVariable(value = "commentId") @ValidComment String commentId,
                           @RequestParam(value = "upvote") boolean upvote) {
-        Optional<Comment> commentOpt = this.commentRepo.findById(commentId);
-        if (!commentOpt.isPresent()) {
-            String response = ResponseBuilder.createErrorResponse("Invalid Comment Id", ErrorTypes.INV_PARAM_ERROR).toString();
-            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
-        }
-
         User authorizedUser = (User)request.getAttribute("authorizedUser");
+        Comment comment = (Comment)request.getAttribute("validComment");
 
-        Comment comment = commentOpt.get();
         HashMap<String, Boolean> upvoters = comment.getUpvoters();
 
         if (upvote) {
@@ -134,17 +117,11 @@ public class CommentController {
 
     @PatchMapping(value = "/{commentId}/downvote", produces = "application/json")
     ResponseEntity downvote(@Authorized HttpServletRequest request,
-                            @PathVariable(value = "commentId") String commentId,
+                            @PathVariable(value = "commentId") @ValidComment String commentId,
                             @RequestParam(value = "downvote") boolean downvote) {
-        Optional<Comment> commentOpt = this.commentRepo.findById(commentId);
-        if (!commentOpt.isPresent()) {
-            String response = ResponseBuilder.createErrorResponse("Invalid Comment Id", ErrorTypes.INV_PARAM_ERROR).toString();
-            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
-        }
-
         User authorizedUser = (User)request.getAttribute("authorizedUser");
+        Comment comment = (Comment)request.getAttribute("validComment");
 
-        Comment comment = commentOpt.get();
         HashMap<String, Boolean> downvoters = comment.getDownvoters();
 
         if (downvote) {

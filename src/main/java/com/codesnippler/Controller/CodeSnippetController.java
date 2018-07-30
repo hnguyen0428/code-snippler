@@ -11,6 +11,7 @@ import com.codesnippler.Utility.JsonUtility;
 import com.codesnippler.Utility.ResponseBuilder;
 import com.codesnippler.Utility.StringParser;
 import com.codesnippler.Validators.Authorized;
+import com.codesnippler.Validators.ValidSnippet;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -36,7 +37,7 @@ public class CodeSnippetController {
     private final UserRepository userRepo;
     private final LanguageRepository langRepo;
     private final CommentRepository commentRepo;
-    MongoTemplate mongoTemplate;
+    private final MongoTemplate mongoTemplate;
 
 
     @Autowired
@@ -80,14 +81,9 @@ public class CodeSnippetController {
                           @RequestParam(value = "description", required = false) String description,
                           @RequestParam(value = "code", required = false) String code,
                           @RequestParam(value = "language", required = false) String languageName,
-                          @PathVariable(value = "snippetId") String snippetId) {
-        Optional<CodeSnippet> snippetOpt = this.snippetRepo.findById(snippetId);
-        if (!snippetOpt.isPresent()) {
-            String response = ResponseBuilder.createErrorResponse("Invalid Snippet Id", ErrorTypes.INV_PARAM_ERROR).toString();
-            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
-        }
+                          @PathVariable(value = "snippetId") @ValidSnippet String snippetId) {
+        CodeSnippet snippet = (CodeSnippet)request.getAttribute("validSnippet");
 
-        CodeSnippet snippet = snippetOpt.get();
         if (title != null) snippet.setTitle(title);
         if (description != null) snippet.setDescription(description);
         if (code != null) snippet.setCode(code);
@@ -108,14 +104,8 @@ public class CodeSnippetController {
 
     @DeleteMapping(value = "/{snippetId}", produces = "application/json")
     ResponseEntity delete(@Authorized HttpServletRequest request,
-                          @PathVariable(value = "snippetId") String snippetId) {
-        Optional<CodeSnippet> snippetOpt = this.snippetRepo.findById(snippetId);
-        if (!snippetOpt.isPresent()) {
-            String response = ResponseBuilder.createErrorResponse("Invalid Snippet Id", ErrorTypes.INV_PARAM_ERROR).toString();
-            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
-        }
-
-        CodeSnippet snippet = snippetOpt.get();
+                          @PathVariable(value = "snippetId") @ValidSnippet String snippetId) {
+        CodeSnippet snippet = (CodeSnippet)request.getAttribute("validSnippet");
         User authorizedUser = (User)request.getAttribute("authorizedUser");
         if (!snippet.getUserId().equals(authorizedUser.getId())) {
             String response = ResponseBuilder.createErrorResponse("User is not authorized to delete this snippet",
@@ -150,16 +140,10 @@ public class CodeSnippetController {
 
     @GetMapping(value = "/{snippetId}", produces = "application/json")
     ResponseEntity getSnippet(@Authorized(required = false) HttpServletRequest request,
-                              @PathVariable(value = "snippetId") String snippetId,
+                              @PathVariable(value = "snippetId") @ValidSnippet String snippetId,
                               @RequestParam(value = "increaseViewcount", required = false) boolean shouldIncrease,
                               @RequestParam(value = "showCommentDetails", required = false) boolean showCommentDetails) {
-        Optional<CodeSnippet> snippetOpt = this.snippetRepo.findById(snippetId);
-        if (!snippetOpt.isPresent()) {
-            String response = ResponseBuilder.createErrorResponse("Invalid Snippet Id", ErrorTypes.INV_PARAM_ERROR).toString();
-            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
-        }
-
-        CodeSnippet snippet = snippetOpt.get();
+        CodeSnippet snippet = (CodeSnippet)request.getAttribute("validSnippet");
 
         if (shouldIncrease) {
             snippet.incrementViewsCount();
@@ -207,17 +191,11 @@ public class CodeSnippetController {
 
     @PatchMapping(value = "/{snippetId}/upvote", produces = "application/json")
     ResponseEntity upvote(@Authorized HttpServletRequest request,
-                          @PathVariable(value = "snippetId") String snippetId,
+                          @PathVariable(value = "snippetId") @ValidSnippet String snippetId,
                           @RequestParam(value = "upvote") boolean upvote) {
-        Optional<CodeSnippet> snippetOpt = this.snippetRepo.findById(snippetId);
-        if (!snippetOpt.isPresent()) {
-            String response = ResponseBuilder.createErrorResponse("Invalid Snippet Id", ErrorTypes.INV_PARAM_ERROR).toString();
-            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
-        }
-
         User authorizedUser = (User)request.getAttribute("authorizedUser");
 
-        CodeSnippet snippet = snippetOpt.get();
+        CodeSnippet snippet = (CodeSnippet)request.getAttribute("validSnippet");
         HashMap<String, Boolean> upvoters = snippet.getUpvoters();
 
         if (upvote) {
@@ -245,17 +223,11 @@ public class CodeSnippetController {
 
     @PatchMapping(value = "/{snippetId}/downvote", produces = "application/json")
     ResponseEntity downvote(@Authorized HttpServletRequest request,
-                            @PathVariable(value = "snippetId") String snippetId,
+                            @PathVariable(value = "snippetId") @ValidSnippet String snippetId,
                             @RequestParam(value = "downvote") boolean downvote) {
-        Optional<CodeSnippet> snippetOpt = this.snippetRepo.findById(snippetId);
-        if (!snippetOpt.isPresent()) {
-            String response = ResponseBuilder.createErrorResponse("Invalid Snippet Id", ErrorTypes.INV_PARAM_ERROR).toString();
-            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
-        }
-
         User authorizedUser = (User)request.getAttribute("authorizedUser");
 
-        CodeSnippet snippet = snippetOpt.get();
+        CodeSnippet snippet = (CodeSnippet)request.getAttribute("validSnippet");
         HashMap<String, Boolean> downvoters = snippet.getDownvoters();
 
         if (downvote) {
@@ -283,17 +255,11 @@ public class CodeSnippetController {
 
     @PatchMapping(value = "/{snippetId}/save", produces = "application/json")
     ResponseEntity saveSnippet(@Authorized HttpServletRequest request,
-                               @PathVariable(value = "snippetId") String snippetId,
+                               @PathVariable(value = "snippetId") @ValidSnippet String snippetId,
                                @RequestParam(value = "save") boolean save) {
-        Optional<CodeSnippet> snippetOpt = this.snippetRepo.findById(snippetId);
-        if (!snippetOpt.isPresent()) {
-            String response = ResponseBuilder.createErrorResponse("Invalid Snippet Id", ErrorTypes.INV_PARAM_ERROR).toString();
-            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
-        }
-
         User authorizedUser = (User)request.getAttribute("authorizedUser");
 
-        CodeSnippet snippet = snippetOpt.get();
+        CodeSnippet snippet = (CodeSnippet)request.getAttribute("validSnippet");
         HashMap<String, Boolean> savedSnippets = authorizedUser.getSavedSnippets();
 
         if (save) {
@@ -320,16 +286,10 @@ public class CodeSnippetController {
     @PostMapping(value = "/{snippetId}/comment", produces = "application/json")
     ResponseEntity createComment(@Authorized HttpServletRequest request,
                                  @RequestParam(value = "content") String content,
-                                 @PathVariable(value = "snippetId") String snippetId) {
-        Optional<CodeSnippet> snippetOpt = this.snippetRepo.findById(snippetId);
-        if (!snippetOpt.isPresent()) {
-            String response = ResponseBuilder.createErrorResponse("Invalid Snippet Id", ErrorTypes.INV_PARAM_ERROR).toString();
-            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
-        }
-
+                                 @PathVariable(value = "snippetId") @ValidSnippet String snippetId) {
         User authorizedUser = (User)request.getAttribute("authorizedUser");
 
-        CodeSnippet snippet = snippetOpt.get();
+        CodeSnippet snippet = (CodeSnippet)request.getAttribute("validSnippet");
         Comment comment = new Comment(content, authorizedUser.getId(), snippetId, new Date());
         comment = this.commentRepo.save(comment);
 
@@ -343,19 +303,13 @@ public class CodeSnippetController {
 
     @GetMapping(value = "/{snippetId}/comments", produces = "application/json")
     ResponseEntity getComments(@Authorized(required = false) HttpServletRequest request,
-                               @PathVariable(value = "snippetId") String snippetId,
+                               @PathVariable(value = "snippetId") @ValidSnippet String snippetId,
                                @RequestParam(value = "showUserDetails", required = false) boolean showUserDetails,
                                @RequestParam(value = "page", required = false, defaultValue = "0") int page,
                                @RequestParam(value = "pageSize", required = false, defaultValue = "10") int pageSize) {
-        Optional<CodeSnippet> snippetOpt = this.snippetRepo.findById(snippetId);
-        if (!snippetOpt.isPresent()) {
-            String response = ResponseBuilder.createErrorResponse("Invalid Snippet Id", ErrorTypes.INV_PARAM_ERROR).toString();
-            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
-        }
-
         User authorizedUser = (User)request.getAttribute("authorizedUser");
 
-        CodeSnippet snippet = snippetOpt.get();
+        CodeSnippet snippet = (CodeSnippet)request.getAttribute("validSnippet");
         List<String> commentIds = snippet.getComments();
         // Pagination
         commentIds = GeneralUtility.paginate(commentIds, page, pageSize);
