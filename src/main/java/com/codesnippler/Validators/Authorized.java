@@ -17,4 +17,4 @@ public @interface Authorized {
     Class<? extends Payload>[] payload() default {};
 
     boolean required() default true;
-        }
+}
