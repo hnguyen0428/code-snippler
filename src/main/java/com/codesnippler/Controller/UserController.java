@@ -88,7 +88,8 @@ public class UserController {
 
     @GetMapping(value = "/me", produces = "application/json")
     ResponseEntity getMyProfile(@Authorized HttpServletRequest request,
-                                @RequestParam(value = "showSnippetDetails", required = false, defaultValue = "false") boolean showSnippetDetails) {
+                                @RequestParam(value = "showSnippetDetails", required = false,
+                                        defaultValue = "false") boolean showSnippetDetails) {
         User user = (User)request.getAttribute("authorizedUser");
         String response;
 
@@ -114,9 +115,28 @@ public class UserController {
 
     @GetMapping(value = "/{userId}", produces = "application/json")
     ResponseEntity getUser(@Authorized HttpServletRequest request,
+                           @RequestParam(value = "showSnippetDetails", required = false,
+                                   defaultValue = "false") boolean showSnippetDetails,
                            @PathVariable(value = "userId") @ValidUser String userId) {
         User user = (User)request.getAttribute("validUser");
-        String response = ResponseBuilder.createDataResponse(user.toJson()).toString();
+        String response;
+
+        if (!showSnippetDetails) {
+            response = ResponseBuilder.createDataResponse(user.toJson()).toString();
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        }
+
+        Set<String> createdSnippetIds = user.getCreatedSnippets().keySet();
+        Set<String> savedSnippetIds = user.getSavedSnippets().keySet();
+
+        Iterable<CodeSnippet> createdSnippets = this.snippetRepo.findAllById(createdSnippetIds);
+        Iterable<CodeSnippet> savedSnippets = this.snippetRepo.findAllById(savedSnippetIds);
+
+        JsonObjectBuilder json = user.toJsonBuilder();
+        json.add("createdSnippets", JsonUtility.listToJson(createdSnippets));
+        json.add("savedSnippets", JsonUtility.listToJson(savedSnippets));
+
+        response = ResponseBuilder.createDataResponse(json.build()).toString();
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
