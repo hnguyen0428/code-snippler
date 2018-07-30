@@ -13,6 +13,12 @@ import java.util.*;
 
 
 public abstract class JsonModel {
+
+    @Override
+    public String toString() {
+        return toJson().toString();
+    }
+
     public JsonObject toJson() {
         return toJsonBuilder().build();
     }

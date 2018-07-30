@@ -30,13 +30,6 @@ public class Language extends JsonModel {
         this.createdDate = date;
     }
 
-    @Override
-    public String toString() {
-        return String.format(
-                "Name[id=%s, name='%s', type='%s']",
-                id, name, type);
-    }
-
     public String getId() {
         return id;
     }
