@@ -29,7 +29,7 @@ public class CodeSnippet extends JsonModel {
     private HashMap<String, Boolean> downvoters;
     private Long savedCount;
     private HashMap<String, Boolean> savers;
-    private List<String> comments;
+    private LinkedList<String> comments;
 
     @Transient
     private Long popularityScore;
@@ -51,7 +51,7 @@ public class CodeSnippet extends JsonModel {
 
     public CodeSnippet(String title, String description, String code, String userId, String languageId, long viewsCount,
                        long upvotes, HashMap<String, Boolean> upvoters, long downvotes,
-                       HashMap<String, Boolean> downvoters, long savedCount, Date date, ArrayList<String> comments,
+                       HashMap<String, Boolean> downvoters, long savedCount, Date date, LinkedList<String> comments,
                        HashMap<String, Boolean> savers) {
         this.title = title;
         this.description = description;
@@ -84,7 +84,7 @@ public class CodeSnippet extends JsonModel {
         this.downvoters = new HashMap<>();
         this.savedCount = (long)0;
         this.createdDate = date;
-        this.comments = new ArrayList<>();
+        this.comments = new LinkedList<>();
         this.savers = new HashMap<>();
         this.popularityScore = null;
     }
@@ -214,13 +214,13 @@ public class CodeSnippet extends JsonModel {
         downvotes -= 1;
     }
 
-    public List<String> getComments() {
-        return comments != null ? comments : new ArrayList<>();
+    public LinkedList<String> getComments() {
+        return comments != null ? comments : new LinkedList<>();
     }
 
     public void addToComments(String commentId) {
         this.comments = getComments();
-        this.comments.add(commentId);
+        this.comments.addFirst(commentId);
     }
 
     public void removeFromComments(String commentId) {

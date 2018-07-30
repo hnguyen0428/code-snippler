@@ -1,5 +1,6 @@
 package com.codesnippler.Controller;
 
+import com.codesnippler.Model.CodeSnippet;
 import com.codesnippler.Model.User;
 import com.codesnippler.Repository.CodeSnippetRepository;
 import com.codesnippler.Repository.UserRepository;
@@ -18,6 +19,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import javax.json.JsonArray;
 import javax.json.JsonObject;
+import javax.json.JsonObjectBuilder;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
@@ -84,6 +86,32 @@ public class UserController {
     }
 
 
+    @GetMapping(value = "/me", produces = "application/json")
+    ResponseEntity getMyProfile(@Authorized HttpServletRequest request,
+                                @RequestParam(value = "showSnippetDetails", required = false, defaultValue = "false") boolean showSnippetDetails) {
+        User user = (User)request.getAttribute("authorizedUser");
+        String response;
+
+        if (!showSnippetDetails) {
+            response = ResponseBuilder.createDataResponse(user.toJson()).toString();
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        }
+
+        Set<String> createdSnippetIds = user.getCreatedSnippets().keySet();
+        Set<String> savedSnippetIds = user.getSavedSnippets().keySet();
+
+        Iterable<CodeSnippet> createdSnippets = this.snippetRepo.findAllById(createdSnippetIds);
+        Iterable<CodeSnippet> savedSnippets = this.snippetRepo.findAllById(savedSnippetIds);
+
+        JsonObjectBuilder json = user.toJsonBuilder();
+        json.add("createdSnippets", JsonUtility.listToJson(createdSnippets));
+        json.add("savedSnippets", JsonUtility.listToJson(savedSnippets));
+
+        response = ResponseBuilder.createDataResponse(json.build()).toString();
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+
     @GetMapping(value = "/{userId}", produces = "application/json")
     ResponseEntity getUser(@Authorized HttpServletRequest request,
                            @PathVariable(value = "userId") @ValidUser String userId) {
@@ -97,8 +125,29 @@ public class UserController {
     ResponseEntity getSavedSnippets(@Authorized HttpServletRequest request,
                                     @RequestParam(value = "showDetails", required = false) boolean showDetails) {
         User user = (User)request.getAttribute("authorizedUser");
-        HashMap<String, Boolean> snippetIdsMap = user.getSavedSnippets();
+        Map<String, Boolean> snippetIdsMap = user.getSavedSnippets();
         Set snippetIds = snippetIdsMap.keySet();
+
+        JsonArray snippetsArray = JsonUtility.listToJson(snippetIds);
+        if (!showDetails) {
+            String response = ResponseBuilder.createDataResponse(snippetsArray).toString();
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        }
+
+        Iterable itr = this.snippetRepo.findAllById(snippetIds);
+        snippetsArray = JsonUtility.listToJson(itr);
+        String response = ResponseBuilder.createDataResponse(snippetsArray).toString();
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+
+    @GetMapping(value = "/{userId}/savedSnippets", produces = "application/json")
+    ResponseEntity getSavedSnippets(@Authorized HttpServletRequest request,
+                                    @PathVariable(value = "userId") @ValidUser String userId,
+                                    @RequestParam(value = "showDetails", required = false) boolean showDetails) {
+        User user = (User)request.getAttribute("validUser");
+        Map<String, Boolean> snippetIdsMap = user.getSavedSnippets();
+        Set<String> snippetIds = snippetIdsMap.keySet();
 
         JsonArray snippetsArray = JsonUtility.listToJson(snippetIds);
         if (!showDetails) {
@@ -117,7 +166,28 @@ public class UserController {
     ResponseEntity getCreatedSnippets(@Authorized HttpServletRequest request,
                                       @RequestParam(value = "showDetails", required = false) boolean showDetails) {
         User user = (User)request.getAttribute("authorizedUser");
-        HashMap<String, Boolean> snippetIdsMap = user.getCreatedSnippets();
+        Map<String, Boolean> snippetIdsMap = user.getCreatedSnippets();
+        Set snippetIds = snippetIdsMap.keySet();
+
+        JsonArray snippetsArray = JsonUtility.listToJson(snippetIds);
+        if (!showDetails) {
+            String response = ResponseBuilder.createDataResponse(snippetsArray).toString();
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        }
+
+        Iterable itr = this.snippetRepo.findAllById(snippetIds);
+        snippetsArray = JsonUtility.listToJson(itr);
+        String response = ResponseBuilder.createDataResponse(snippetsArray).toString();
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+
+    @GetMapping(value = "/{userId}/createdSnippets", produces = "application/json")
+    ResponseEntity getCreatedSnippets(@Authorized HttpServletRequest request,
+                                      @PathVariable(value = "userId") @ValidUser String userId,
+                                      @RequestParam(value = "showDetails", required = false) boolean showDetails) {
+        User user = (User)request.getAttribute("validUser");
+        Map<String, Boolean> snippetIdsMap = user.getCreatedSnippets();
         Set snippetIds = snippetIdsMap.keySet();
 
         JsonArray snippetsArray = JsonUtility.listToJson(snippetIds);

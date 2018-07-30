@@ -187,7 +187,7 @@ public class CodeSnippetController {
         User authorizedUser = (User)request.getAttribute("authorizedUser");
 
         CodeSnippet snippet = (CodeSnippet)request.getAttribute("validSnippet");
-        HashMap<String, Boolean> upvoters = snippet.getUpvoters();
+        Map<String, Boolean> upvoters = snippet.getUpvoters();
 
         if (upvote) {
             if (!upvoters.containsKey(authorizedUser.getId())) {
@@ -219,7 +219,7 @@ public class CodeSnippetController {
         User authorizedUser = (User)request.getAttribute("authorizedUser");
 
         CodeSnippet snippet = (CodeSnippet)request.getAttribute("validSnippet");
-        HashMap<String, Boolean> downvoters = snippet.getDownvoters();
+        Map<String, Boolean> downvoters = snippet.getDownvoters();
 
         if (downvote) {
             if (!downvoters.containsKey(authorizedUser.getId())) {
@@ -251,7 +251,7 @@ public class CodeSnippetController {
         User authorizedUser = (User)request.getAttribute("authorizedUser");
 
         CodeSnippet snippet = (CodeSnippet)request.getAttribute("validSnippet");
-        HashMap<String, Boolean> savedSnippets = authorizedUser.getSavedSnippets();
+        Map<String, Boolean> savedSnippets = authorizedUser.getSavedSnippets();
 
         if (save) {
             if (!savedSnippets.containsKey(snippetId)) {

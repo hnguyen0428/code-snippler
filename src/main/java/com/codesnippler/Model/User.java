@@ -22,16 +22,16 @@ public class User extends JsonModel {
     private String password;
 
     private String apiKey;
-    private HashMap<String, Boolean> savedSnippets;
-    private HashMap<String, Boolean> createdSnippets;
+    private Map<String, Boolean> savedSnippets;
+    private Map<String, Boolean> createdSnippets;
 
     @DateTimeFormat(iso = ISO.DATE_TIME)
     private Date createdDate;
 
     public User() {}
 
-    public User(String username, String password, String apiKey, HashMap<String, Boolean> savedSnippets,
-                HashMap<String, Boolean> createdSnippets, Date createdDate) {
+    public User(String username, String password, String apiKey, LinkedHashMap<String, Boolean> savedSnippets,
+                LinkedHashMap<String, Boolean> createdSnippets, Date createdDate) {
         this.username = username;
         this.password = password;
         this.apiKey = apiKey;
@@ -46,8 +46,8 @@ public class User extends JsonModel {
         this.apiKey = apiKey;
         this.createdDate = createdDate;
 
-        this.savedSnippets = new HashMap<>();
-        this.createdSnippets = new HashMap<>();
+        this.savedSnippets = new LinkedHashMap<>();
+        this.createdSnippets = new LinkedHashMap<>();
     }
 
     @Override
@@ -79,8 +79,8 @@ public class User extends JsonModel {
         this.apiKey = apiKey;
     }
 
-    public HashMap<String, Boolean> getSavedSnippets() {
-        return savedSnippets != null ? savedSnippets : new HashMap<>();
+    public Map<String, Boolean> getSavedSnippets() {
+        return savedSnippets != null ? savedSnippets : new LinkedHashMap<>();
     }
 
     public void addToSavedSnippets(String snippetId) {
@@ -93,8 +93,8 @@ public class User extends JsonModel {
         savedSnippets.remove(snippetId);
     }
 
-    public HashMap<String, Boolean> getCreatedSnippets() {
-        return createdSnippets != null ? createdSnippets : new HashMap<>();
+    public Map<String, Boolean> getCreatedSnippets() {
+        return createdSnippets != null ? createdSnippets : new LinkedHashMap<>();
     }
 
     public void addToCreatedSnippets(String snippetId) {
@@ -117,7 +117,27 @@ public class User extends JsonModel {
 
     @Override
     public JsonObject toJson() {
-        return super.toJson(hidden);
+        return toJsonBuilder().build();
+    }
+
+    @Override
+    public JsonObject toJson(Map<String, ?> addOns) {
+        return toJsonBuilder(addOns).build();
+    }
+
+    @Override
+    public JsonObjectBuilder toJsonBuilder() {
+        JsonObjectBuilder json = super.toJsonBuilder(hidden);
+        json.add("savedSnippets", JsonUtility.listToJson(savedSnippets.keySet()));
+        json.add("createdSnippets", JsonUtility.listToJson(createdSnippets.keySet()));
+
+        return json;
+    }
+
+    @Override
+    public JsonObjectBuilder toJsonBuilder(Map<String, ?> addOns) {
+        JsonObjectBuilder result = super.toJsonBuilder(hidden);
+        return JsonUtility.addJsonValues(result, addOns);
     }
 
     public String getId() {
