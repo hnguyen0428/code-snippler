@@ -26,6 +26,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.json.*;
 import javax.servlet.http.HttpServletRequest;
+import javax.swing.text.html.Option;
 import javax.validation.constraints.NotNull;
 import java.util.*;
 import java.util.stream.Stream;
@@ -127,11 +128,43 @@ public class CodeSnippetController {
     }
 
 
+    private JsonArray getCommentDetails(User user, CodeSnippet snippet) {
+        List<String> commentIds = snippet.getComments();
+        Iterable<Comment> comments = this.commentRepo.findAllById(commentIds);
+
+        List<JsonObject> jsons = new ArrayList<>();
+        comments.forEach(comment -> {
+            if (user.isAuthenticated()) {
+                comment.setUpvoted(user);
+                comment.setDownvoted(user);
+            }
+            jsons.add(comment.toJson());
+        });
+
+        return JsonUtility.listToJson(jsons);
+    }
+
+
+    private JsonArray getCommentDetails(User user, Iterable<Comment> comments) {
+        List<JsonObject> jsons = new ArrayList<>();
+        comments.forEach(comment -> {
+            if (user.isAuthenticated()) {
+                comment.setUpvoted(user);
+                comment.setDownvoted(user);
+            }
+            jsons.add(comment.toJson());
+        });
+
+        return JsonUtility.listToJson(jsons);
+    }
+
+
     @GetMapping(value = "/{snippetId}", produces = "application/json")
     ResponseEntity getSnippet(@Authorized(required = false) User authorizedUser,
                               @PathVariable(value = "snippetId") @NotNull CodeSnippet snippet,
                               @RequestParam(value = "increaseViewcount", required = false) boolean shouldIncrease,
-                              @RequestParam(value = "showCommentDetails", required = false) boolean showCommentDetails) {
+                              @RequestParam(value = "showCommentDetails", required = false) boolean showCommentDetails,
+                              @RequestParam(value = "showUserDetails", required = false) boolean showUserDetails) {
         if (shouldIncrease) {
             snippet.incrementViewsCount();
             snippet = this.snippetRepo.save(snippet);
@@ -139,10 +172,8 @@ public class CodeSnippetController {
 
         // Declare add on key value pairs to the JSON response
         Map<String, String> addOns = new HashMap<>();
-        Optional<Language> language = this.langRepo.findById(snippet.getLanguageId());
-        if (language.isPresent()) {
-            addOns.put("language", language.get().getName());
-        }
+        Optional<Language> languageOpt = this.langRepo.findById(snippet.getLanguageId());
+        languageOpt.ifPresent(language -> addOns.put("language", language.getName()));
 
         if (authorizedUser.isAuthenticated()) {
             snippet.setUpvoted(authorizedUser);
@@ -154,20 +185,13 @@ public class CodeSnippetController {
         JsonObjectBuilder snippetJsonBuilder = snippet.toJsonBuilder(addOns);
 
         if (showCommentDetails) {
-            List<String> commentIds = snippet.getComments();
-            Iterable<Comment> comments = this.commentRepo.findAllById(commentIds);
-
-            List<JsonObject> jsons = new ArrayList<>();
-            comments.forEach(comment -> {
-                if (authorizedUser.isAuthenticated()) {
-                    comment.setUpvoted(authorizedUser);
-                    comment.setDownvoted(authorizedUser);
-                }
-                jsons.add(comment.toJson());
-            });
-
-            JsonArray commentsJsonArray = JsonUtility.listToJson(jsons);
+            JsonArray commentsJsonArray = getCommentDetails(authorizedUser, snippet);
             snippetJsonBuilder.add("comments", commentsJsonArray);
+        }
+
+        if (showUserDetails) {
+            Optional<User> userOpt = this.userRepo.findById(snippet.getUserId());
+            userOpt.ifPresent(user -> snippetJsonBuilder.add("user", user.toJson()));
         }
 
         String response = ResponseBuilder.createDataResponse(snippetJsonBuilder.build()).toString();
@@ -314,14 +338,7 @@ public class CodeSnippetController {
             data = JsonUtility.listToJson(jsons);
         }
         else {
-            comments.forEach(comment -> {
-                if (authorizedUser.isAuthenticated()) {
-                    comment.setUpvoted(authorizedUser);
-                    comment.setDownvoted(authorizedUser);
-                }
-                jsons.add(comment.toJson());
-            });
-            data = JsonUtility.listToJson(comments);
+            data = getCommentDetails(authorizedUser, comments);
         }
 
         String response = ResponseBuilder.createDataResponse(data).toString();

@@ -14,7 +14,7 @@ import java.util.*;
 
 
 public class User extends JsonModel {
-    public static List<String> hidden = Arrays.asList("password");
+    public static List<String> hidden = Arrays.asList("password", "authenticated", "apiKey");
 
     @Id
     private String userId;

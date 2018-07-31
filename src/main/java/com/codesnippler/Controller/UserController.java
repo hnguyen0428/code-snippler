@@ -76,8 +76,9 @@ public class UserController {
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
 
         if (encoder.matches(password, user.getPassword())) {
-            JsonObject userJson = user.toJson();
-            String response = ResponseBuilder.createDataResponse(userJson).toString();
+            JsonObjectBuilder json = user.toJsonBuilder();
+            json.add("apiKey", user.getApiKey());
+            String response = ResponseBuilder.createDataResponse(json.build()).toString();
             return new ResponseEntity<>(response, HttpStatus.OK);
         }
         else {
@@ -87,10 +88,7 @@ public class UserController {
     }
 
 
-    @GetMapping(value = "/me", produces = "application/json")
-    ResponseEntity getMyProfile(@Authorized User user,
-                                @RequestParam(value = "showSnippetDetails", required = false,
-                                        defaultValue = "false") boolean showSnippetDetails) {
+    private ResponseEntity getUserProfile(User user, boolean showSnippetDetails) {
         String response;
 
         if (!showSnippetDetails) {
@@ -110,6 +108,14 @@ public class UserController {
 
         response = ResponseBuilder.createDataResponse(json.build()).toString();
         return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+
+    @GetMapping(value = "/me", produces = "application/json")
+    ResponseEntity getMyProfile(@Authorized User user,
+                                @RequestParam(value = "showSnippetDetails", required = false,
+                                        defaultValue = "false") boolean showSnippetDetails) {
+        return this.getUserProfile(user, showSnippetDetails);
     }
 
 
@@ -117,33 +123,13 @@ public class UserController {
     ResponseEntity getUser(@RequestParam(value = "showSnippetDetails", required = false,
                                    defaultValue = "false") boolean showSnippetDetails,
                            @PathVariable(value = "userId") @NotNull User user) {
-        String response;
-
-        if (!showSnippetDetails) {
-            response = ResponseBuilder.createDataResponse(user.toJson()).toString();
-            return new ResponseEntity<>(response, HttpStatus.OK);
-        }
-
-        Set<String> createdSnippetIds = user.getCreatedSnippets().keySet();
-        Set<String> savedSnippetIds = user.getSavedSnippets().keySet();
-
-        Iterable<CodeSnippet> createdSnippets = this.snippetRepo.findAllById(createdSnippetIds);
-        Iterable<CodeSnippet> savedSnippets = this.snippetRepo.findAllById(savedSnippetIds);
-
-        JsonObjectBuilder json = user.toJsonBuilder();
-        json.add("createdSnippets", JsonUtility.listToJson(createdSnippets));
-        json.add("savedSnippets", JsonUtility.listToJson(savedSnippets));
-
-        response = ResponseBuilder.createDataResponse(json.build()).toString();
-        return new ResponseEntity<>(response, HttpStatus.OK);
+        return this.getUserProfile(user, showSnippetDetails);
     }
 
 
-    @GetMapping(value = "/savedSnippets", produces = "application/json")
-    ResponseEntity getSavedSnippets(@Authorized User user,
-                                    @RequestParam(value = "showDetails", required = false) boolean showDetails) {
+    private ResponseEntity getUserSavedSnippets(User user, boolean showDetails) {
         Map<String, Boolean> snippetIdsMap = user.getSavedSnippets();
-        Set snippetIds = snippetIdsMap.keySet();
+        Set<String> snippetIds = snippetIdsMap.keySet();
 
         JsonArray snippetsArray = JsonUtility.listToJson(snippetIds);
         if (!showDetails) {
@@ -158,11 +144,23 @@ public class UserController {
     }
 
 
+    @GetMapping(value = "/savedSnippets", produces = "application/json")
+    ResponseEntity getSavedSnippets(@Authorized User user,
+                                    @RequestParam(value = "showDetails", required = false) boolean showDetails) {
+        return this.getUserSavedSnippets(user, showDetails);
+    }
+
+
     @GetMapping(value = "/{userId}/savedSnippets", produces = "application/json")
     ResponseEntity getSavedSnippets(@Authorized User authorizedUser,
                                     @PathVariable(value = "userId") @NotNull User user,
                                     @RequestParam(value = "showDetails", required = false) boolean showDetails) {
-        Map<String, Boolean> snippetIdsMap = user.getSavedSnippets();
+        return this.getUserSavedSnippets(user, showDetails);
+    }
+
+
+    private ResponseEntity getUserCreatedSnippets(User user, boolean showDetails) {
+        Map<String, Boolean> snippetIdsMap = user.getCreatedSnippets();
         Set<String> snippetIds = snippetIdsMap.keySet();
 
         JsonArray snippetsArray = JsonUtility.listToJson(snippetIds);
@@ -181,19 +179,7 @@ public class UserController {
     @GetMapping(value = "/createdSnippets", produces = "application/json")
     ResponseEntity getCreatedSnippets(@Authorized User user,
                                       @RequestParam(value = "showDetails", required = false) boolean showDetails) {
-        Map<String, Boolean> snippetIdsMap = user.getCreatedSnippets();
-        Set snippetIds = snippetIdsMap.keySet();
-
-        JsonArray snippetsArray = JsonUtility.listToJson(snippetIds);
-        if (!showDetails) {
-            String response = ResponseBuilder.createDataResponse(snippetsArray).toString();
-            return new ResponseEntity<>(response, HttpStatus.OK);
-        }
-
-        Iterable itr = this.snippetRepo.findAllById(snippetIds);
-        snippetsArray = JsonUtility.listToJson(itr);
-        String response = ResponseBuilder.createDataResponse(snippetsArray).toString();
-        return new ResponseEntity<>(response, HttpStatus.OK);
+        return this.getUserCreatedSnippets(user, showDetails);
     }
 
 
@@ -201,18 +187,6 @@ public class UserController {
     ResponseEntity getCreatedSnippets(@Authorized User authorizedUser,
                                       @PathVariable(value = "userId") @NotNull User user,
                                       @RequestParam(value = "showDetails", required = false) boolean showDetails) {
-        Map<String, Boolean> snippetIdsMap = user.getCreatedSnippets();
-        Set snippetIds = snippetIdsMap.keySet();
-
-        JsonArray snippetsArray = JsonUtility.listToJson(snippetIds);
-        if (!showDetails) {
-            String response = ResponseBuilder.createDataResponse(snippetsArray).toString();
-            return new ResponseEntity<>(response, HttpStatus.OK);
-        }
-
-        Iterable itr = this.snippetRepo.findAllById(snippetIds);
-        snippetsArray = JsonUtility.listToJson(itr);
-        String response = ResponseBuilder.createDataResponse(snippetsArray).toString();
-        return new ResponseEntity<>(response, HttpStatus.OK);
+        return this.getUserCreatedSnippets(user, showDetails);
     }
 }
