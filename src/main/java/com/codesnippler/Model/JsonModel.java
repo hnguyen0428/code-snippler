@@ -14,6 +14,8 @@ import java.util.*;
 
 public abstract class JsonModel {
 
+    private Map<String, Object> addOns = new HashMap<>();
+
     @Transient
     private boolean valid;
 
@@ -50,6 +52,7 @@ public abstract class JsonModel {
             }
         }
 
+        json = JsonUtility.addJsonValues(json, this.addOns);
         return json;
     }
 
@@ -78,6 +81,7 @@ public abstract class JsonModel {
             }
         }
 
+        json = JsonUtility.addJsonValues(json, this.addOns);
         return json;
     }
 
@@ -115,14 +119,8 @@ public abstract class JsonModel {
             }
         }
 
-        Iterator itr = addOns.entrySet().iterator();
-        while (itr.hasNext()) {
-            Map.Entry pair = (Map.Entry)itr.next();
-            String key = (String)pair.getKey();
-            Object value = pair.getValue();
-            json = JsonUtility.addJsonValue(json, key, value);
-        }
-
+        json = JsonUtility.addJsonValues(json, this.addOns);
+        json = JsonUtility.addJsonValues(json, addOns);
         return json;
     }
 
@@ -160,6 +158,14 @@ public abstract class JsonModel {
 
     public void setValid() {
         valid = true;
+    }
+
+    public Map<String, Object> getAddOns() {
+        return addOns;
+    }
+
+    public void includeInJson(String key, Object value) {
+        addOns.put(key, value);
     }
 
 }

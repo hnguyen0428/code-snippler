@@ -1,15 +1,16 @@
 package com.codesnippler.Model;
 
+import com.codesnippler.Repository.CodeSnippetRepository;
 import com.codesnippler.Utility.JsonUtility;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.format.annotation.DateTimeFormat.ISO;
 
-import javax.json.Json;
+import javax.json.JsonArray;
 import javax.json.JsonObject;
 import javax.json.JsonObjectBuilder;
-import javax.validation.constraints.NotNull;
 import java.util.*;
 
 
@@ -31,6 +32,7 @@ public class User extends JsonModel {
 
     @Transient
     private boolean authenticated;
+
 
     public User() {}
 
@@ -127,6 +129,20 @@ public class User extends JsonModel {
         return authenticated;
     }
 
+    public void includeSavedSnippetsDetails(CodeSnippetRepository snippetRepo) {
+        Set<String> snippetIds = this.getSavedSnippets().keySet();
+        Iterable<CodeSnippet> itr = snippetRepo.findAllById(snippetIds);
+        JsonArray snippetsArray = JsonUtility.listToJson(itr);
+        includeInJson("savedSnippets", snippetsArray);
+    }
+
+    public void includeCreatedSnippetsDetails(CodeSnippetRepository snippetRepo) {
+        Set<String> snippetIds = this.getCreatedSnippets().keySet();
+        Iterable<CodeSnippet> itr = snippetRepo.findAllById(snippetIds);
+        JsonArray snippetsArray = JsonUtility.listToJson(itr);
+        includeInJson("createdSnippets", snippetsArray);
+    }
+
     @Override
     public JsonObject toJson() {
         return toJsonBuilder().build();
@@ -140,8 +156,10 @@ public class User extends JsonModel {
     @Override
     public JsonObjectBuilder toJsonBuilder() {
         JsonObjectBuilder json = super.toJsonBuilder(hidden);
-        json.add("savedSnippets", JsonUtility.listToJson(savedSnippets.keySet()));
-        json.add("createdSnippets", JsonUtility.listToJson(createdSnippets.keySet()));
+        if (!getAddOns().containsKey("savedSnippets"))
+            json.add("savedSnippets", JsonUtility.listToJson(savedSnippets.keySet()));
+        if (!getAddOns().containsKey("createdSnippets"))
+            json.add("createdSnippets", JsonUtility.listToJson(createdSnippets.keySet()));
 
         return json;
     }

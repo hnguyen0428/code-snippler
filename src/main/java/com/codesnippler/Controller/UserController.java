@@ -89,24 +89,12 @@ public class UserController {
 
 
     private ResponseEntity getUserProfile(User user, boolean showSnippetDetails) {
-        String response;
-
-        if (!showSnippetDetails) {
-            response = ResponseBuilder.createDataResponse(user.toJson()).toString();
-            return new ResponseEntity<>(response, HttpStatus.OK);
+        if (showSnippetDetails) {
+            user.includeCreatedSnippetsDetails(snippetRepo);
+            user.includeSavedSnippetsDetails(snippetRepo);
         }
 
-        Set<String> createdSnippetIds = user.getCreatedSnippets().keySet();
-        Set<String> savedSnippetIds = user.getSavedSnippets().keySet();
-
-        Iterable<CodeSnippet> createdSnippets = this.snippetRepo.findAllById(createdSnippetIds);
-        Iterable<CodeSnippet> savedSnippets = this.snippetRepo.findAllById(savedSnippetIds);
-
-        JsonObjectBuilder json = user.toJsonBuilder();
-        json.add("createdSnippets", JsonUtility.listToJson(createdSnippets));
-        json.add("savedSnippets", JsonUtility.listToJson(savedSnippets));
-
-        response = ResponseBuilder.createDataResponse(json.build()).toString();
+        String response = ResponseBuilder.createDataResponse(user.toJson()).toString();
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 

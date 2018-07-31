@@ -1,11 +1,14 @@
 package com.codesnippler.Model;
 
+import com.codesnippler.Repository.CommentRepository;
+import com.codesnippler.Repository.UserRepository;
 import com.codesnippler.Utility.JsonUtility;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.format.annotation.DateTimeFormat.ISO;
 
+import javax.json.JsonArray;
 import javax.json.JsonObject;
 import javax.json.JsonObjectBuilder;
 import java.util.*;
@@ -263,9 +266,51 @@ public class CodeSnippet extends JsonModel {
         popularityScore = savedCount + viewsCount + upvotes - downvotes;
     }
 
+    public void setUserRelatedStatus(User user) {
+        setUpvoted(user);
+        setDownvoted(user);
+        setSaved(user);
+    }
+
+
+    public void includeUserDetails(UserRepository userRepo) {
+        Optional<User> userOpt = userRepo.findById(this.getUserId());
+        userOpt.ifPresent(user -> includeInJson("user", user));
+    }
+
+
+    public void includeCommentsDetails(CommentRepository commentRepo, User user) {
+        List<String> commentIds = this.getComments();
+        Iterable<Comment> comments = commentRepo.findAllById(commentIds);
+
+        JsonArray commentsJson = getCommentsDetailJson(user, comments);
+        includeInJson("comments", commentsJson);
+    }
+
+
+    public void includeCommentsDetails(User user, Iterable<Comment> comments) {
+        JsonArray commentsJson = getCommentsDetailJson(user, comments);
+        includeInJson("comments", commentsJson);
+    }
+
+
+    private JsonArray getCommentsDetailJson(User user, Iterable<Comment> comments) {
+        List<JsonObject> jsons = new ArrayList<>();
+        comments.forEach(comment -> {
+            if (user.isAuthenticated()) {
+                comment.setUpvoted(user);
+                comment.setDownvoted(user);
+            }
+            jsons.add(comment.toJson());
+        });
+
+        return JsonUtility.listToJson(jsons);
+    }
+
+
     @Override
     public JsonObject toJson() {
-        return super.toJson(hidden);
+        return toJsonBuilder(hidden).build();
     }
 
     @Override

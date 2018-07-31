@@ -128,37 +128,6 @@ public class CodeSnippetController {
     }
 
 
-    private JsonArray getCommentDetails(User user, CodeSnippet snippet) {
-        List<String> commentIds = snippet.getComments();
-        Iterable<Comment> comments = this.commentRepo.findAllById(commentIds);
-
-        List<JsonObject> jsons = new ArrayList<>();
-        comments.forEach(comment -> {
-            if (user.isAuthenticated()) {
-                comment.setUpvoted(user);
-                comment.setDownvoted(user);
-            }
-            jsons.add(comment.toJson());
-        });
-
-        return JsonUtility.listToJson(jsons);
-    }
-
-
-    private JsonArray getCommentDetails(User user, Iterable<Comment> comments) {
-        List<JsonObject> jsons = new ArrayList<>();
-        comments.forEach(comment -> {
-            if (user.isAuthenticated()) {
-                comment.setUpvoted(user);
-                comment.setDownvoted(user);
-            }
-            jsons.add(comment.toJson());
-        });
-
-        return JsonUtility.listToJson(jsons);
-    }
-
-
     @GetMapping(value = "/{snippetId}", produces = "application/json")
     ResponseEntity getSnippet(@Authorized(required = false) User authorizedUser,
                               @PathVariable(value = "snippetId") @NotNull CodeSnippet snippet,
@@ -170,31 +139,25 @@ public class CodeSnippetController {
             snippet = this.snippetRepo.save(snippet);
         }
 
-        // Declare add on key value pairs to the JSON response
-        Map<String, String> addOns = new HashMap<>();
         Optional<Language> languageOpt = this.langRepo.findById(snippet.getLanguageId());
-        languageOpt.ifPresent(language -> addOns.put("language", language.getName()));
+        if (languageOpt.isPresent()) {
+            snippet.includeInJson("language", languageOpt.get().getName());
+        }
 
         if (authorizedUser.isAuthenticated()) {
-            snippet.setUpvoted(authorizedUser);
-            snippet.setDownvoted(authorizedUser);
-            snippet.setSaved(authorizedUser);
+            snippet.setUserRelatedStatus(authorizedUser);
         }
         snippet.setPopularityScore();
 
-        JsonObjectBuilder snippetJsonBuilder = snippet.toJsonBuilder(addOns);
-
         if (showCommentDetails) {
-            JsonArray commentsJsonArray = getCommentDetails(authorizedUser, snippet);
-            snippetJsonBuilder.add("comments", commentsJsonArray);
+            snippet.includeCommentsDetails(commentRepo, authorizedUser);
         }
 
         if (showUserDetails) {
-            Optional<User> userOpt = this.userRepo.findById(snippet.getUserId());
-            userOpt.ifPresent(user -> snippetJsonBuilder.add("user", user.toJson()));
+            snippet.includeUserDetails(userRepo);
         }
 
-        String response = ResponseBuilder.createDataResponse(snippetJsonBuilder.build()).toString();
+        String response = ResponseBuilder.createDataResponse(snippet.toJson()).toString();
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
@@ -313,7 +276,6 @@ public class CodeSnippetController {
 
         Iterable<Comment> comments = this.commentRepo.findAllById(commentIds);
 
-        List<JsonObject> jsons = new ArrayList<>();
         if (showUserDetails) {
             Map<String, User> usersMap = new HashMap<>();
             List<String> usersToFind = new ArrayList<>();
@@ -325,20 +287,17 @@ public class CodeSnippetController {
             users.forEach(user -> usersMap.put(user.getId(), user));
 
             comments.forEach(comment -> {
-                if (authorizedUser.isAuthenticated()) {
-                    comment.setUpvoted(authorizedUser);
-                    comment.setDownvoted(authorizedUser);
-                }
-                JsonObjectBuilder builder = comment.toJsonBuilder();
+                comment.setUserRelatedStatus(authorizedUser);
                 User user = usersMap.get(comment.getUserId());
-                builder.add("user", user.toJson());
-
-                jsons.add(builder.build());
+                comment.includeInJson("user", user);
             });
-            data = JsonUtility.listToJson(jsons);
+            data = JsonUtility.listToJson(comments);
         }
         else {
-            data = getCommentDetails(authorizedUser, comments);
+            comments.forEach(comment -> {
+                comment.setUserRelatedStatus(authorizedUser);
+            });
+            data = JsonUtility.listToJson(comments);
         }
 
         String response = ResponseBuilder.createDataResponse(data).toString();

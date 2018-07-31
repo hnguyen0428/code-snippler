@@ -1,5 +1,6 @@
 package com.codesnippler.Model;
 
+import com.codesnippler.Repository.UserRepository;
 import com.codesnippler.Utility.JsonUtility;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
@@ -154,6 +155,16 @@ public class Comment extends JsonModel {
     public void setDownvoted(User user) {
         downvoters = getDownvoters();
         downvoted = downvoters.containsKey(user.getId());
+    }
+
+    public void includeUserDetails(UserRepository userRepo) {
+        Optional<User> userOpt = userRepo.findById(this.getUserId());
+        userOpt.ifPresent(user -> includeInJson("user", user));
+    }
+
+    public void setUserRelatedStatus(User user) {
+        setUpvoted(user);
+        setDownvoted(user);
     }
 
     @Override
