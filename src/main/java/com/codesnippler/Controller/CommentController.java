@@ -39,7 +39,7 @@ public class CommentController {
     @PatchMapping(value = "/{commentId}", produces = "application/json")
     ResponseEntity update(@Authorized User authorizedUser,
                           @RequestParam(value = "content") String content,
-                          @PathVariable(value = "commentId") @NotNull Comment comment) {
+                          @PathVariable(value = "commentId") @NotNull(message = "Invalid Comment ID") Comment comment) {
         if (!comment.getUserId().equals(authorizedUser.getId())) {
             String response = ResponseBuilder.createErrorResponse("User is not authorized to update this comment",
                     ErrorTypes.INV_AUTH_ERROR).toString();
@@ -56,7 +56,7 @@ public class CommentController {
 
     @DeleteMapping(value = "/{commentId}", produces = "application/json")
     ResponseEntity delete(@Authorized User authorizedUser,
-                          @PathVariable(value = "commentId") @NotNull Comment comment) {
+                          @PathVariable(value = "commentId") @NotNull(message = "Invalid Comment ID") Comment comment) {
         if (!comment.getUserId().equals(authorizedUser.getId())) {
             String response = ResponseBuilder.createErrorResponse("User is not authorized to update this comment",
                     ErrorTypes.INV_AUTH_ERROR).toString();
@@ -79,7 +79,7 @@ public class CommentController {
 
     @PatchMapping(value = "/{commentId}/upvote", produces = "application/json")
     ResponseEntity upvote(@Authorized User authorizedUser,
-                          @PathVariable(value = "commentId") @NotNull Comment comment,
+                          @PathVariable(value = "commentId") @NotNull(message = "Invalid Comment ID") Comment comment,
                           @RequestParam(value = "upvote") boolean upvote) {
         HashMap<String, Boolean> upvoters = comment.getUpvoters();
 
@@ -109,7 +109,7 @@ public class CommentController {
 
     @PatchMapping(value = "/{commentId}/downvote", produces = "application/json")
     ResponseEntity downvote(@Authorized User authorizedUser,
-                            @PathVariable(value = "commentId") @NotNull Comment comment,
+                            @PathVariable(value = "commentId") @NotNull(message = "Invalid Comment ID") Comment comment,
                             @RequestParam(value = "downvote") boolean downvote) {
         HashMap<String, Boolean> downvoters = comment.getDownvoters();
 

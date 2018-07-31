@@ -110,7 +110,7 @@ public class UserController {
     @GetMapping(value = "/{userId}", produces = "application/json")
     ResponseEntity getUser(@RequestParam(value = "showSnippetDetails", required = false,
                                    defaultValue = "false") boolean showSnippetDetails,
-                           @PathVariable(value = "userId") @NotNull User user) {
+                           @PathVariable(value = "userId") @NotNull(message = "Invalid User ID") User user) {
         return this.getUserProfile(user, showSnippetDetails);
     }
 
@@ -141,7 +141,7 @@ public class UserController {
 
     @GetMapping(value = "/{userId}/savedSnippets", produces = "application/json")
     ResponseEntity getSavedSnippets(@Authorized User authorizedUser,
-                                    @PathVariable(value = "userId") @NotNull User user,
+                                    @PathVariable(value = "userId") @NotNull(message = "Invalid User ID") User user,
                                     @RequestParam(value = "showDetails", required = false) boolean showDetails) {
         return this.getUserSavedSnippets(user, showDetails);
     }
@@ -173,7 +173,7 @@ public class UserController {
 
     @GetMapping(value = "/{userId}/createdSnippets", produces = "application/json")
     ResponseEntity getCreatedSnippets(@Authorized User authorizedUser,
-                                      @PathVariable(value = "userId") @NotNull User user,
+                                      @PathVariable(value = "userId") @NotNull(message = "Invalid User ID") User user,
                                       @RequestParam(value = "showDetails", required = false) boolean showDetails) {
         return this.getUserCreatedSnippets(user, showDetails);
     }
