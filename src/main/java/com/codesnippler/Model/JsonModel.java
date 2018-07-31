@@ -14,6 +14,9 @@ import java.util.*;
 
 public abstract class JsonModel {
 
+    @Transient
+    private boolean valid;
+
     @Override
     public String toString() {
         return toJson().toString();
@@ -123,6 +126,7 @@ public abstract class JsonModel {
         return json;
     }
 
+
     public static Set<String> getModelAttributes(Class cls) {
         Field[] fields = cls.getDeclaredFields();
         Set<String> result = new HashSet<>();
@@ -132,6 +136,30 @@ public abstract class JsonModel {
             }
         }
         return result;
+    }
+
+
+    public void copyTo(JsonModel model) {
+        Field[] fields = this.getClass().getDeclaredFields();
+
+        for (Field field : fields) {
+            if (Modifier.isStatic(field.getModifiers()))
+                continue;
+
+            field.setAccessible(true);
+
+            try {
+                field.set(model, field.get(this));
+
+            } catch (IllegalAccessException | ClassCastException e) {
+                System.out.println("Unable to retrieve fields");
+            }
+        }
+    }
+
+
+    public void setValid() {
+        valid = true;
     }
 
 }

@@ -2,6 +2,7 @@ package com.codesnippler.Model;
 
 import com.codesnippler.Utility.JsonUtility;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Transient;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.format.annotation.DateTimeFormat.ISO;
 
@@ -27,6 +28,9 @@ public class User extends JsonModel {
 
     @DateTimeFormat(iso = ISO.DATE_TIME)
     private Date createdDate;
+
+    @Transient
+    private boolean authenticated;
 
     public User() {}
 
@@ -113,6 +117,14 @@ public class User extends JsonModel {
 
     public void setCreatedDate(Date createdDate) {
         this.createdDate = createdDate;
+    }
+
+    public void setAuthenticated() {
+        authenticated = true;
+    }
+
+    public boolean isAuthenticated() {
+        return authenticated;
     }
 
     @Override

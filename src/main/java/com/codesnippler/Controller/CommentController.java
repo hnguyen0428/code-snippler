@@ -36,10 +36,10 @@ public class CommentController {
 
 
     @PatchMapping(value = "/{commentId}", produces = "application/json")
-    ResponseEntity update(@Authorized HttpServletRequest request,
+    ResponseEntity update(HttpServletRequest request,
+                          @Authorized User authorizedUser,
                           @RequestParam(value = "content") String content,
                           @PathVariable(value = "commentId") @ValidComment String commentId) {
-        User authorizedUser = (User)request.getAttribute("authorizedUser");
         Comment comment = (Comment)request.getAttribute("validComment");
 
         if (!comment.getUserId().equals(authorizedUser.getId())) {
@@ -57,9 +57,9 @@ public class CommentController {
 
 
     @DeleteMapping(value = "/{commentId}", produces = "application/json")
-    ResponseEntity delete(@Authorized HttpServletRequest request,
+    ResponseEntity delete(HttpServletRequest request,
+                          @Authorized User authorizedUser,
                           @PathVariable(value = "commentId") @ValidComment String commentId) {
-        User authorizedUser = (User)request.getAttribute("authorizedUser");
         Comment comment = (Comment)request.getAttribute("validComment");
 
         if (!comment.getUserId().equals(authorizedUser.getId())) {
@@ -83,10 +83,10 @@ public class CommentController {
 
 
     @PatchMapping(value = "/{commentId}/upvote", produces = "application/json")
-    ResponseEntity upvote(@Authorized HttpServletRequest request,
+    ResponseEntity upvote(HttpServletRequest request,
+                          @Authorized User authorizedUser,
                           @PathVariable(value = "commentId") @ValidComment String commentId,
                           @RequestParam(value = "upvote") boolean upvote) {
-        User authorizedUser = (User)request.getAttribute("authorizedUser");
         Comment comment = (Comment)request.getAttribute("validComment");
 
         HashMap<String, Boolean> upvoters = comment.getUpvoters();
@@ -116,10 +116,10 @@ public class CommentController {
 
 
     @PatchMapping(value = "/{commentId}/downvote", produces = "application/json")
-    ResponseEntity downvote(@Authorized HttpServletRequest request,
+    ResponseEntity downvote(HttpServletRequest request,
+                            @Authorized User authorizedUser,
                             @PathVariable(value = "commentId") @ValidComment String commentId,
                             @RequestParam(value = "downvote") boolean downvote) {
-        User authorizedUser = (User)request.getAttribute("authorizedUser");
         Comment comment = (Comment)request.getAttribute("validComment");
 
         HashMap<String, Boolean> downvoters = comment.getDownvoters();
