@@ -81,6 +81,12 @@ public class CodeSnippetController {
                           @RequestParam(value = "code", required = false) String code,
                           @RequestParam(value = "language", required = false) @ValidLanguageName String languageName,
                           @PathVariable(value = "snippetId") @NotNull CodeSnippet snippet) {
+        if (!snippet.getUserId().equals(authorizedUser.getId())) {
+            String response = ResponseBuilder.createErrorResponse("User is not authorized to delete this snippet",
+                    ErrorTypes.INV_AUTH_ERROR).toString();
+            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+        }
+
         if (title != null) snippet.setTitle(title);
         if (description != null) snippet.setDescription(description);
         if (code != null) snippet.setCode(code);
