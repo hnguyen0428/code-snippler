@@ -21,6 +21,7 @@ import javax.json.JsonArray;
 import javax.json.JsonObject;
 import javax.json.JsonObjectBuilder;
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 import java.util.*;
@@ -87,8 +88,7 @@ public class UserController {
 
 
     @GetMapping(value = "/me", produces = "application/json")
-    ResponseEntity getMyProfile(HttpServletRequest request,
-                                @Authorized User user,
+    ResponseEntity getMyProfile(@Authorized User user,
                                 @RequestParam(value = "showSnippetDetails", required = false,
                                         defaultValue = "false") boolean showSnippetDetails) {
         String response;
@@ -114,11 +114,9 @@ public class UserController {
 
 
     @GetMapping(value = "/{userId}", produces = "application/json")
-    ResponseEntity getUser(HttpServletRequest request,
-                           @RequestParam(value = "showSnippetDetails", required = false,
+    ResponseEntity getUser(@RequestParam(value = "showSnippetDetails", required = false,
                                    defaultValue = "false") boolean showSnippetDetails,
-                           @PathVariable(value = "userId") @ValidUser String userId) {
-        User user = (User)request.getAttribute("validUser");
+                           @PathVariable(value = "userId") @NotNull User user) {
         String response;
 
         if (!showSnippetDetails) {
@@ -142,8 +140,7 @@ public class UserController {
 
 
     @GetMapping(value = "/savedSnippets", produces = "application/json")
-    ResponseEntity getSavedSnippets(HttpServletRequest request,
-                                    @Authorized User user,
+    ResponseEntity getSavedSnippets(@Authorized User user,
                                     @RequestParam(value = "showDetails", required = false) boolean showDetails) {
         Map<String, Boolean> snippetIdsMap = user.getSavedSnippets();
         Set snippetIds = snippetIdsMap.keySet();
@@ -162,11 +159,9 @@ public class UserController {
 
 
     @GetMapping(value = "/{userId}/savedSnippets", produces = "application/json")
-    ResponseEntity getSavedSnippets(HttpServletRequest request,
-                                    @Authorized User authorizedUser,
-                                    @PathVariable(value = "userId") @ValidUser String userId,
+    ResponseEntity getSavedSnippets(@Authorized User authorizedUser,
+                                    @PathVariable(value = "userId") @NotNull User user,
                                     @RequestParam(value = "showDetails", required = false) boolean showDetails) {
-        User user = (User)request.getAttribute("validUser");
         Map<String, Boolean> snippetIdsMap = user.getSavedSnippets();
         Set<String> snippetIds = snippetIdsMap.keySet();
 
@@ -184,8 +179,7 @@ public class UserController {
 
 
     @GetMapping(value = "/createdSnippets", produces = "application/json")
-    ResponseEntity getCreatedSnippets(HttpServletRequest request,
-                                      @Authorized User user,
+    ResponseEntity getCreatedSnippets(@Authorized User user,
                                       @RequestParam(value = "showDetails", required = false) boolean showDetails) {
         Map<String, Boolean> snippetIdsMap = user.getCreatedSnippets();
         Set snippetIds = snippetIdsMap.keySet();
@@ -204,11 +198,9 @@ public class UserController {
 
 
     @GetMapping(value = "/{userId}/createdSnippets", produces = "application/json")
-    ResponseEntity getCreatedSnippets(HttpServletRequest request,
-                                      @Authorized User authorizedUser,
-                                      @PathVariable(value = "userId") @ValidUser String userId,
+    ResponseEntity getCreatedSnippets(@Authorized User authorizedUser,
+                                      @PathVariable(value = "userId") @NotNull User user,
                                       @RequestParam(value = "showDetails", required = false) boolean showDetails) {
-        User user = (User)request.getAttribute("validUser");
         Map<String, Boolean> snippetIdsMap = user.getCreatedSnippets();
         Set snippetIds = snippetIdsMap.keySet();
 

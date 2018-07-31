@@ -17,6 +17,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.constraints.NotNull;
 import java.util.HashMap;
 import java.util.Optional;
 
@@ -36,12 +37,9 @@ public class CommentController {
 
 
     @PatchMapping(value = "/{commentId}", produces = "application/json")
-    ResponseEntity update(HttpServletRequest request,
-                          @Authorized User authorizedUser,
+    ResponseEntity update(@Authorized User authorizedUser,
                           @RequestParam(value = "content") String content,
-                          @PathVariable(value = "commentId") @ValidComment String commentId) {
-        Comment comment = (Comment)request.getAttribute("validComment");
-
+                          @PathVariable(value = "commentId") @NotNull Comment comment) {
         if (!comment.getUserId().equals(authorizedUser.getId())) {
             String response = ResponseBuilder.createErrorResponse("User is not authorized to update this comment",
                     ErrorTypes.INV_AUTH_ERROR).toString();
@@ -57,11 +55,8 @@ public class CommentController {
 
 
     @DeleteMapping(value = "/{commentId}", produces = "application/json")
-    ResponseEntity delete(HttpServletRequest request,
-                          @Authorized User authorizedUser,
-                          @PathVariable(value = "commentId") @ValidComment String commentId) {
-        Comment comment = (Comment)request.getAttribute("validComment");
-
+    ResponseEntity delete(@Authorized User authorizedUser,
+                          @PathVariable(value = "commentId") @NotNull Comment comment) {
         if (!comment.getUserId().equals(authorizedUser.getId())) {
             String response = ResponseBuilder.createErrorResponse("User is not authorized to update this comment",
                     ErrorTypes.INV_AUTH_ERROR).toString();
@@ -72,7 +67,7 @@ public class CommentController {
 
         if (snippetOpt.isPresent()) {
             CodeSnippet snippet = snippetOpt.get();
-            snippet.removeFromComments(commentId);
+            snippet.removeFromComments(comment.getId());
             this.snippetRepo.save(snippet);
         }
         this.commentRepo.delete(comment);
@@ -83,12 +78,9 @@ public class CommentController {
 
 
     @PatchMapping(value = "/{commentId}/upvote", produces = "application/json")
-    ResponseEntity upvote(HttpServletRequest request,
-                          @Authorized User authorizedUser,
-                          @PathVariable(value = "commentId") @ValidComment String commentId,
+    ResponseEntity upvote(@Authorized User authorizedUser,
+                          @PathVariable(value = "commentId") @NotNull Comment comment,
                           @RequestParam(value = "upvote") boolean upvote) {
-        Comment comment = (Comment)request.getAttribute("validComment");
-
         HashMap<String, Boolean> upvoters = comment.getUpvoters();
 
         if (upvote) {
@@ -116,12 +108,9 @@ public class CommentController {
 
 
     @PatchMapping(value = "/{commentId}/downvote", produces = "application/json")
-    ResponseEntity downvote(HttpServletRequest request,
-                            @Authorized User authorizedUser,
-                            @PathVariable(value = "commentId") @ValidComment String commentId,
+    ResponseEntity downvote(@Authorized User authorizedUser,
+                            @PathVariable(value = "commentId") @NotNull Comment comment,
                             @RequestParam(value = "downvote") boolean downvote) {
-        Comment comment = (Comment)request.getAttribute("validComment");
-
         HashMap<String, Boolean> downvoters = comment.getDownvoters();
 
         if (downvote) {

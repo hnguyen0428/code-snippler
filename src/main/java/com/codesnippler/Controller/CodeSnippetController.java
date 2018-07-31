@@ -26,6 +26,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.json.*;
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.constraints.NotNull;
 import java.util.*;
 import java.util.stream.Stream;
 
@@ -78,9 +79,7 @@ public class CodeSnippetController {
                           @RequestParam(value = "description", required = false) String description,
                           @RequestParam(value = "code", required = false) String code,
                           @RequestParam(value = "language", required = false) @ValidLanguageName String languageName,
-                          @PathVariable(value = "snippetId") @ValidSnippet String snippetId) {
-        CodeSnippet snippet = (CodeSnippet)request.getAttribute("validSnippet");
-
+                          @PathVariable(value = "snippetId") @NotNull CodeSnippet snippet) {
         if (title != null) snippet.setTitle(title);
         if (description != null) snippet.setDescription(description);
         if (code != null) snippet.setCode(code);
@@ -95,11 +94,8 @@ public class CodeSnippetController {
 
 
     @DeleteMapping(value = "/{snippetId}", produces = "application/json")
-    ResponseEntity delete(HttpServletRequest request,
-                          @Authorized User authorizedUser,
-                          @PathVariable(value = "snippetId") @ValidSnippet String snippetId) {
-        CodeSnippet snippet = (CodeSnippet)request.getAttribute("validSnippet");
-
+    ResponseEntity delete(@Authorized User authorizedUser,
+                          @PathVariable(value = "snippetId") @NotNull CodeSnippet snippet) {
         if (!snippet.getUserId().equals(authorizedUser.getId())) {
             String response = ResponseBuilder.createErrorResponse("User is not authorized to delete this snippet",
                     ErrorTypes.INV_AUTH_ERROR).toString();
@@ -109,8 +105,8 @@ public class CodeSnippetController {
         List<String> commentIds = snippet.getComments();
         commentIds.forEach(this.commentRepo::deleteById);
         this.snippetRepo.delete(snippet);
-        authorizedUser.removeFromCreatedSnippets(snippetId);
-        authorizedUser.removeFromSavedSnippets(snippetId);
+        authorizedUser.removeFromCreatedSnippets(snippet.getId());
+        authorizedUser.removeFromSavedSnippets(snippet.getId());
 
         Set<String> saverIds = snippet.getSavers().keySet();
         List<User> toSaveUsers = new ArrayList<>();
@@ -120,7 +116,7 @@ public class CodeSnippetController {
             Optional<User> userOpt = this.userRepo.findById(id);
             if (userOpt.isPresent()) {
                 User user = userOpt.get();
-                user.removeFromSavedSnippets(snippetId);
+                user.removeFromSavedSnippets(snippet.getId());
                 toSaveUsers.add(user);
             }
         });
@@ -131,14 +127,11 @@ public class CodeSnippetController {
     }
 
 
-    @GetMapping(value = "/{id}", produces = "application/json")
-    ResponseEntity getSnippet(HttpServletRequest request,
-                              @Authorized(required = false) User authorizedUser,
-                              @PathVariable(value = "id") @ValidSnippet String snippetId,
+    @GetMapping(value = "/{snippetId}", produces = "application/json")
+    ResponseEntity getSnippet(@Authorized(required = false) User authorizedUser,
+                              @PathVariable(value = "snippetId") @NotNull CodeSnippet snippet,
                               @RequestParam(value = "increaseViewcount", required = false) boolean shouldIncrease,
                               @RequestParam(value = "showCommentDetails", required = false) boolean showCommentDetails) {
-        CodeSnippet snippet = (CodeSnippet)request.getAttribute("validSnippet");
-
         if (shouldIncrease) {
             snippet.incrementViewsCount();
             snippet = this.snippetRepo.save(snippet);
@@ -183,11 +176,9 @@ public class CodeSnippetController {
 
 
     @PatchMapping(value = "/{snippetId}/upvote", produces = "application/json")
-    ResponseEntity upvote(HttpServletRequest request,
-                          @Authorized User authorizedUser,
-                          @PathVariable(value = "snippetId") @ValidSnippet String snippetId,
+    ResponseEntity upvote(@Authorized User authorizedUser,
+                          @PathVariable(value = "snippetId") @NotNull CodeSnippet snippet,
                           @RequestParam(value = "upvote") boolean upvote) {
-        CodeSnippet snippet = (CodeSnippet)request.getAttribute("validSnippet");
         Map<String, Boolean> upvoters = snippet.getUpvoters();
 
         if (upvote) {
@@ -214,11 +205,9 @@ public class CodeSnippetController {
 
 
     @PatchMapping(value = "/{snippetId}/downvote", produces = "application/json")
-    ResponseEntity downvote(HttpServletRequest request,
-                            @Authorized User authorizedUser,
-                            @PathVariable(value = "snippetId") @ValidSnippet String snippetId,
+    ResponseEntity downvote(@Authorized User authorizedUser,
+                            @PathVariable(value = "snippetId") @NotNull CodeSnippet snippet,
                             @RequestParam(value = "downvote") boolean downvote) {
-        CodeSnippet snippet = (CodeSnippet)request.getAttribute("validSnippet");
         Map<String, Boolean> downvoters = snippet.getDownvoters();
 
         if (downvote) {
@@ -245,24 +234,22 @@ public class CodeSnippetController {
 
 
     @PatchMapping(value = "/{snippetId}/save", produces = "application/json")
-    ResponseEntity saveSnippet(HttpServletRequest request,
-                               @Authorized User authorizedUser,
-                               @PathVariable(value = "snippetId") @ValidSnippet String snippetId,
+    ResponseEntity saveSnippet(@Authorized User authorizedUser,
+                               @PathVariable(value = "snippetId") @NotNull CodeSnippet snippet,
                                @RequestParam(value = "save") boolean save) {
-        CodeSnippet snippet = (CodeSnippet)request.getAttribute("validSnippet");
         Map<String, Boolean> savedSnippets = authorizedUser.getSavedSnippets();
 
         if (save) {
-            if (!savedSnippets.containsKey(snippetId)) {
-                authorizedUser.addToSavedSnippets(snippetId);
+            if (!savedSnippets.containsKey(snippet.getId())) {
+                authorizedUser.addToSavedSnippets(snippet.getId());
                 snippet.addToSavers(authorizedUser.getId());
                 this.snippetRepo.save(snippet);
                 this.userRepo.save(authorizedUser);
             }
         }
         else {
-            if (savedSnippets.containsKey(snippetId)) {
-                authorizedUser.removeFromSavedSnippets(snippetId);
+            if (savedSnippets.containsKey(snippet.getId())) {
+                authorizedUser.removeFromSavedSnippets(snippet.getId());
                 snippet.removeFromSavers(authorizedUser.getId());
                 this.snippetRepo.save(snippet);
                 this.userRepo.save(authorizedUser);
@@ -274,12 +261,10 @@ public class CodeSnippetController {
 
 
     @PostMapping(value = "/{snippetId}/comment", produces = "application/json")
-    ResponseEntity createComment(HttpServletRequest request,
-                                 @Authorized User authorizedUser,
+    ResponseEntity createComment(@Authorized User authorizedUser,
                                  @RequestParam(value = "content") String content,
-                                 @PathVariable(value = "snippetId") @ValidSnippet String snippetId) {
-        CodeSnippet snippet = (CodeSnippet)request.getAttribute("validSnippet");
-        Comment comment = new Comment(content, authorizedUser.getId(), snippetId, new Date());
+                                 @PathVariable(value = "snippetId") @NotNull CodeSnippet snippet) {
+        Comment comment = new Comment(content, authorizedUser.getId(), snippet.getId(), new Date());
         comment = this.commentRepo.save(comment);
 
         snippet.addToComments(comment.getId());
@@ -291,13 +276,11 @@ public class CodeSnippetController {
 
 
     @GetMapping(value = "/{snippetId}/comments", produces = "application/json")
-    ResponseEntity getComments(HttpServletRequest request,
-                               @Authorized(required = false) User authorizedUser,
-                               @PathVariable(value = "snippetId") @ValidSnippet String snippetId,
+    ResponseEntity getComments(@Authorized(required = false) User authorizedUser,
+                               @PathVariable(value = "snippetId") @NotNull CodeSnippet snippet,
                                @RequestParam(value = "showUserDetails", required = false) boolean showUserDetails,
                                @RequestParam(value = "page", required = false, defaultValue = "0") int page,
                                @RequestParam(value = "pageSize", required = false, defaultValue = "10") int pageSize) {
-        CodeSnippet snippet = (CodeSnippet)request.getAttribute("validSnippet");
         List<String> commentIds = snippet.getComments();
         // Pagination
         commentIds = GeneralUtility.paginate(commentIds, page, pageSize);

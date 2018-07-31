@@ -12,7 +12,7 @@ import javax.validation.ConstraintValidatorContext;
 import java.util.Optional;
 
 
-public class SnippetValidator implements ConstraintValidator<ValidSnippet, String> {
+public class SnippetValidator implements ConstraintValidator<ValidSnippet, CodeSnippet> {
     private final CodeSnippetRepository snippetRepo;
 
     @Autowired
@@ -25,17 +25,17 @@ public class SnippetValidator implements ConstraintValidator<ValidSnippet, Strin
 
 
     @Override
-    public boolean isValid(String value, ConstraintValidatorContext context) {
-        Optional<CodeSnippet> snippetOpt = this.snippetRepo.findById(value);
+    public boolean isValid(CodeSnippet value, ConstraintValidatorContext context) {
+        if (value == null)
+            return false;
+
+        Optional<CodeSnippet> snippetOpt = this.snippetRepo.findById(value.getId());
 
         if (!snippetOpt.isPresent()) {
             return false;
         }
         else {
-            HttpServletRequest request =
-                    ((ServletRequestAttributes)RequestContextHolder.getRequestAttributes()).getRequest();
-
-            request.setAttribute("validSnippet", snippetOpt.get());
+//            snippetOpt.get().copyTo(value);
             return true;
         }
     }

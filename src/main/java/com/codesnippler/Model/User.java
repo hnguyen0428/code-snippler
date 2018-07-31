@@ -17,7 +17,7 @@ public class User extends JsonModel {
     public static List<String> hidden = Arrays.asList("password");
 
     @Id
-    private String id;
+    private String userId;
 
     private String username;
     private String password;
@@ -153,6 +153,6 @@ public class User extends JsonModel {
     }
 
     public String getId() {
-        return id;
+        return userId;
     }
 }

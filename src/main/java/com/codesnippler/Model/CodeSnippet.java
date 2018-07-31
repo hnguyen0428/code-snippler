@@ -15,7 +15,7 @@ public class CodeSnippet extends JsonModel {
     private static List<String> hidden = Arrays.asList("upvoters", "downvoters", "savers");
 
     @Id
-    private String id;
+    private String snippetId;
 
     private String title;
     private String description;
@@ -179,7 +179,7 @@ public class CodeSnippet extends JsonModel {
     }
 
     public String getId() {
-        return id;
+        return snippetId;
     }
 
     public HashMap<String, Boolean> getUpvoters() {

@@ -15,7 +15,7 @@ public class Comment extends JsonModel {
     private static List<String> hidden = Arrays.asList("upvoters", "downvoters");
 
     @Id
-    private String id;
+    private String commentId;
 
     private String content;
     private String userId;
@@ -59,11 +59,11 @@ public class Comment extends JsonModel {
     }
 
     public String getId() {
-        return id;
+        return commentId;
     }
 
     public void setId(String id) {
-        this.id = id;
+        this.commentId = id;
     }
 
     public String getContent() {
