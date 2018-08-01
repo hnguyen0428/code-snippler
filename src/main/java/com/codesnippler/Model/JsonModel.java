@@ -14,6 +14,7 @@ import java.util.*;
 
 public abstract class JsonModel {
 
+    @Transient
     private Map<String, Object> addOns = new HashMap<>();
 
     @Transient

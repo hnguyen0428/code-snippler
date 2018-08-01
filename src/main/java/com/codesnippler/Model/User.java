@@ -5,6 +5,7 @@ import com.codesnippler.Utility.JsonUtility;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.format.annotation.DateTimeFormat.ISO;
 
@@ -20,6 +21,8 @@ public class User extends JsonModel {
     @Id
     private String userId;
 
+    @Indexed
+    
     private String username;
     private String password;
 
