@@ -22,6 +22,7 @@ import java.util.HashMap;
 import java.util.Optional;
 
 @RestController
+@CrossOrigin
 @Validated
 @RequestMapping("/api/comment")
 public class CommentController {

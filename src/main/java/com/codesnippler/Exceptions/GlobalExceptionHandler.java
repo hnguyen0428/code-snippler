@@ -18,8 +18,8 @@ public class GlobalExceptionHandler {
     @ExceptionHandler
     @ResponseBody
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public String handle(ConstraintViolationException exception) {
-        JsonObject error = ResponseBuilder.createErrorObject(exception.getLocalizedMessage(), "ContraintViolationException");
+    public String handle(Exception exception) {
+        JsonObject error = ResponseBuilder.createErrorObject(exception.getLocalizedMessage(), exception.getClass().getSimpleName());
         return ResponseBuilder.createErrorResponse(error).toString();
     }
 }

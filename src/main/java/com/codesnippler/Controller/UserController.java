@@ -28,6 +28,7 @@ import java.util.*;
 
 
 @RestController
+@CrossOrigin
 @Validated
 @RequestMapping("/api/user")
 public class UserController {
@@ -61,9 +62,10 @@ public class UserController {
         String apiKey = keyGen.generateApiKey(API_KEY_LENGTH);
 
         User newUser = this.userRepo.save(new User(username, hashedPw, apiKey, new Date()));
-        JsonObject userJson = newUser.toJson();
+        JsonObjectBuilder userJson = newUser.toJsonBuilder();
+        userJson.add("apiKey", newUser.getApiKey());
 
-        String response = ResponseBuilder.createDataResponse(userJson).toString();
+        String response = ResponseBuilder.createDataResponse(userJson.build()).toString();
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 

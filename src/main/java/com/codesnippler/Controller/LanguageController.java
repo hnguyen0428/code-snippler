@@ -20,6 +20,7 @@ import java.util.List;
 
 
 @RestController
+@CrossOrigin
 @RequestMapping("/api/language")
 @Validated
 public class LanguageController {

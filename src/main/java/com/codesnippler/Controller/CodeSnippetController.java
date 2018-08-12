@@ -33,6 +33,7 @@ import java.util.stream.Stream;
 
 
 @RestController
+@CrossOrigin
 @RequestMapping("/api/snippet")
 @Validated
 public class CodeSnippetController {
