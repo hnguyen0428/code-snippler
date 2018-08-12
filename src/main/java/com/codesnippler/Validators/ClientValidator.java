@@ -25,7 +25,7 @@ public class ClientValidator implements ConstraintValidator<ClientAuthorized, Ob
     public boolean isValid(Object value, ConstraintValidatorContext context) {
         HttpServletRequest request =
                 ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
-        String key = request.getHeader("clientKey");
+        String key = request.getHeader("Client-Key");
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
 
         return key != null && encoder.matches(key, clientKey);

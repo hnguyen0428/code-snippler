@@ -61,7 +61,7 @@ public class CodeSnippetController {
                           @RequestParam(value = "description", required = false) String description,
                           @RequestParam(value = "code") String code,
                           @RequestParam(value = "language") @ValidLanguageName String languageName) {
-        Language language = (Language)request.getAttribute("validLanguage");
+        Language language = (Language) request.getAttribute("validLanguage");
 
         CodeSnippet snippet = new CodeSnippet(title, description, code, authorizedUser.getId(), language.getId(), new Date());
         snippet = this.snippetRepo.save(snippet);
@@ -92,7 +92,7 @@ public class CodeSnippetController {
         if (description != null) snippet.setDescription(description);
         if (code != null) snippet.setCode(code);
         if (languageName != null) {
-            Language language = (Language)request.getAttribute("validLanguage");
+            Language language = (Language) request.getAttribute("validLanguage");
             snippet.setLanguageId(language.getId());
         }
         snippet = this.snippetRepo.save(snippet);
@@ -189,8 +189,7 @@ public class CodeSnippetController {
 
                 this.snippetRepo.save(snippet);
             }
-        }
-        else {
+        } else {
             if (upvoters.containsKey(authorizedUser.getId())) {
                 snippet.removeFromUpvoters(authorizedUser.getId());
                 this.snippetRepo.save(snippet);
@@ -219,8 +218,7 @@ public class CodeSnippetController {
 
                 this.snippetRepo.save(snippet);
             }
-        }
-        else {
+        } else {
             if (downvoters.containsKey(authorizedUser.getId())) {
                 snippet.removeFromDownvoters(authorizedUser.getId());
                 this.snippetRepo.save(snippet);
@@ -245,8 +243,7 @@ public class CodeSnippetController {
                 this.snippetRepo.save(snippet);
                 this.userRepo.save(authorizedUser);
             }
-        }
-        else {
+        } else {
             if (savedSnippets.containsKey(snippet.getId())) {
                 authorizedUser.removeFromSavedSnippets(snippet.getId());
                 snippet.removeFromSavers(authorizedUser.getId());
@@ -306,8 +303,7 @@ public class CodeSnippetController {
                 comment.includeInJson("user", user);
             });
             data = JsonUtility.listToJson(comments);
-        }
-        else {
+        } else {
             comments.forEach(comment -> {
                 comment.setUserRelatedStatus(authorizedUser);
             });

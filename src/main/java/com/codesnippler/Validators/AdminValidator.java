@@ -25,7 +25,7 @@ public class AdminValidator implements ConstraintValidator<AdminAuthorized, Obje
     public boolean isValid(Object value, ConstraintValidatorContext context) {
         HttpServletRequest request =
                 ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
-        String key = request.getHeader("adminKey");
+        String key = request.getHeader("Admin-Key");
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
 
         return key != null && encoder.matches(key, adminKey);
