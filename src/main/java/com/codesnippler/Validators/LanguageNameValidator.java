@@ -32,7 +32,7 @@ public class LanguageNameValidator implements ConstraintValidator<ValidLanguageN
         HttpServletRequest request =
                 ((ServletRequestAttributes)RequestContextHolder.getRequestAttributes()).getRequest();
 
-        Language language = this.langRepo.findByName(value);
+        Language language = this.langRepo.findByNameIgnoreCase(value);
         if (language == null) {
             return false;
         }

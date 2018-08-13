@@ -19,6 +19,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.*;
+import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -29,6 +30,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.swing.text.html.Option;
 import javax.validation.constraints.NotNull;
 import java.util.*;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 
@@ -64,7 +67,7 @@ public class CodeSnippetController {
                           @RequestParam(value = "language") @ValidLanguageName String languageName) {
         Language language = (Language) request.getAttribute("validLanguage");
 
-        CodeSnippet snippet = new CodeSnippet(title, description, code, authorizedUser.getId(), language.getId(), new Date());
+        CodeSnippet snippet = new CodeSnippet(title, description, code, authorizedUser.getId(), language.getName(), new Date());
         snippet = this.snippetRepo.save(snippet);
         authorizedUser.addToCreatedSnippets(snippet.getId());
         this.userRepo.save(authorizedUser);
@@ -94,7 +97,7 @@ public class CodeSnippetController {
         if (code != null) snippet.setCode(code);
         if (languageName != null) {
             Language language = (Language) request.getAttribute("validLanguage");
-            snippet.setLanguageId(language.getId());
+            snippet.setLanguageName(language.getName());
         }
         snippet = this.snippetRepo.save(snippet);
         String response = ResponseBuilder.createDataResponse(snippet.toJson()).toString();
@@ -147,11 +150,6 @@ public class CodeSnippetController {
         if (shouldIncrease) {
             snippet.incrementViewsCount();
             snippet = this.snippetRepo.save(snippet);
-        }
-
-        Optional<Language> languageOpt = this.langRepo.findById(snippet.getLanguageId());
-        if (languageOpt.isPresent()) {
-            snippet.includeInJson("language", languageOpt.get().getName());
         }
 
         if (authorizedUser.isAuthenticated()) {
@@ -281,7 +279,6 @@ public class CodeSnippetController {
                                @RequestParam(value = "page", required = false, defaultValue = "0") int page,
                                @RequestParam(value = "pageSize", required = false, defaultValue = "10") int pageSize) {
         List<String> commentIds = snippet.getComments();
-        // Pagination
         commentIds = GeneralUtility.paginate(commentIds, page, pageSize);
 
         JsonArray data;
@@ -316,8 +313,56 @@ public class CodeSnippetController {
     }
 
 
+    @GetMapping(value = "/search", produces = "application/json")
+    ResponseEntity search(@RequestParam(value = "pageSize", required = false, defaultValue = "10") int pageSize,
+                          @RequestParam(value = "page", required = false, defaultValue = "0") int page,
+                          @RequestParam(value = "query") String query,
+                          @RequestParam(value = "fields", required = false,
+                                  defaultValue = "title,description,upvotes,downvotes,viewsCount,savedCount") String fieldsString) {
+        String[] fieldsArray = fieldsString.split(",");
+        List<String> fieldsList = new ArrayList<>(Arrays.asList(fieldsArray));
+
+        // Filter out fields to only contain class instance variables
+        Set<String> snippetFields = JsonModel.getModelAttributes(CodeSnippet.class);
+        Stream<String> stream = fieldsList.stream().filter(snippetFields::contains);
+
+        Object[] streamArray = stream.toArray();
+        // Casting to String array
+        fieldsArray = Arrays.copyOf(streamArray, streamArray.length, String[].class);
+        Fields fields = Fields.fields(fieldsArray);
+
+        List<String> words = Arrays.asList(query.split(" "));
+        List<String> regexes = words.stream().map(word -> String.format(".*%s.*", word)).collect(Collectors.toList());
+
+        String regex = String.join("|", regexes);
+        Pattern regPat = Pattern.compile(regex, Pattern.CASE_INSENSITIVE);
+
+        Criteria matchQuery = new Criteria();
+        matchQuery.orOperator(Criteria.where("title").regex(regPat), Criteria.where("description").regex(regPat));
+
+        Aggregation aggregation = Aggregation.newAggregation(
+                Aggregation.match(matchQuery),
+                Aggregation.project(fields)
+                        .andExpression("add(add(viewsCount, subtract(upvotes, downvotes)), savedCount)")
+                        .as("popularityScore"),
+                Aggregation.sort(new Sort(Sort.Direction.DESC, "popularityScore")),
+                Aggregation.skip((long)page * pageSize),
+                Aggregation.limit(pageSize)
+        );
+
+        AggregationResults<CodeSnippet> results = mongoTemplate.aggregate(aggregation, CodeSnippet.class, CodeSnippet.class);
+        List<CodeSnippet> snippets = results.getMappedResults();
+
+        JsonArray snippetsJson = JsonUtility.listToJson(snippets);
+        String response = ResponseBuilder.createDataResponse(snippetsJson).toString();
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+
     @GetMapping(value = "/popular", produces = "application/json")
-    ResponseEntity getPopular(@RequestParam(value = "limit", required = false, defaultValue = "10") int limit,
+    ResponseEntity getPopular(@RequestParam(value = "pageSize", required = false, defaultValue = "10") int pageSize,
+                              @RequestParam(value = "page", required = false, defaultValue = "0") int page,
                               @RequestParam(value = "fields", required = false,
                                       defaultValue = "title,description,upvotes,downvotes,viewsCount,savedCount") String fieldsString) {
         String[] fieldsArray = fieldsString.split(",");
@@ -337,7 +382,8 @@ public class CodeSnippetController {
                         .andExpression("add(add(viewsCount, subtract(upvotes, downvotes)), savedCount)")
                         .as("popularityScore"),
                 Aggregation.sort(new Sort(Sort.Direction.DESC, "popularityScore")),
-                Aggregation.limit(limit)
+                Aggregation.skip((long)page * pageSize),
+                Aggregation.limit(pageSize)
         );
 
         AggregationResults<CodeSnippet> results = mongoTemplate.aggregate(aggregation, CodeSnippet.class, CodeSnippet.class);

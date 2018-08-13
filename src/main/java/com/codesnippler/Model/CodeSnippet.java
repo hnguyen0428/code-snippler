@@ -24,7 +24,7 @@ public class CodeSnippet extends JsonModel {
     private String description;
     private String code;
     private String userId;
-    private String languageId;
+    private String languageName;
     private Long viewsCount;
     private Long upvotes;
     private HashMap<String, Boolean> upvoters;
@@ -52,7 +52,7 @@ public class CodeSnippet extends JsonModel {
 
     public CodeSnippet() {}
 
-    public CodeSnippet(String title, String description, String code, String userId, String languageId, long viewsCount,
+    public CodeSnippet(String title, String description, String code, String userId, String languageName, long viewsCount,
                        long upvotes, HashMap<String, Boolean> upvoters, long downvotes,
                        HashMap<String, Boolean> downvoters, long savedCount, Date date, LinkedList<String> comments,
                        HashMap<String, Boolean> savers) {
@@ -60,7 +60,7 @@ public class CodeSnippet extends JsonModel {
         this.description = description;
         this.code = code;
         this.userId = userId;
-        this.languageId = languageId;
+        this.languageName = languageName;
         this.viewsCount = viewsCount;
         this.upvotes = upvotes;
         this.upvoters = upvoters;
@@ -74,12 +74,12 @@ public class CodeSnippet extends JsonModel {
     }
 
 
-    public CodeSnippet(String title, String description, String code, String userId, String languageId, Date date) {
+    public CodeSnippet(String title, String description, String code, String userId, String languageName, Date date) {
         this.title = title;
         this.description = description;
         this.code = code;
         this.userId = userId;
-        this.languageId = languageId;
+        this.languageName = languageName;
         this.viewsCount = (long)0;
         this.upvotes = (long)0;
         this.upvoters = new HashMap<>();
@@ -121,12 +121,12 @@ public class CodeSnippet extends JsonModel {
         this.upvotes = upvotes;
     }
 
-    public String getLanguageId() {
-        return languageId;
+    public String getLanguageName() {
+        return languageName;
     }
 
-    public void setLanguageId(String languageId) {
-        this.languageId = languageId;
+    public void setLanguageName(String languageName) {
+        this.languageName = languageName;
     }
 
     public String getUserId() {
