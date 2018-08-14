@@ -318,7 +318,7 @@ public class CodeSnippetController {
                           @RequestParam(value = "page", required = false, defaultValue = "0") int page,
                           @RequestParam(value = "query") String query,
                           @RequestParam(value = "fields", required = false,
-                                  defaultValue = "title,description,upvotes,downvotes,viewsCount,savedCount") String fieldsString) {
+                                  defaultValue = "title,description,upvotes,downvotes,viewsCount,savedCount,languageName") String fieldsString) {
         String[] fieldsArray = fieldsString.split(",");
         List<String> fieldsList = new ArrayList<>(Arrays.asList(fieldsArray));
 
@@ -364,7 +364,7 @@ public class CodeSnippetController {
     ResponseEntity getPopular(@RequestParam(value = "pageSize", required = false, defaultValue = "10") int pageSize,
                               @RequestParam(value = "page", required = false, defaultValue = "0") int page,
                               @RequestParam(value = "fields", required = false,
-                                      defaultValue = "title,description,upvotes,downvotes,viewsCount,savedCount") String fieldsString) {
+                                      defaultValue = "title,description,upvotes,downvotes,viewsCount,savedCount,languageName") String fieldsString) {
         String[] fieldsArray = fieldsString.split(",");
         List<String> fieldsList = new ArrayList<>(Arrays.asList(fieldsArray));
 
