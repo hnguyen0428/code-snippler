@@ -170,6 +170,41 @@ public class CodeSnippetController {
     }
 
 
+    @GetMapping(value = "/byIds", produces = "application/json")
+    ResponseEntity getSnippets(@Authorized(required = false) User authorizedUser,
+                               @RequestParam(value = "ids") List<String> snippetIds,
+                               @RequestParam(value = "showUserDetails", required = false) boolean showUserDetails) {
+        Iterable<CodeSnippet> snippets = this.snippetRepo.findAllById(snippetIds);
+
+        if (authorizedUser.isAuthenticated())
+            for (CodeSnippet snippet : snippets)
+                snippet.setUserRelatedStatus(authorizedUser);
+
+        if (!showUserDetails) {
+            JsonArray snippetsJson = JsonUtility.listToJson(snippets);
+            String response = ResponseBuilder.createDataResponse(snippetsJson).toString();
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        }
+
+        List<String> userIds = new ArrayList<>();
+        for (CodeSnippet snippet : snippets)
+            userIds.add(snippet.getUserId());
+
+        Iterable<User> users = this.userRepo.findAllById(userIds);
+        Map<String, User> usersMap = new HashMap<>();
+        for (User user : users)
+            usersMap.put(user.getId(), user);
+
+        for (CodeSnippet snippet : snippets)
+            snippet.includeInJson("user", usersMap.get(snippet.getUserId()));
+
+
+        JsonArray snippetsJson = JsonUtility.listToJson(snippets);
+        String response = ResponseBuilder.createDataResponse(snippetsJson).toString();
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+
     @PatchMapping(value = "/{snippetId}/upvote", produces = "application/json")
     ResponseEntity upvote(@Authorized User authorizedUser,
                           @PathVariable(value = "snippetId")

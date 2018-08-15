@@ -7,6 +7,8 @@ import com.codesnippler.Model.Comment;
 import com.codesnippler.Model.User;
 import com.codesnippler.Repository.CodeSnippetRepository;
 import com.codesnippler.Repository.CommentRepository;
+import com.codesnippler.Repository.UserRepository;
+import com.codesnippler.Utility.JsonUtility;
 import com.codesnippler.Utility.ResponseBuilder;
 import com.codesnippler.Validators.Authorized;
 import com.codesnippler.Validators.ValidComment;
@@ -16,10 +18,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import javax.json.JsonArray;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.constraints.NotNull;
-import java.util.HashMap;
-import java.util.Optional;
+import java.util.*;
 
 @RestController
 @CrossOrigin
@@ -28,12 +30,50 @@ import java.util.Optional;
 public class CommentController {
     private final CommentRepository commentRepo;
     private final CodeSnippetRepository snippetRepo;
+    private final UserRepository userRepo;
 
 
     @Autowired
-    public CommentController(CommentRepository commentRepo, CodeSnippetRepository snippetRepo) {
+    public CommentController(CommentRepository commentRepo, CodeSnippetRepository snippetRepo,
+                             UserRepository userRepo) {
         this.commentRepo = commentRepo;
         this.snippetRepo = snippetRepo;
+        this.userRepo = userRepo;
+    }
+
+
+    @GetMapping(value = "/byIds", produces = "application/json")
+    ResponseEntity getComments(@Authorized(required = false) User authorizedUser,
+                               @RequestParam(value = "ids") List<String> commentIds,
+                               @RequestParam(value = "showUserDetails", required = false) boolean showUserDetails) {
+        Iterable<Comment> comments = this.commentRepo.findAllById(commentIds);
+
+        if (authorizedUser.isAuthenticated())
+            for (Comment comment : comments)
+                comment.setUserRelatedStatus(authorizedUser);
+
+        if (!showUserDetails) {
+            JsonArray snippetsJson = JsonUtility.listToJson(comments);
+            String response = ResponseBuilder.createDataResponse(snippetsJson).toString();
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        }
+
+        List<String> userIds = new ArrayList<>();
+        for (Comment comment : comments)
+            userIds.add(comment.getUserId());
+
+        Iterable<User> users = this.userRepo.findAllById(userIds);
+        Map<String, User> usersMap = new HashMap<>();
+        for (User user : users)
+            usersMap.put(user.getId(), user);
+
+        for (Comment comment : comments)
+            comment.includeInJson("user", usersMap.get(comment.getUserId()));
+
+
+        JsonArray snippetsJson = JsonUtility.listToJson(comments);
+        String response = ResponseBuilder.createDataResponse(snippetsJson).toString();
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
 
