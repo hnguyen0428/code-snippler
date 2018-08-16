@@ -117,66 +117,59 @@ public class UserController {
     }
 
 
-    private ResponseEntity getUserSavedSnippets(User user, boolean showDetails) {
+    @GetMapping(value = "/byIds", produces = "application/json")
+    ResponseEntity getUsers(@RequestParam(value = "ids") List<String> userIds) {
+        Iterable<User> users = this.userRepo.findAllById(userIds);
+        JsonArray usersJson = JsonUtility.listToJson(users);
+        String response = ResponseBuilder.createDataResponse(usersJson).toString();
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+
+    private ResponseEntity getUserSavedSnippets(User user) {
         Map<String, Boolean> snippetIdsMap = user.getSavedSnippets();
         Set<String> snippetIds = snippetIdsMap.keySet();
 
-        JsonArray snippetsArray = JsonUtility.listToJson(snippetIds);
-        if (!showDetails) {
-            String response = ResponseBuilder.createDataResponse(snippetsArray).toString();
-            return new ResponseEntity<>(response, HttpStatus.OK);
-        }
-
         Iterable itr = this.snippetRepo.findAllById(snippetIds);
-        snippetsArray = JsonUtility.listToJson(itr);
+        JsonArray snippetsArray = JsonUtility.listToJson(itr);
         String response = ResponseBuilder.createDataResponse(snippetsArray).toString();
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
 
     @GetMapping(value = "/savedSnippets", produces = "application/json")
-    ResponseEntity getSavedSnippets(@Authorized User user,
-                                    @RequestParam(value = "showDetails", required = false) boolean showDetails) {
-        return this.getUserSavedSnippets(user, showDetails);
+    ResponseEntity getSavedSnippets(@Authorized User user) {
+        return this.getUserSavedSnippets(user);
     }
 
 
     @GetMapping(value = "/{userId}/savedSnippets", produces = "application/json")
     ResponseEntity getSavedSnippets(@Authorized User authorizedUser,
-                                    @PathVariable(value = "userId") @NotNull(message = "Invalid User ID") User user,
-                                    @RequestParam(value = "showDetails", required = false) boolean showDetails) {
-        return this.getUserSavedSnippets(user, showDetails);
+                                    @PathVariable(value = "userId") @NotNull(message = "Invalid User ID") User user) {
+        return this.getUserSavedSnippets(user);
     }
 
 
-    private ResponseEntity getUserCreatedSnippets(User user, boolean showDetails) {
+    private ResponseEntity getUserCreatedSnippets(User user) {
         Map<String, Boolean> snippetIdsMap = user.getCreatedSnippets();
         Set<String> snippetIds = snippetIdsMap.keySet();
 
-        JsonArray snippetsArray = JsonUtility.listToJson(snippetIds);
-        if (!showDetails) {
-            String response = ResponseBuilder.createDataResponse(snippetsArray).toString();
-            return new ResponseEntity<>(response, HttpStatus.OK);
-        }
-
         Iterable itr = this.snippetRepo.findAllById(snippetIds);
-        snippetsArray = JsonUtility.listToJson(itr);
+        JsonArray snippetsArray = JsonUtility.listToJson(itr);
         String response = ResponseBuilder.createDataResponse(snippetsArray).toString();
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
 
     @GetMapping(value = "/createdSnippets", produces = "application/json")
-    ResponseEntity getCreatedSnippets(@Authorized User user,
-                                      @RequestParam(value = "showDetails", required = false) boolean showDetails) {
-        return this.getUserCreatedSnippets(user, showDetails);
+    ResponseEntity getCreatedSnippets(@Authorized User user) {
+        return this.getUserCreatedSnippets(user);
     }
 
 
     @GetMapping(value = "/{userId}/createdSnippets", produces = "application/json")
     ResponseEntity getCreatedSnippets(@Authorized User authorizedUser,
-                                      @PathVariable(value = "userId") @NotNull(message = "Invalid User ID") User user,
-                                      @RequestParam(value = "showDetails", required = false) boolean showDetails) {
-        return this.getUserCreatedSnippets(user, showDetails);
+                                      @PathVariable(value = "userId") @NotNull(message = "Invalid User ID") User user) {
+        return this.getUserCreatedSnippets(user);
     }
 }
