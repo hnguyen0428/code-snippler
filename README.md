@@ -283,13 +283,34 @@ Example Response:
     
     
 ### GET: /api/snippet/byIds
-Get a code snippet
+Get code snippets by their ids
 
 Request Parameters:
 
     {
         "ids": <array of snippet ids>,
         "showUserDetails": <boolean> (if true, user objects will be queried)
+    }
+    
+Example Response:
+
+    {
+        "data": <array of snippet objects>,
+        "success": true
+    }
+    
+    
+### GET: /api/snippet/byLanguage
+Get code snippets by a language
+
+Request Parameters:
+
+    {
+        "ids": <array of snippet ids>,
+        "language": <language name>
+        "page": <int> (page number),
+        "pageSize": <int> (how many to query),
+        "fields": <string> (attribute names separated by commas, possible values are title|description|code|upvotes|downvotes|viewsCount|savedCount|languageName|userId|createdDate|comments)
     }
     
 Example Response:
