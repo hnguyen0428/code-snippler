@@ -207,7 +207,6 @@ public class CodeSnippetController {
 
     @GetMapping(value = "/byLanguage", produces = "application/json")
     ResponseEntity getSnippets(HttpServletRequest request,
-                               @Authorized(required = false) User authorizedUser,
                                @RequestParam(value = "language") @ValidLanguageName String languageName,
                                @RequestParam(value = "pageSize", required = false, defaultValue = "10") int pageSize,
                                @RequestParam(value = "page", required = false, defaultValue = "0") int page,
