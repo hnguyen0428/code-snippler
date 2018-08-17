@@ -205,6 +205,48 @@ public class CodeSnippetController {
     }
 
 
+    @GetMapping(value = "/byLanguage", produces = "application/json")
+    ResponseEntity getSnippets(HttpServletRequest request,
+                               @Authorized(required = false) User authorizedUser,
+                               @RequestParam(value = "language") @ValidLanguageName String languageName,
+                               @RequestParam(value = "pageSize", required = false, defaultValue = "10") int pageSize,
+                               @RequestParam(value = "page", required = false, defaultValue = "0") int page,
+                               @RequestParam(value = "fields", required = false,
+                                       defaultValue = "title,description,upvotes,downvotes,viewsCount,savedCount,languageName")
+                                       String fieldsString) {
+        languageName = ((Language) (request.getAttribute("validLanguage"))).getName();
+        String[] fieldsArray = fieldsString.split(",");
+        List<String> fieldsList = new ArrayList<>(Arrays.asList(fieldsArray));
+
+        // Filter out fields to only contain class instance variables
+        Set<String> snippetFields = JsonModel.getModelAttributes(CodeSnippet.class);
+        Stream<String> stream = fieldsList.stream().filter(snippetFields::contains);
+
+        Object[] streamArray = stream.toArray();
+        // Casting to String array
+        fieldsArray = Arrays.copyOf(streamArray, streamArray.length, String[].class);
+        Fields fields = Fields.fields(fieldsArray);
+
+        Aggregation aggregation = Aggregation.newAggregation(
+                Aggregation.match(Criteria.where("languageName").is(languageName)),
+                Aggregation.project(fields)
+                        .andExpression("add(add(viewsCount, subtract(upvotes, downvotes)), savedCount)")
+                        .as("popularityScore"),
+                Aggregation.sort(new Sort(Sort.Direction.DESC, "popularityScore")),
+                Aggregation.skip((long)page * pageSize),
+                Aggregation.limit(pageSize)
+        );
+
+        AggregationResults<CodeSnippet> results = mongoTemplate.aggregate(aggregation, CodeSnippet.class, CodeSnippet.class);
+        List<CodeSnippet> snippets = results.getMappedResults();
+
+        JsonArray snippetsJson = JsonUtility.listToJson(snippets);
+        String response = ResponseBuilder.createDataResponse(snippetsJson).toString();
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+
     @PatchMapping(value = "/{snippetId}/upvote", produces = "application/json")
     ResponseEntity upvote(@Authorized User authorizedUser,
                           @PathVariable(value = "snippetId")
