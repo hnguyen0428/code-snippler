@@ -207,12 +207,13 @@ public class CodeSnippetController {
 
     @GetMapping(value = "/byLanguage", produces = "application/json")
     ResponseEntity getSnippets(HttpServletRequest request,
+                               @Authorized(required = false) User authorizedUser,
                                @RequestParam(value = "language") @ValidLanguageName String languageName,
                                @RequestParam(value = "pageSize", required = false, defaultValue = "10") int pageSize,
                                @RequestParam(value = "page", required = false, defaultValue = "0") int page,
                                @RequestParam(value = "fields", required = false,
-                                       defaultValue = "title,description,upvotes,downvotes,viewsCount,savedCount,languageName")
-                                       String fieldsString) {
+                                       defaultValue = "title,description,upvotes,downvotes,viewsCount,savedCount," +
+                                               "languageName,savers,upvoters,downvoters") String fieldsString) {
         languageName = ((Language) (request.getAttribute("validLanguage"))).getName();
         String[] fieldsArray = fieldsString.split(",");
         List<String> fieldsList = new ArrayList<>(Arrays.asList(fieldsArray));
@@ -238,6 +239,10 @@ public class CodeSnippetController {
 
         AggregationResults<CodeSnippet> results = mongoTemplate.aggregate(aggregation, CodeSnippet.class, CodeSnippet.class);
         List<CodeSnippet> snippets = results.getMappedResults();
+
+        if (authorizedUser.isAuthenticated())
+            for (CodeSnippet snippet: snippets)
+                snippet.setUserRelatedStatus(authorizedUser);
 
         JsonArray snippetsJson = JsonUtility.listToJson(snippets);
         String response = ResponseBuilder.createDataResponse(snippetsJson).toString();
@@ -390,11 +395,13 @@ public class CodeSnippetController {
 
 
     @GetMapping(value = "/search", produces = "application/json")
-    ResponseEntity search(@RequestParam(value = "pageSize", required = false, defaultValue = "10") int pageSize,
+    ResponseEntity search(@Authorized(required = false) User authorizedUser,
+                          @RequestParam(value = "pageSize", required = false, defaultValue = "10") int pageSize,
                           @RequestParam(value = "page", required = false, defaultValue = "0") int page,
                           @RequestParam(value = "query") String query,
                           @RequestParam(value = "fields", required = false,
-                                  defaultValue = "title,description,upvotes,downvotes,viewsCount,savedCount,languageName") String fieldsString) {
+                                  defaultValue = "title,description,upvotes,downvotes,viewsCount,savedCount," +
+                                          "languageName,savers,upvoters,downvoters") String fieldsString) {
         String[] fieldsArray = fieldsString.split(",");
         List<String> fieldsList = new ArrayList<>(Arrays.asList(fieldsArray));
 
@@ -429,6 +436,10 @@ public class CodeSnippetController {
         AggregationResults<CodeSnippet> results = mongoTemplate.aggregate(aggregation, CodeSnippet.class, CodeSnippet.class);
         List<CodeSnippet> snippets = results.getMappedResults();
 
+        if (authorizedUser.isAuthenticated())
+            for (CodeSnippet snippet: snippets)
+                snippet.setUserRelatedStatus(authorizedUser);
+
         JsonArray snippetsJson = JsonUtility.listToJson(snippets);
         String response = ResponseBuilder.createDataResponse(snippetsJson).toString();
 
@@ -437,10 +448,12 @@ public class CodeSnippetController {
 
 
     @GetMapping(value = "/popular", produces = "application/json")
-    ResponseEntity getPopular(@RequestParam(value = "pageSize", required = false, defaultValue = "10") int pageSize,
+    ResponseEntity getPopular(@Authorized(required = false) User authorizedUser,
+                              @RequestParam(value = "pageSize", required = false, defaultValue = "10") int pageSize,
                               @RequestParam(value = "page", required = false, defaultValue = "0") int page,
                               @RequestParam(value = "fields", required = false,
-                                      defaultValue = "title,description,upvotes,downvotes,viewsCount,savedCount,languageName") String fieldsString) {
+                                      defaultValue = "title,description,upvotes,downvotes,viewsCount,savedCount," +
+                                              "languageName,savers,upvoters,downvoters") String fieldsString) {
         String[] fieldsArray = fieldsString.split(",");
         List<String> fieldsList = new ArrayList<>(Arrays.asList(fieldsArray));
 
@@ -465,6 +478,11 @@ public class CodeSnippetController {
         AggregationResults<CodeSnippet> results = mongoTemplate.aggregate(aggregation, CodeSnippet.class, CodeSnippet.class);
         List<CodeSnippet> snippets = results.getMappedResults();
 
+        if (authorizedUser.isAuthenticated())
+            for (CodeSnippet snippet: snippets)
+                snippet.setUserRelatedStatus(authorizedUser);
+
+
         JsonArray snippetsJson = JsonUtility.listToJson(snippets);
         String response = ResponseBuilder.createDataResponse(snippetsJson).toString();
 
@@ -473,12 +491,17 @@ public class CodeSnippetController {
 
 
     @GetMapping(value = "/mostViews", produces = "application/json")
-    ResponseEntity getMostViews(@RequestParam(value = "page", required = false, defaultValue = "0") int page,
+    ResponseEntity getMostViews(@Authorized(required = false) User authorizedUser,
+                                @RequestParam(value = "page", required = false, defaultValue = "0") int page,
                                 @RequestParam(value = "pageSize", required = false, defaultValue = "10") int pageSize) {
         PageRequest request = PageRequest.of(page, pageSize, new Sort(Sort.Direction.DESC, "viewsCount"));
 
         Page<CodeSnippet> snippetsPage = this.snippetRepo.findAll(request);
-        List snippets = snippetsPage.getContent();
+        List<CodeSnippet> snippets = snippetsPage.getContent();
+
+        if (authorizedUser.isAuthenticated())
+            for (CodeSnippet snippet: snippets)
+                snippet.setUserRelatedStatus(authorizedUser);
 
         JsonArray snippetsJson = JsonUtility.listToJson(snippets);
         String response = ResponseBuilder.createDataResponse(snippetsJson).toString();
@@ -488,12 +511,17 @@ public class CodeSnippetController {
 
 
     @GetMapping(value = "/mostUpvotes", produces = "application/json")
-    ResponseEntity getMostUpvotes(@RequestParam(value = "page", required = false, defaultValue = "0") int page,
+    ResponseEntity getMostUpvotes(@Authorized(required = false) User authorizedUser,
+                                  @RequestParam(value = "page", required = false, defaultValue = "0") int page,
                                   @RequestParam(value = "pageSize", required = false, defaultValue = "10") int pageSize) {
         PageRequest request = PageRequest.of(page, pageSize, new Sort(Sort.Direction.DESC, "upvotes"));
 
         Page<CodeSnippet> snippetsPage = this.snippetRepo.findAll(request);
-        List snippets = snippetsPage.getContent();
+        List<CodeSnippet> snippets = snippetsPage.getContent();
+
+        if (authorizedUser.isAuthenticated())
+            for (CodeSnippet snippet: snippets)
+                snippet.setUserRelatedStatus(authorizedUser);
 
         JsonArray snippetsJson = JsonUtility.listToJson(snippets);
         String response = ResponseBuilder.createDataResponse(snippetsJson).toString();
@@ -503,12 +531,17 @@ public class CodeSnippetController {
 
 
     @GetMapping(value = "/mostSaved", produces = "application/json")
-    ResponseEntity getMostSaved(@RequestParam(value = "page", required = false, defaultValue = "0") int page,
+    ResponseEntity getMostSaved(@Authorized(required = false) User authorizedUser,
+                                @RequestParam(value = "page", required = false, defaultValue = "0") int page,
                                 @RequestParam(value = "pageSize", required = false, defaultValue = "10") int pageSize) {
         PageRequest request = PageRequest.of(page, pageSize, new Sort(Sort.Direction.DESC, "savedCount"));
 
         Page<CodeSnippet> snippetsPage = this.snippetRepo.findAll(request);
-        List snippets = snippetsPage.getContent();
+        List<CodeSnippet> snippets = snippetsPage.getContent();
+
+        if (authorizedUser.isAuthenticated())
+            for (CodeSnippet snippet: snippets)
+                snippet.setUserRelatedStatus(authorizedUser);
 
         JsonArray snippetsJson = JsonUtility.listToJson(snippets);
         String response = ResponseBuilder.createDataResponse(snippetsJson).toString();
