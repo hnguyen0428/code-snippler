@@ -203,7 +203,7 @@ Example Response:
     }
     
 
-### PATCH: /api/snippet/{snippetId}, needs Authorization
+### POST: /api/snippet/{snippetId}/update, needs Authorization
 Update a code snippet
 
 Request Parameters:
@@ -420,6 +420,7 @@ Request Parameters:
 
     {
         "query": <string>,
+        "languages": <string> (comma separated string of languages to filter),
         "page": <int> (page number),
         "pageSize": <int> (how many to query),
         "fields": <string> (attribute names separated by commas, possible values are title|description|code|upvotes|downvotes|viewsCount|savedCount|languageName|userId|createdDate|comments)
@@ -439,6 +440,7 @@ Get the most popular snippets.
 Request Parameters:
 
     {
+        "languages": <string> (comma separated string of languages to filter),
         "page": <int> (page number),
         "pageSize": <int> (how many to query),
         "fields": <string> (attribute names separated by commas, possible values are title|description|code|upvotes|downvotes|viewsCount|savedCount|languageName|userId|createdDate|comments)
@@ -458,6 +460,7 @@ Get the snippets with the most views.
 Request Parameters:
 
     {
+        "languages": <string> (comma separated string of languages to filter),
         "page": <int> (page number),
         "pageSize": <int> (how many to query)
     }
@@ -476,6 +479,7 @@ Get the snippets with the most upvotes.
 Request Parameters:
 
     {
+        "languages": <string> (comma separated string of languages to filter),
         "page": <int> (page number),
         "pageSize": <int> (how many to query)
     }
@@ -494,6 +498,7 @@ Get the snippets with the most saves.
 Request Parameters:
 
     {
+        "languages": <string> (comma separated string of languages to filter),
         "page": <int> (page number),
         "pageSize": <int> (how many to query)
     }
