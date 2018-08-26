@@ -397,6 +397,7 @@ public class CodeSnippetController {
 
     @GetMapping(value = "/search", produces = "application/json")
     ResponseEntity search(@Authorized(required = false) User authorizedUser,
+                          @RequestParam(value = "languages", required = false, defaultValue = "all") String languages,
                           @RequestParam(value = "pageSize", required = false, defaultValue = "10") int pageSize,
                           @RequestParam(value = "page", required = false, defaultValue = "0") int page,
                           @RequestParam(value = "query") String query,
@@ -424,15 +425,36 @@ public class CodeSnippetController {
         Criteria matchQuery = new Criteria();
         matchQuery.orOperator(Criteria.where("title").regex(regPat), Criteria.where("description").regex(regPat));
 
-        Aggregation aggregation = Aggregation.newAggregation(
-                Aggregation.match(matchQuery),
-                Aggregation.project(fields)
-                        .andExpression("add(add(viewsCount, subtract(upvotes, downvotes)), savedCount)")
-                        .as("popularityScore"),
-                Aggregation.sort(new Sort(Sort.Direction.DESC, "popularityScore")),
-                Aggregation.skip((long)page * pageSize),
-                Aggregation.limit(pageSize)
-        );
+        Aggregation aggregation;
+        if (languages.equals("all")) {
+            aggregation = Aggregation.newAggregation(
+                    Aggregation.match(matchQuery),
+                    Aggregation.project(fields)
+                            .andExpression("add(add(viewsCount, subtract(upvotes, downvotes)), savedCount)")
+                            .as("popularityScore"),
+                    Aggregation.sort(new Sort(Sort.Direction.DESC, "popularityScore")),
+                    Aggregation.skip((long) page * pageSize),
+                    Aggregation.limit(pageSize)
+            );
+        }
+        else {
+            List<String> languagesList = Arrays.asList(languages.split(","));
+            regexes = languagesList.stream().map(
+                    word -> String.format("\\b%s\\b", word)).collect(Collectors.toList());
+
+            regex = String.join("|", regexes);
+            regPat = Pattern.compile(regex, Pattern.CASE_INSENSITIVE);
+
+            aggregation = Aggregation.newAggregation(
+                    Aggregation.match(matchQuery.andOperator(Criteria.where("languageName").regex(regPat))),
+                    Aggregation.project(fields)
+                            .andExpression("add(add(viewsCount, subtract(upvotes, downvotes)), savedCount)")
+                            .as("popularityScore"),
+                    Aggregation.sort(new Sort(Sort.Direction.DESC, "popularityScore")),
+                    Aggregation.skip((long) page * pageSize),
+                    Aggregation.limit(pageSize)
+            );
+        }
 
         AggregationResults<CodeSnippet> results = mongoTemplate.aggregate(aggregation, CodeSnippet.class, CodeSnippet.class);
         List<CodeSnippet> snippets = results.getMappedResults();
@@ -452,6 +474,7 @@ public class CodeSnippetController {
     ResponseEntity getPopular(@Authorized(required = false) User authorizedUser,
                               @RequestParam(value = "pageSize", required = false, defaultValue = "10") int pageSize,
                               @RequestParam(value = "page", required = false, defaultValue = "0") int page,
+                              @RequestParam(value = "languages", required = false, defaultValue = "all") String languages,
                               @RequestParam(value = "fields", required = false,
                                       defaultValue = "title,description,upvotes,downvotes,viewsCount,savedCount," +
                                               "languageName,savers,upvoters,downvoters") String fieldsString) {
@@ -467,14 +490,35 @@ public class CodeSnippetController {
         fieldsArray = Arrays.copyOf(streamArray, streamArray.length, String[].class);
         Fields fields = Fields.fields(fieldsArray);
 
-        Aggregation aggregation = Aggregation.newAggregation(
-                Aggregation.project(fields)
-                        .andExpression("add(add(viewsCount, subtract(upvotes, downvotes)), savedCount)")
-                        .as("popularityScore"),
-                Aggregation.sort(new Sort(Sort.Direction.DESC, "popularityScore")),
-                Aggregation.skip((long)page * pageSize),
-                Aggregation.limit(pageSize)
-        );
+        Aggregation aggregation;
+        if (!languages.equals("all")) {
+            List<String> languagesList = Arrays.asList(languages.split(","));
+            List<String> regexes = languagesList.stream().map(
+                    word -> String.format("\\b%s\\b", word)).collect(Collectors.toList());
+
+            String regex = String.join("|", regexes);
+            Pattern regPat = Pattern.compile(regex, Pattern.CASE_INSENSITIVE);
+
+            aggregation = Aggregation.newAggregation(
+                    Aggregation.match(Criteria.where("languageName").regex(regPat)),
+                    Aggregation.project(fields)
+                            .andExpression("add(add(viewsCount, subtract(upvotes, downvotes)), savedCount)")
+                            .as("popularityScore"),
+                    Aggregation.sort(new Sort(Sort.Direction.DESC, "popularityScore")),
+                    Aggregation.skip((long)page * pageSize),
+                    Aggregation.limit(pageSize)
+            );
+        }
+        else {
+            aggregation = Aggregation.newAggregation(
+                    Aggregation.project(fields)
+                            .andExpression("add(add(viewsCount, subtract(upvotes, downvotes)), savedCount)")
+                            .as("popularityScore"),
+                    Aggregation.sort(new Sort(Sort.Direction.DESC, "popularityScore")),
+                    Aggregation.skip((long)page * pageSize),
+                    Aggregation.limit(pageSize)
+            );
+        }
 
         AggregationResults<CodeSnippet> results = mongoTemplate.aggregate(aggregation, CodeSnippet.class, CodeSnippet.class);
         List<CodeSnippet> snippets = results.getMappedResults();
@@ -493,11 +537,23 @@ public class CodeSnippetController {
 
     @GetMapping(value = "/mostViews", produces = "application/json")
     ResponseEntity getMostViews(@Authorized(required = false) User authorizedUser,
+                                @RequestParam(value = "languages", required = false, defaultValue = "all") String languages,
                                 @RequestParam(value = "page", required = false, defaultValue = "0") int page,
                                 @RequestParam(value = "pageSize", required = false, defaultValue = "10") int pageSize) {
         PageRequest request = PageRequest.of(page, pageSize, new Sort(Sort.Direction.DESC, "viewsCount"));
 
-        Page<CodeSnippet> snippetsPage = this.snippetRepo.findAll(request);
+        Page<CodeSnippet> snippetsPage;
+        if (languages.equals("all"))
+            snippetsPage = this.snippetRepo.findAll(request);
+        else {
+            List<String> languagesList = Arrays.asList(languages.split(","));
+            List<String> regexes = languagesList.stream().map(
+                    word -> String.format("(?i)\\b%s\\b", word)).collect(Collectors.toList());
+
+            String regex = String.join("|", regexes);
+            snippetsPage = this.snippetRepo.findByLanguageNameMatchesRegex(regex, request);
+        }
+
         List<CodeSnippet> snippets = snippetsPage.getContent();
 
         if (authorizedUser.isAuthenticated())
@@ -513,11 +569,23 @@ public class CodeSnippetController {
 
     @GetMapping(value = "/mostUpvotes", produces = "application/json")
     ResponseEntity getMostUpvotes(@Authorized(required = false) User authorizedUser,
+                                  @RequestParam(value = "languages", required = false, defaultValue = "all") String languages,
                                   @RequestParam(value = "page", required = false, defaultValue = "0") int page,
                                   @RequestParam(value = "pageSize", required = false, defaultValue = "10") int pageSize) {
         PageRequest request = PageRequest.of(page, pageSize, new Sort(Sort.Direction.DESC, "upvotes"));
 
-        Page<CodeSnippet> snippetsPage = this.snippetRepo.findAll(request);
+        Page<CodeSnippet> snippetsPage;
+        if (languages.equals("all"))
+            snippetsPage = this.snippetRepo.findAll(request);
+        else {
+            List<String> languagesList = Arrays.asList(languages.split(","));
+            List<String> regexes = languagesList.stream().map(
+                    word -> String.format("(?i)\\b%s\\b", word)).collect(Collectors.toList());
+
+            String regex = String.join("|", regexes);
+            snippetsPage = this.snippetRepo.findByLanguageNameMatchesRegex(regex, request);
+        }
+
         List<CodeSnippet> snippets = snippetsPage.getContent();
 
         if (authorizedUser.isAuthenticated())
@@ -533,11 +601,23 @@ public class CodeSnippetController {
 
     @GetMapping(value = "/mostSaved", produces = "application/json")
     ResponseEntity getMostSaved(@Authorized(required = false) User authorizedUser,
+                                @RequestParam(value = "languages", required = false, defaultValue = "all") String languages,
                                 @RequestParam(value = "page", required = false, defaultValue = "0") int page,
                                 @RequestParam(value = "pageSize", required = false, defaultValue = "10") int pageSize) {
         PageRequest request = PageRequest.of(page, pageSize, new Sort(Sort.Direction.DESC, "savedCount"));
 
-        Page<CodeSnippet> snippetsPage = this.snippetRepo.findAll(request);
+        Page<CodeSnippet> snippetsPage;
+        if (languages.equals("all"))
+            snippetsPage = this.snippetRepo.findAll(request);
+        else {
+            List<String> languagesList = Arrays.asList(languages.split(","));
+            List<String> regexes = languagesList.stream().map(
+                    word -> String.format("(?i)\\b%s\\b", word)).collect(Collectors.toList());
+
+            String regex = String.join("|", regexes);
+            snippetsPage = this.snippetRepo.findByLanguageNameMatchesRegex(regex, request);
+        }
+
         List<CodeSnippet> snippets = snippetsPage.getContent();
 
         if (authorizedUser.isAuthenticated())
