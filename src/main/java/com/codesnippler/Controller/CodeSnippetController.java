@@ -77,7 +77,7 @@ public class CodeSnippetController {
     }
 
 
-    @PatchMapping(value = "/{snippetId}", produces = "application/json")
+    @PostMapping(value = "/{snippetId}/update", produces = "application/json")
     ResponseEntity update(HttpServletRequest request,
                           @Authorized User authorizedUser,
                           @RequestParam(value = "title", required = false) String title,
@@ -252,7 +252,8 @@ public class CodeSnippetController {
 
 
     @PatchMapping(value = "/{snippetId}/upvote", produces = "application/json")
-    ResponseEntity upvote(@Authorized User authorizedUser,
+    ResponseEntity upvote(HttpServletRequest request,
+                          @Authorized User authorizedUser,
                           @PathVariable(value = "snippetId")
                           @NotNull(message = "Invalid Snippet ID") CodeSnippet snippet,
                           @RequestParam(value = "upvote") boolean upvote) {
