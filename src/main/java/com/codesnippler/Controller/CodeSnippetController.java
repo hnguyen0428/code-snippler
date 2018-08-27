@@ -99,6 +99,9 @@ public class CodeSnippetController {
             Language language = (Language) request.getAttribute("validLanguage");
             snippet.setLanguageName(language.getName());
         }
+
+        snippet.setUpdatedDate(new Date());
+
         snippet = this.snippetRepo.save(snippet);
         String response = ResponseBuilder.createDataResponse(snippet.toJson()).toString();
         return new ResponseEntity<>(response, HttpStatus.OK);

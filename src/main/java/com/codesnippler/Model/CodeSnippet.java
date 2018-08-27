@@ -50,6 +50,9 @@ public class CodeSnippet extends JsonModel {
     @DateTimeFormat(iso = ISO.DATE_TIME)
     private Date createdDate;
 
+    @DateTimeFormat(iso = ISO.DATE_TIME)
+    private Date updatedDate;
+
     public CodeSnippet() {}
 
     public CodeSnippet(String title, String description, String code, String userId, String languageName, long viewsCount,
@@ -325,5 +328,13 @@ public class CodeSnippet extends JsonModel {
     public JsonObjectBuilder toJsonBuilder(Map<String, ?> addOns) {
         JsonObjectBuilder result = super.toJsonBuilder(hidden);
         return JsonUtility.addJsonValues(result, addOns);
+    }
+
+    public Date getUpdatedDate() {
+        return updatedDate;
+    }
+
+    public void setUpdatedDate(Date updatedDate) {
+        this.updatedDate = updatedDate;
     }
 }
