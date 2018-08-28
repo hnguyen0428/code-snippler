@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.json.JsonArray;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import java.util.*;
 
 @RestController
@@ -79,7 +80,7 @@ public class CommentController {
 
     @PatchMapping(value = "/{commentId}", produces = "application/json")
     ResponseEntity update(@Authorized User authorizedUser,
-                          @RequestParam(value = "content") String content,
+                          @RequestParam(value = "content") @Size(min = 1, max = 1500) String content,
                           @PathVariable(value = "commentId") @NotNull(message = "Invalid Comment ID") Comment comment) {
         if (!comment.getUserId().equals(authorizedUser.getId())) {
             String response = ResponseBuilder.createErrorResponse("User is not authorized to update this comment",

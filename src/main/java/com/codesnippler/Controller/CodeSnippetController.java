@@ -29,6 +29,7 @@ import javax.json.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.swing.text.html.Option;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import java.util.*;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -61,9 +62,9 @@ public class CodeSnippetController {
     @PostMapping(produces = "application/json")
     ResponseEntity create(HttpServletRequest request,
                           @Authorized User authorizedUser,
-                          @RequestParam(value = "title") String title,
-                          @RequestParam(value = "description", required = false) String description,
-                          @RequestParam(value = "code") String code,
+                          @RequestParam(value = "title") @Size(min = 1, max = 256) String title,
+                          @RequestParam(value = "description", required = false) @Size(max = 3000) String description,
+                          @RequestParam(value = "code") @Size(min = 1, max = 8000) String code,
                           @RequestParam(value = "language") @ValidLanguageName String languageName) {
         Language language = (Language) request.getAttribute("validLanguage");
 
@@ -80,9 +81,9 @@ public class CodeSnippetController {
     @PostMapping(value = "/{snippetId}/update", produces = "application/json")
     ResponseEntity update(HttpServletRequest request,
                           @Authorized User authorizedUser,
-                          @RequestParam(value = "title", required = false) String title,
-                          @RequestParam(value = "description", required = false) String description,
-                          @RequestParam(value = "code", required = false) String code,
+                          @RequestParam(value = "title", required = false) @Size(min = 1, max = 256) String title,
+                          @RequestParam(value = "description", required = false) @Size(max = 3000) String description,
+                          @RequestParam(value = "code", required = false) @Size(min = 1, max = 8000) String code,
                           @RequestParam(value = "language", required = false) @ValidLanguageName String languageName,
                           @PathVariable(value = "snippetId")
                           @NotNull(message = "Invalid Snippet ID") CodeSnippet snippet) {
@@ -342,7 +343,7 @@ public class CodeSnippetController {
 
     @PostMapping(value = "/{snippetId}/comment", produces = "application/json")
     ResponseEntity createComment(@Authorized User authorizedUser,
-                                 @RequestParam(value = "content") String content,
+                                 @RequestParam(value = "content") @Size(min = 1, max = 1500) String content,
                                  @PathVariable(value = "snippetId")
                                  @NotNull(message = "Invalid Snippet ID") CodeSnippet snippet) {
         Comment comment = new Comment(content, authorizedUser.getId(), snippet.getId(), new Date());
