@@ -90,6 +90,44 @@ public class UserController {
     }
 
 
+    @PostMapping(value = "/changePassword", produces = "application/json")
+    ResponseEntity changePassword(@Authorized User user,
+                                  @RequestParam(value = "currentPassword") String currPw,
+                                  @RequestParam(value = "newPassword") String newPw) {
+        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+
+        if (encoder.matches(currPw, user.getPassword())) {
+            String hashedPw = encoder.encode(newPw);
+            user.setPassword(hashedPw);
+            user = this.userRepo.save(user);
+            String response = ResponseBuilder.createDataResponse(user.toJson()).toString();
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        }
+        else {
+            String response = ResponseBuilder.createErrorResponse("Current Password is incorrect", ErrorTypes.INV_AUTH_ERROR).toString();
+            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+        }
+    }
+
+
+    @PatchMapping(value = "/profile", produces = "application/json")
+    ResponseEntity updateProfile(@Authorized User user,
+                                 @RequestParam(value = "firstName", required = false) @Size(min = 1, max = 256) String firstName,
+                                 @RequestParam(value = "lastName", required = false) @Size(min = 1, max = 256) String lastName,
+                                 @RequestParam(value = "email", required = false) @Size(min = 1, max = 256) String email) {
+        if (firstName != null)
+            user.updateProfile("firstName", firstName);
+        if (lastName != null)
+            user.updateProfile("lastName", lastName);
+        if (email != null)
+            user.updateProfile("email", email);
+
+        this.userRepo.save(user);
+        String response = ResponseBuilder.createDataResponse(user.toJson()).toString();
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+
     private ResponseEntity getUserProfile(User user, boolean showSnippetDetails) {
         if (showSnippetDetails) {
             user.includeCreatedSnippetsDetails(snippetRepo);

@@ -30,6 +30,8 @@ public class User extends JsonModel {
     private Map<String, Boolean> savedSnippets;
     private Map<String, Boolean> createdSnippets;
 
+    private Map<String, String> profile;
+
     @DateTimeFormat(iso = ISO.DATE_TIME)
     private Date createdDate;
 
@@ -130,6 +132,15 @@ public class User extends JsonModel {
 
     public boolean isAuthenticated() {
         return authenticated;
+    }
+
+    public Map<String, String> getProfile() {
+        return profile;
+    }
+
+    public void updateProfile(String key, String value) {
+        profile = profile != null ? profile : new HashMap<>();
+        profile.put(key, value);
     }
 
     public void includeSavedSnippetsDetails(CodeSnippetRepository snippetRepo) {
