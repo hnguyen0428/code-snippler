@@ -21,6 +21,7 @@ import javax.json.JsonArray;
 import javax.json.JsonObject;
 import javax.json.JsonObjectBuilder;
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
@@ -92,8 +93,10 @@ public class UserController {
 
     @PostMapping(value = "/changePassword", produces = "application/json")
     ResponseEntity changePassword(@Authorized User user,
-                                  @RequestParam(value = "currentPassword") String currPw,
-                                  @RequestParam(value = "newPassword") String newPw) {
+                                  @RequestParam(value = "currentPassword") @Size(min=6, max=20)
+                                  @Pattern(regexp = "^[a-zA-Z0-9]*$") String currPw,
+                                  @RequestParam(value = "newPassword") @Size(min=6, max=20)
+                                  @Pattern(regexp = "^[a-zA-Z0-9]*$") String newPw) {
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
 
         if (encoder.matches(currPw, user.getPassword())) {
@@ -114,7 +117,7 @@ public class UserController {
     ResponseEntity updateProfile(@Authorized User user,
                                  @RequestParam(value = "firstName", required = false) @Size(min = 1, max = 256) String firstName,
                                  @RequestParam(value = "lastName", required = false) @Size(min = 1, max = 256) String lastName,
-                                 @RequestParam(value = "email", required = false) @Size(min = 1, max = 256) String email) {
+                                 @RequestParam(value = "email", required = false) @Size(min = 1, max = 256) @Email String email) {
         if (firstName != null)
             user.updateProfile("firstName", firstName);
         if (lastName != null)
