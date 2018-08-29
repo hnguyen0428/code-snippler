@@ -115,9 +115,9 @@ public class UserController {
 
     @PatchMapping(value = "/profile", produces = "application/json")
     ResponseEntity updateProfile(@Authorized User user,
-                                 @RequestParam(value = "firstName", required = false) @Size(min = 1, max = 256) String firstName,
-                                 @RequestParam(value = "lastName", required = false) @Size(min = 1, max = 256) String lastName,
-                                 @RequestParam(value = "email", required = false) @Size(min = 1, max = 256) @Email String email) {
+                                 @RequestParam(value = "firstName", required = false) @Size(max = 256) String firstName,
+                                 @RequestParam(value = "lastName", required = false) @Size(max = 256) String lastName,
+                                 @RequestParam(value = "email", required = false) @Email String email) {
         if (firstName != null)
             user.updateProfile("firstName", firstName);
         if (lastName != null)
