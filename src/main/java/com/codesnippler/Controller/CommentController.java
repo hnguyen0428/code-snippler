@@ -92,6 +92,7 @@ public class CommentController {
 
 
         comment.setContent(content);
+        comment.setUpdatedDate(new Date());
         comment = this.commentRepo.save(comment);
         String response = ResponseBuilder.createDataResponse(comment.toJson()).toString();
         return new ResponseEntity<>(response, HttpStatus.OK);

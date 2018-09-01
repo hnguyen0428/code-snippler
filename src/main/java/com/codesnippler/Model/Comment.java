@@ -35,6 +35,9 @@ public class Comment extends JsonModel {
     @DateTimeFormat(iso = ISO.DATE_TIME)
     private Date createdDate;
 
+    @DateTimeFormat(iso = ISO.DATE_TIME)
+    private Date updatedDate;
+
     public Comment() {}
 
     public Comment(String content, String userId, String snippetId, Long upvotes, Long downvotes, Date createdDate) {
@@ -188,5 +191,13 @@ public class Comment extends JsonModel {
     public JsonObjectBuilder toJsonBuilder(Map<String, ?> addOns) {
         JsonObjectBuilder result = super.toJsonBuilder(hidden);
         return JsonUtility.addJsonValues(result, addOns);
+    }
+
+    public Date getUpdatedDate() {
+        return updatedDate;
+    }
+
+    public void setUpdatedDate(Date updatedDate) {
+        this.updatedDate = updatedDate;
     }
 }
