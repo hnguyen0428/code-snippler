@@ -11,6 +11,7 @@ import com.codesnippler.Utility.JsonUtility;
 import com.codesnippler.Utility.ResponseBuilder;
 import com.codesnippler.Utility.StringParser;
 import com.codesnippler.Validators.Authorized;
+import com.codesnippler.Validators.ClientAuthorized;
 import com.codesnippler.Validators.ValidLanguageName;
 import com.codesnippler.Validators.ValidSnippet;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,6 +61,7 @@ public class CodeSnippetController {
     }
 
     @PostMapping(produces = "application/json")
+    @ClientAuthorized
     ResponseEntity create(HttpServletRequest request,
                           @Authorized User authorizedUser,
                           @RequestParam(value = "title") @Size(min = 1, max = 256) String title,
@@ -79,6 +81,7 @@ public class CodeSnippetController {
 
 
     @PostMapping(value = "/{snippetId}/update", produces = "application/json")
+    @ClientAuthorized
     ResponseEntity update(HttpServletRequest request,
                           @Authorized User authorizedUser,
                           @RequestParam(value = "title", required = false) @Size(min = 1, max = 256) String title,
@@ -110,6 +113,7 @@ public class CodeSnippetController {
 
 
     @DeleteMapping(value = "/{snippetId}", produces = "application/json")
+    @ClientAuthorized
     ResponseEntity delete(@Authorized User authorizedUser,
                           @PathVariable(value = "snippetId")
                           @NotNull(message = "Invalid Snippet ID") CodeSnippet snippet) {
@@ -256,6 +260,7 @@ public class CodeSnippetController {
 
 
     @PatchMapping(value = "/{snippetId}/upvote", produces = "application/json")
+    @ClientAuthorized
     ResponseEntity upvote(HttpServletRequest request,
                           @Authorized User authorizedUser,
                           @PathVariable(value = "snippetId")
@@ -286,6 +291,7 @@ public class CodeSnippetController {
 
 
     @PatchMapping(value = "/{snippetId}/downvote", produces = "application/json")
+    @ClientAuthorized
     ResponseEntity downvote(@Authorized User authorizedUser,
                             @PathVariable(value = "snippetId")
                             @NotNull(message = "Invalid Snippet ID") CodeSnippet snippet,
@@ -315,6 +321,7 @@ public class CodeSnippetController {
 
 
     @PatchMapping(value = "/{snippetId}/save", produces = "application/json")
+    @ClientAuthorized
     ResponseEntity saveSnippet(@Authorized User authorizedUser,
                                @PathVariable(value = "snippetId")
                                @NotNull(message = "Invalid Snippet ID") CodeSnippet snippet,
@@ -342,6 +349,7 @@ public class CodeSnippetController {
 
 
     @PostMapping(value = "/{snippetId}/comment", produces = "application/json")
+    @ClientAuthorized
     ResponseEntity createComment(@Authorized User authorizedUser,
                                  @RequestParam(value = "content") @Size(min = 1, max = 1500) String content,
                                  @PathVariable(value = "snippetId")

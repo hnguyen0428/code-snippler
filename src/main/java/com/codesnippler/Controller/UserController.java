@@ -9,6 +9,7 @@ import com.codesnippler.Utility.JsonUtility;
 import com.codesnippler.Utility.ResponseBuilder;
 import com.codesnippler.Utility.RandomKeyGenerator;
 import com.codesnippler.Validators.Authorized;
+import com.codesnippler.Validators.ClientAuthorized;
 import com.codesnippler.Validators.ValidUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -46,6 +47,7 @@ public class UserController {
 
 
     @PostMapping(value = "/register", produces = "application/json")
+    @ClientAuthorized
     ResponseEntity register(@RequestParam(value = "username") @Size(min=6, max=20)
                             @Pattern(regexp = "^[a-zA-Z0-9_]*$") String username,
                             @RequestParam(value = "password") @Size(min=6, max=20)
@@ -72,6 +74,7 @@ public class UserController {
 
 
     @PostMapping(value = "/login", produces = "application/json")
+    @ClientAuthorized
     ResponseEntity login(HttpServletRequest request,
                          @RequestParam(value = "username") @ValidUser(type = "username") String username,
                          @RequestParam(value = "password") String password) {
@@ -92,6 +95,7 @@ public class UserController {
 
 
     @PostMapping(value = "/changePassword", produces = "application/json")
+    @ClientAuthorized
     ResponseEntity changePassword(@Authorized User user,
                                   @RequestParam(value = "currentPassword") @Size(min=6, max=20)
                                   @Pattern(regexp = "^[a-zA-Z0-9]*$") String currPw,
@@ -114,6 +118,7 @@ public class UserController {
 
 
     @PatchMapping(value = "/profile", produces = "application/json")
+    @ClientAuthorized
     ResponseEntity updateProfile(@Authorized User user,
                                  @RequestParam(value = "firstName", required = false) @Size(max = 256) String firstName,
                                  @RequestParam(value = "lastName", required = false) @Size(max = 256) String lastName,

@@ -11,6 +11,7 @@ import com.codesnippler.Repository.UserRepository;
 import com.codesnippler.Utility.JsonUtility;
 import com.codesnippler.Utility.ResponseBuilder;
 import com.codesnippler.Validators.Authorized;
+import com.codesnippler.Validators.ClientAuthorized;
 import com.codesnippler.Validators.ValidComment;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -79,6 +80,7 @@ public class CommentController {
 
 
     @PatchMapping(value = "/{commentId}", produces = "application/json")
+    @ClientAuthorized
     ResponseEntity update(@Authorized User authorizedUser,
                           @RequestParam(value = "content") @Size(min = 1, max = 1500) String content,
                           @PathVariable(value = "commentId") @NotNull(message = "Invalid Comment ID") Comment comment) {
@@ -97,6 +99,7 @@ public class CommentController {
 
 
     @DeleteMapping(value = "/{commentId}", produces = "application/json")
+    @ClientAuthorized
     ResponseEntity delete(@Authorized User authorizedUser,
                           @PathVariable(value = "commentId") @NotNull(message = "Invalid Comment ID") Comment comment) {
         if (!comment.getUserId().equals(authorizedUser.getId())) {
@@ -120,6 +123,7 @@ public class CommentController {
 
 
     @PatchMapping(value = "/{commentId}/upvote", produces = "application/json")
+    @ClientAuthorized
     ResponseEntity upvote(@Authorized User authorizedUser,
                           @PathVariable(value = "commentId") @NotNull(message = "Invalid Comment ID") Comment comment,
                           @RequestParam(value = "upvote") boolean upvote) {
@@ -150,6 +154,7 @@ public class CommentController {
 
 
     @PatchMapping(value = "/{commentId}/downvote", produces = "application/json")
+    @ClientAuthorized
     ResponseEntity downvote(@Authorized User authorizedUser,
                             @PathVariable(value = "commentId") @NotNull(message = "Invalid Comment ID") Comment comment,
                             @RequestParam(value = "downvote") boolean downvote) {
