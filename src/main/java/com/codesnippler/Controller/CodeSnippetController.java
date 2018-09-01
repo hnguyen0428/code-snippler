@@ -374,10 +374,11 @@ public class CodeSnippetController {
                                @RequestParam(value = "pageSize", required = false, defaultValue = "10") int pageSize) {
         List<String> commentIds = snippet.getComments();
         commentIds = GeneralUtility.paginate(commentIds, page, pageSize);
-
         JsonArray data;
 
-        Iterable<Comment> comments = this.commentRepo.findAllById(commentIds);
+        Iterable<Comment> commentsItr = this.commentRepo.findAllById(commentIds);
+        LinkedList<Comment> comments = new LinkedList<>();
+        commentsItr.forEach(comments::addFirst);
 
         if (showUserDetails) {
             Map<String, User> usersMap = new HashMap<>();
