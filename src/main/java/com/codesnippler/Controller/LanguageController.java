@@ -1,5 +1,6 @@
 package com.codesnippler.Controller;
 
+import com.codesnippler.Exceptions.ErrorTypes;
 import com.codesnippler.Model.Language;
 import com.codesnippler.Repository.LanguageRepository;
 import com.codesnippler.Utility.JsonUtility;
@@ -37,7 +38,14 @@ public class LanguageController {
     @AdminAuthorized
     ResponseEntity create(@RequestParam(value = "name") String name,
                           @RequestParam(value = "type") String type) {
-        Language language = this.langRepo.save(new Language(name, type, new Date()));
+        Language language = this.langRepo.findByNameIgnoreCase(name);
+        if (language != null) {
+            String response = ResponseBuilder.createErrorResponse("Language already exists",
+                    ErrorTypes.INV_PARAM_ERROR).toString();
+            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+        }
+
+        language = this.langRepo.save(new Language(name, type, new Date()));
         String response = ResponseBuilder.createDataResponse(language.toJson()).toString();
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
