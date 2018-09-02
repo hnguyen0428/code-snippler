@@ -501,6 +501,51 @@ public class CodeSnippetController {
     }
 
 
+    @GetMapping(value = "/recent", produces = "application/json")
+    ResponseEntity getRecent(@Authorized(required = false) User authorizedUser,
+                             @RequestParam(value = "pageSize", required = false, defaultValue = "10") int pageSize,
+                             @RequestParam(value = "page", required = false, defaultValue = "0") int page,
+                             @RequestParam(value = "languages", required = false, defaultValue = "all") String languages) {
+        Aggregation aggregation;
+        // Sort by id since _id in mongodb is sorted by created date
+        if (!languages.equals("all")) {
+            List<String> languagesList = Arrays.asList(languages.split(","));
+            List<String> regexes = languagesList.stream().map(
+                    word -> String.format("\\b%s\\b", word)).collect(Collectors.toList());
+
+            String regex = String.join("|", regexes);
+            Pattern regPat = Pattern.compile(regex, Pattern.CASE_INSENSITIVE);
+
+            aggregation = Aggregation.newAggregation(
+                    Aggregation.match(Criteria.where("languageName").regex(regPat)),
+                    Aggregation.sort(new Sort(Sort.Direction.DESC, "snippetId")),
+                    Aggregation.skip((long)page * pageSize),
+                    Aggregation.limit(pageSize)
+            );
+        }
+        else {
+            aggregation = Aggregation.newAggregation(
+                    Aggregation.sort(new Sort(Sort.Direction.DESC, "snippetId")),
+                    Aggregation.skip((long)page * pageSize),
+                    Aggregation.limit(pageSize)
+            );
+        }
+
+        AggregationResults<CodeSnippet> results = mongoTemplate.aggregate(aggregation, CodeSnippet.class, CodeSnippet.class);
+        List<CodeSnippet> snippets = results.getMappedResults();
+
+        if (authorizedUser.isAuthenticated())
+            for (CodeSnippet snippet: snippets)
+                snippet.setUserRelatedStatus(authorizedUser);
+
+
+        JsonArray snippetsJson = JsonUtility.listToJson(snippets);
+        String response = ResponseBuilder.createDataResponse(snippetsJson).toString();
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+
     @GetMapping(value = "/popular", produces = "application/json")
     ResponseEntity getPopular(@Authorized(required = false) User authorizedUser,
                               @RequestParam(value = "pageSize", required = false, defaultValue = "10") int pageSize,
