@@ -371,14 +371,32 @@ public class CodeSnippetController {
                                @NotNull(message = "Invalid Snippet ID") CodeSnippet snippet,
                                @RequestParam(value = "showUserDetails", required = false) boolean showUserDetails,
                                @RequestParam(value = "page", required = false, defaultValue = "0") int page,
-                               @RequestParam(value = "pageSize", required = false, defaultValue = "10") int pageSize) {
+                               @RequestParam(value = "pageSize", required = false, defaultValue = "10") int pageSize,
+                               @RequestParam(value = "sort", required = false, defaultValue = "mostRecent")
+                                       @javax.validation.constraints.Pattern(regexp = "mostRecent|mostUpvoted")
+                                       String sortOption) {
         List<String> commentIds = snippet.getComments();
-        commentIds = GeneralUtility.paginate(commentIds, page, pageSize);
+        List<Comment> comments;
         JsonArray data;
 
-        Iterable<Comment> commentsItr = this.commentRepo.findAllById(commentIds);
-        LinkedList<Comment> comments = new LinkedList<>();
-        commentsItr.forEach(comments::addFirst);
+        if (sortOption.equals("mostUpvoted")) {
+            Aggregation aggregation = Aggregation.newAggregation(
+                    Aggregation.match(Criteria.where("_id").in(commentIds)),
+                    Aggregation.sort(new Sort(Sort.Direction.DESC, "upvotes")),
+                    Aggregation.skip((long)page * pageSize),
+                    Aggregation.limit(pageSize)
+            );
+
+            AggregationResults<Comment> results = mongoTemplate.aggregate(aggregation, Comment.class, Comment.class);
+            comments = results.getMappedResults();
+        }
+        else {
+            commentIds = GeneralUtility.paginate(commentIds, page, pageSize);
+
+            Iterable<Comment> commentsItr = this.commentRepo.findAllById(commentIds);
+            comments = new LinkedList<>();
+            commentsItr.forEach(((LinkedList<Comment>)comments)::addFirst);
+        }
 
         if (showUserDetails) {
             Map<String, User> usersMap = new HashMap<>();
