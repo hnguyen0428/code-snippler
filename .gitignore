@@ -1,5 +1,5 @@
-.gradle
-/build/
+*.gradle
+backend/build/
 !gradle/wrapper/gradle-wrapper.jar
 
 ### STS ###
