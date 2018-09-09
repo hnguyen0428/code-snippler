@@ -6,6 +6,8 @@ import Input from '@material-ui/core/Input';
 
 import Search from '@material-ui/icons/Search';
 
+import {SNIPPETS_SEARCH_BAR_PH} from '../../../constants/constants';
+
 
 class SearchBar extends Component {
     constructor(props) {
@@ -54,7 +56,7 @@ class SearchBar extends Component {
                         </IconButton>
                     }
                     disableUnderline={this.props.disableUnderline}
-                    placeholder="Search for snippets"
+                    placeholder={SNIPPETS_SEARCH_BAR_PH}
                     style={{color: this.props.color}}
                     fullWidth={this.props.fullWidth}
                     value={this.props.value}

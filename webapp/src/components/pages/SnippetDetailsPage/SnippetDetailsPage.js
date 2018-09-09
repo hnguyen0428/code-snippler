@@ -44,6 +44,11 @@ import Bookmark from '@material-ui/icons/Bookmark';
 import Settings from '@material-ui/icons/Settings';
 
 import {languagesMap} from '../../../constants/languages';
+import {
+    DISMISS_MSG, SIGNIN_MSG, SAVE_SNPT_SIGNIN_MSG, UPVOTE_SNPT_SIGNIN_MSG,
+    DOWNVOTE_SNPT_SIGNIN_MSG, DELETE_MSG, DELETE_SNPT_VERIFY_MSG, ADD_COMMENT_PH,
+    MY_PROFILE_PATH, userProfilePath, LOGIN_PATH, editSnippetPath
+} from '../../../constants/constants';
 
 import 'brace/theme/github';
 import 'brace/theme/xcode';
@@ -145,13 +150,13 @@ class SnippetDetailsPage extends Component {
 
     onClickEdit = () => {
         this.props.overridePath(this.props.location.pathname);
-        history.push('/snippet?snippetId=' + this.props.match.params.snippetId);
+        history.push(editSnippetPath(this.props.match.params.snippetId));
     };
 
     onClickDelete = () => {
-        let actionOne = {title: 'Dismiss'};
-        let actionTwo = {title: 'Delete', callback: this.deleteSnippet};
-        this.props.showBinaryAlert('Delete?', 'Are you sure you want to delete this snippet?', actionOne, actionTwo);
+        let actionOne = {title: DISMISS_MSG};
+        let actionTwo = {title: DELETE_MSG, callback: this.deleteSnippet};
+        this.props.showBinaryAlert(`${DELETE_MSG}?`, DELETE_SNPT_VERIFY_MSG, actionOne, actionTwo);
     };
 
     deleteSnippet = () => {
@@ -177,9 +182,9 @@ class SnippetDetailsPage extends Component {
         let snippet = this.props.snippets.byIds[snippetId];
 
         if (this.props.auth.loggedIn && snippet.userId === this.props.auth.currentUser.userId)
-            history.push('/user/me');
+            history.push(MY_PROFILE_PATH);
         else
-            history.push('/user/' + snippet.userId);
+            history.push(userProfilePath(snippet.userId));
     };
 
     onChangeComment = (event) => {
@@ -198,16 +203,16 @@ class SnippetDetailsPage extends Component {
     };
 
     redirectToLogin = () => {
-        history.push('/login');
+        history.push(LOGIN_PATH);
         this.props.closeBinaryAlert();
     };
 
 
     handleSaveSnippet = (event) => {
-        let actionOne = {title: 'Dismiss'};
-        let actionTwo = {title: 'Sign In', callback: this.redirectToLogin};
+        let actionOne = {title: DISMISS_MSG};
+        let actionTwo = {title: SIGNIN_MSG, callback: this.redirectToLogin};
         if (!this.props.auth.loggedIn)
-            this.props.showBinaryAlert('Sign In?', 'To save the snippet, you must sign in', actionOne, actionTwo);
+            this.props.showBinaryAlert(`${SIGNIN_MSG}?`, SAVE_SNPT_SIGNIN_MSG, actionOne, actionTwo);
 
         const snippetId = this.props.match.params.snippetId;
         const saved = this.props.snippets.byIds[snippetId].saved;
@@ -218,10 +223,10 @@ class SnippetDetailsPage extends Component {
 
 
     handleUpvoteSnippet = (event) => {
-        let actionOne = {title: 'Dismiss'};
-        let actionTwo = {title: 'Sign In', callback: this.redirectToLogin};
+        let actionOne = {title: DISMISS_MSG};
+        let actionTwo = {title: SIGNIN_MSG, callback: this.redirectToLogin};
         if (!this.props.auth.loggedIn)
-            this.props.showBinaryAlert('Sign In?', 'To upvote the snippet, you must sign in', actionOne, actionTwo);
+            this.props.showBinaryAlert(`${SIGNIN_MSG}?`, UPVOTE_SNPT_SIGNIN_MSG, actionOne, actionTwo);
 
         const snippetId = this.props.match.params.snippetId;
         const upvoted = this.props.snippets.byIds[snippetId].upvoted;
@@ -231,10 +236,10 @@ class SnippetDetailsPage extends Component {
 
 
     handleDownvoteSnippet = (event) => {
-        let actionOne = {title: 'Dismiss'};
-        let actionTwo = {title: 'Sign In', callback: this.redirectToLogin};
+        let actionOne = {title: DISMISS_MSG};
+        let actionTwo = {title: SIGNIN_MSG, callback: this.redirectToLogin};
         if (!this.props.auth.loggedIn)
-            this.props.showBinaryAlert('Sign In?', 'To downvote the snippet, you must sign in', actionOne, actionTwo);
+            this.props.showBinaryAlert(`${SIGNIN_MSG}?`, DOWNVOTE_SNPT_SIGNIN_MSG, actionOne, actionTwo);
 
         const snippetId = this.props.match.params.snippetId;
         const downvoted = this.props.snippets.byIds[snippetId].downvoted;
@@ -408,7 +413,7 @@ class SnippetDetailsPage extends Component {
                             currentUser &&
                             <TextField
                                 style={styles.commentTextField}
-                                placeholder="Add a comment..." fullWidth
+                                placeholder={ADD_COMMENT_PH} fullWidth
                                 helperText={
                                     <Button color="primary"
                                             disabled={this.state.commentText.length === 0}

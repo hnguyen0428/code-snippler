@@ -13,6 +13,11 @@ import AceEditor from 'react-ace';
 
 import {styles} from './styles';
 import history from '../../../root/history';
+import {
+    SNIPPET_TITLE_PH, SNIPPET_DESC_PH, SNIPPET_CREATE_MSG, SNIPPET_CREATE_VERIFY_MSG, SNIPPET_TITLE_LIMIT,
+    SNIPPET_DESC_LIMIT, SNIPPET_CODE_LIMIT, SNIPPET_TITLE_EMPTY_ERR, SNIPPET_LANG_CHOOSE_ERR,
+    SNIPPET_EMPTY_CODE_ERR, SNIPPET_CODE_LENGTH_ERR, SNIPPET_UPDATE_BTN, SNIPPET_CREATE_BTN
+} from '../../../constants/constants';
 
 import {supportedLanguages, languagesMap} from '../../../constants/languages';
 import {writeAceConfig as aceConfig, editorTheme} from '../../../constants/AceConfig';
@@ -27,11 +32,6 @@ for (let language in languagesMap) {
 
 
 class SnippetFormPage extends Component {
-    TITLE_LIMIT = 256;
-    DESC_LIMIT = 3000;
-    CODE_LIMIT = 8000;
-
-
     constructor(props) {
         super(props);
 
@@ -122,10 +122,10 @@ class SnippetFormPage extends Component {
     onEditingForm = (event) => {
         switch (event.target.name) {
             case "title":
-                if (event.target.value.length > this.TITLE_LIMIT)
+                if (event.target.value.length > SNIPPET_TITLE_LIMIT)
                     return;
             case "description":
-                if (event.target.value.length > this.DESC_LIMIT)
+                if (event.target.value.length > SNIPPET_DESC_LIMIT)
                     return;
         }
 
@@ -170,8 +170,8 @@ class SnippetFormPage extends Component {
         };
 
         const action = {callback: createSnippetAction};
-        const title = 'Post?';
-        const message = 'Do you want to post this snippet';
+        const title = SNIPPET_CREATE_MSG;
+        const message = SNIPPET_CREATE_VERIFY_MSG;
 
         if (this.state.updating)
             updateSnippetAction();
@@ -191,27 +191,27 @@ class SnippetFormPage extends Component {
         if (this.state.title.value.length === 0) {
             passed = false;
             errors.title.error = true;
-            errors.title.errorMsg = 'Title must not be empty';
+            errors.title.errorMsg = SNIPPET_TITLE_EMPTY_ERR;
         }
 
         if (this.state.language.value.length === 0) {
             passed = false;
             errors.language.error = true;
-            errors.language.errorMsg = 'Language/Technology must be chosen';
+            errors.language.errorMsg = SNIPPET_LANG_CHOOSE_ERR;
         }
 
         if (this.state.code.length === 0) {
             // If passed before then show the alert, but if there are other errors, don't show
             // the alert
             if (passed) {
-                this.props.showAlert('Error', 'Cannot submit empty code');
+                this.props.showAlert('Error', SNIPPET_EMPTY_CODE_ERR);
             }
             passed = false;
         }
 
-        if (this.state.code.length > this.CODE_LIMIT) {
+        if (this.state.code.length > SNIPPET_CODE_LIMIT) {
             if (passed) {
-                this.props.showAlert('Error', 'Code contains more characters than ' + this.CODE_LIMIT);
+                this.props.showAlert('Error', SNIPPET_CODE_LENGTH_ERR);
             }
             passed = false;
         }
@@ -250,7 +250,7 @@ class SnippetFormPage extends Component {
                             name="title"
                             label="Title"
                             multiline
-                            placeholder="Title of your Snippet"
+                            placeholder={SNIPPET_TITLE_PH}
                             fullWidth
                             value={this.state.title.value}
                             error={this.state.title.error}
@@ -258,8 +258,8 @@ class SnippetFormPage extends Component {
                         />
                         {this.state.title.error
                         && <FormHelperText>{this.state.title.errorMsg}</FormHelperText>}
-                        <FormHelperText error={this.state.title.value.length > this.TITLE_LIMIT}>
-                            {this.state.title.value.length}/{this.TITLE_LIMIT}
+                        <FormHelperText error={this.state.title.value.length > SNIPPET_TITLE_LIMIT}>
+                            {this.state.title.value.length}/{SNIPPET_TITLE_LIMIT}
                         </FormHelperText>
                     </FormControl>
 
@@ -268,7 +268,7 @@ class SnippetFormPage extends Component {
                             name="description"
                             label="Description"
                             multiline
-                            placeholder="Describe what your snippet is about..."
+                            placeholder={SNIPPET_DESC_PH}
                             fullWidth
                             value={this.state.description.value}
                             error={this.state.description.error}
@@ -276,8 +276,8 @@ class SnippetFormPage extends Component {
                         />
                         {this.state.description.error &&
                         <FormHelperText>{this.state.description.errorMsg}</FormHelperText>}
-                        <FormHelperText error={this.state.description.value.length > this.DESC_LIMIT}>
-                            {this.state.description.value.length}/{this.DESC_LIMIT}
+                        <FormHelperText error={this.state.description.value.length > SNIPPET_DESC_LIMIT}>
+                            {this.state.description.value.length}/{SNIPPET_DESC_LIMIT}
                         </FormHelperText>
                     </FormControl>
 
@@ -315,8 +315,9 @@ class SnippetFormPage extends Component {
                         onChange={this.onCodeEditing}
                         onValidate={this.onEditorValidate}
                     />
-                    <FormHelperText error={this.state.code.length > this.CODE_LIMIT} style={styles.aceEditorCharCount}>
-                        {this.state.code.length}/{this.CODE_LIMIT}
+                    <FormHelperText error={this.state.code.length > SNIPPET_CODE_LIMIT}
+                                    style={styles.aceEditorCharCount}>
+                        {this.state.code.length}/{SNIPPET_CODE_LIMIT}
                     </FormHelperText>
 
                     <Button
@@ -325,7 +326,7 @@ class SnippetFormPage extends Component {
                         color="primary"
                         onClick={this.onClickSubmit}
                     >
-                        {this.state.updating ? "Update" : "Post"}
+                        {this.state.updating ? SNIPPET_UPDATE_BTN : SNIPPET_CREATE_BTN}
                     </Button>
                 </div>
             </div>

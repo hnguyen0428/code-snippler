@@ -29,15 +29,13 @@ import {showAlert, closeAlert} from "../../../redux/actions/alertActions";
 import SnipplerConfig from '../../../constants/SnipplerConfig';
 
 import {styles} from './styles';
+import {
+    PASSWORD_CHAR_INVALID_ERR, PASSWORD_LENGTH_ERR, CONF_PW_NOT_MATCHED, PASSWORD_RANGE
+} from '../../../constants/constants';
 import Utility from "../../../util/Utility";
 
 
 class ChangePasswordForm extends Component {
-    PASSWORD_CHAR_INVALID_ERR = 'Password must be alphanumeric.';
-    PASSWORD_LENGTH_ERR = 'Password must be between 6 to 20 characters.';
-    CONF_PW_NOT_MATCHED = 'Confirmation password does not match new password';
-
-
     constructor(props) {
         super(props);
 
@@ -54,16 +52,16 @@ class ChangePasswordForm extends Component {
 
         let regexTest = Utility.isAlphanum(this.state.newPw);
         if (!regexTest) {
-            errors.push(this.PASSWORD_CHAR_INVALID_ERR);
+            errors.push(PASSWORD_CHAR_INVALID_ERR);
         }
 
-        let rangeTest = Utility.withinRange(this.state.newPw, 6, 20);
+        let rangeTest = Utility.withinRange(this.state.newPw, PASSWORD_RANGE.low, PASSWORD_RANGE.high);
         if (!rangeTest) {
-            errors.push(this.PASSWORD_LENGTH_ERR);
+            errors.push(PASSWORD_LENGTH_ERR);
         }
 
         if (this.state.newPw !== this.state.confirmPw) {
-            errors.push(this.CONF_PW_NOT_MATCHED);
+            errors.push(CONF_PW_NOT_MATCHED);
         }
 
         if (errors.length !== 0)

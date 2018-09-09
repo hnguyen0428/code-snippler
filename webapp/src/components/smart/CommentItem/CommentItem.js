@@ -31,6 +31,10 @@ import {upvoteComment, downvoteComment, updateComment, deleteComment} from '../.
 import {showBinaryAlert, closeBinaryAlert} from '../../../redux/actions/alertActions';
 
 import {styles, materialStyles} from './styles';
+import {
+    SIGNIN_MSG, DISMISS_MSG, UPVOTE_CMT_SIGNIN_MSG, DOWNVOTE_CMT_SIGNIN_MSG, userProfilePath, MY_PROFILE_PATH,
+    LOGIN_PATH, DELETE_MSG, DELETE_CMT_VERIFY_MSG
+} from '../../../constants/constants';
 
 const moment = require('moment');
 
@@ -48,16 +52,16 @@ class CommentItem extends Component {
 
 
     redirectToLogin = () => {
-        history.push('/login');
+        history.push(LOGIN_PATH);
         this.props.closeBinaryAlert();
     };
 
 
     handleUpvoteComment = () => {
-        let actionOne = {title: 'Dismiss'};
-        let actionTwo = {title: 'Sign In', callback: this.redirectToLogin};
+        let actionOne = {title: DISMISS_MSG};
+        let actionTwo = {title: SIGNIN_MSG, callback: this.redirectToLogin};
         if (!this.props.auth.loggedIn)
-            this.props.showBinaryAlert('Sign In?', 'To upvote the comment, you must sign in', actionOne, actionTwo);
+            this.props.showBinaryAlert(`${SIGNIN_MSG}?`, UPVOTE_CMT_SIGNIN_MSG, actionOne, actionTwo);
 
         const commentId = this.props.comment.commentId;
         const upvoted = this.props.comments.byIds[commentId].upvoted;
@@ -66,10 +70,10 @@ class CommentItem extends Component {
     };
 
     handleDownvoteComment = () => {
-        let actionOne = {title: 'Dismiss'};
-        let actionTwo = {title: 'Sign In', callback: this.redirectToLogin};
+        let actionOne = {title: DISMISS_MSG};
+        let actionTwo = {title: SIGNIN_MSG, callback: this.redirectToLogin};
         if (!this.props.auth.loggedIn)
-            this.props.showBinaryAlert('Sign In?', 'To downvote the comment, you must sign in', actionOne, actionTwo);
+            this.props.showBinaryAlert(`${SIGNIN_MSG}?`, DOWNVOTE_CMT_SIGNIN_MSG, actionOne, actionTwo);
 
         const commentId = this.props.comment.commentId;
         const downvoted = this.props.comments.byIds[commentId].downvoted;
@@ -86,9 +90,9 @@ class CommentItem extends Component {
 
     onClickUsername = () => {
         if (this.props.auth.currentUser && this.props.auth.currentUser.userId === this.props.comment.userId)
-            history.push('/user/me');
+            history.push(MY_PROFILE_PATH);
         else
-            history.push('/user/' + this.props.comment.userId);
+            history.push(userProfilePath(this.props.comment.userId));
     };
 
     onClickEdit = () => {
@@ -105,9 +109,9 @@ class CommentItem extends Component {
     };
 
     onClickDelete = () => {
-        let actionOne = {title: 'Dismiss'};
-        let actionTwo = {title: 'Delete', callback: this.deleteComment};
-        this.props.showBinaryAlert('Delete?', 'Are you sure you want to delete this comment?', actionOne, actionTwo);
+        let actionOne = {title: DISMISS_MSG};
+        let actionTwo = {title: DELETE_MSG, callback: this.deleteComment};
+        this.props.showBinaryAlert(`${DELETE_MSG}?`, DELETE_CMT_VERIFY_MSG, actionOne, actionTwo);
         this.setState({
             anchorEl: null
         });

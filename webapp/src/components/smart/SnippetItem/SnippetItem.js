@@ -15,6 +15,10 @@ import Visibility from '@material-ui/icons/Visibility';
 import history from '../../../root/history';
 
 import {styles} from './styles';
+import {
+    snippetDetailsPath, LOGIN_PATH, DISMISS_MSG, SIGNIN_MSG, SAVE_SNPT_SIGNIN_MSG, UPVOTE_SNPT_SIGNIN_MSG,
+    DOWNVOTE_SNPT_SIGNIN_MSG
+} from '../../../constants/constants';
 
 import {upvoteSnippet, downvoteSnippet, saveSnippet, setShouldIncreaseView} from '../../../redux/actions/snippetActions';
 import {showBinaryAlert, closeBinaryAlert} from '../../../redux/actions/alertActions';
@@ -25,21 +29,21 @@ class SnippetItem extends Component {
         let snippetId = this.props.snippetId;
 
         this.props.setShouldIncreaseView();
-        history.push(`/snippet/${snippetId}`);
+        history.push(snippetDetailsPath(snippetId));
     };
 
 
     redirectToLogin = () => {
-        history.push('/login');
+        history.push(LOGIN_PATH);
         this.props.closeBinaryAlert();
     };
 
 
     handleSaveSnippet = (event) => {
-        let actionOne = {title: 'Dismiss'};
-        let actionTwo = {title: 'Sign In', callback: this.redirectToLogin};
+        let actionOne = {title: DISMISS_MSG};
+        let actionTwo = {title: SIGNIN_MSG, callback: this.redirectToLogin};
         if (!this.props.auth.loggedIn)
-            this.props.showBinaryAlert('Sign In?', 'To save the snippet, you must sign in', actionOne, actionTwo);
+            this.props.showBinaryAlert(`${SIGNIN_MSG}?`, SAVE_SNPT_SIGNIN_MSG, actionOne, actionTwo);
 
         const snippetId = this.props.snippetId;
         const saved = this.props.snippets.byIds[snippetId].saved;
@@ -50,10 +54,10 @@ class SnippetItem extends Component {
 
 
     handleUpvoteSnippet = (event) => {
-        let actionOne = {title: 'Dismiss'};
-        let actionTwo = {title: 'Sign In', callback: this.redirectToLogin};
+        let actionOne = {title: DISMISS_MSG};
+        let actionTwo = {title: SIGNIN_MSG, callback: this.redirectToLogin};
         if (!this.props.auth.loggedIn)
-            this.props.showBinaryAlert('Sign In?', 'To upvote the snippet, you must sign in', actionOne, actionTwo);
+            this.props.showBinaryAlert(`${SIGNIN_MSG}?`, UPVOTE_SNPT_SIGNIN_MSG, actionOne, actionTwo);
 
         const snippetId = this.props.snippetId;
         const upvoted = this.props.snippets.byIds[snippetId].upvoted;
@@ -63,10 +67,10 @@ class SnippetItem extends Component {
 
 
     handleDownvoteSnippet = (event) => {
-        let actionOne = {title: 'Dismiss'};
-        let actionTwo = {title: 'Sign In', callback: this.redirectToLogin};
+        let actionOne = {title: DISMISS_MSG};
+        let actionTwo = {title: SIGNIN_MSG, callback: this.redirectToLogin};
         if (!this.props.auth.loggedIn)
-            this.props.showBinaryAlert('Sign In?', 'To downvote the snippet, you must sign in', actionOne, actionTwo);
+            this.props.showBinaryAlert(`${SIGNIN_MSG}?`, DOWNVOTE_SNPT_SIGNIN_MSG, actionOne, actionTwo);
 
         const snippetId = this.props.snippetId;
         const downvoted = this.props.snippets.byIds[snippetId].downvoted;

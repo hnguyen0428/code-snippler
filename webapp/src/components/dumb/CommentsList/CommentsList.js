@@ -33,6 +33,9 @@ class CommentsList extends Component {
     render() {
         const {comments, ...props} = this.props;
 
+        if (comments.length === 0)
+            return <div/>;
+
         return (
             <List id="commentsList" {...props} onScroll={this.trackScrolling}>
                 {

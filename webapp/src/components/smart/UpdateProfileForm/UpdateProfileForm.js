@@ -19,16 +19,13 @@ import {updateProfile, fetchMe} from "../../../redux/actions/userActions";
 import {showAlert, closeAlert} from "../../../redux/actions/alertActions";
 
 import {styles} from './styles';
+import {
+    INV_EMAIL_MSG, FIRST_NAME_LIMIT, LAST_NAME_LIMIT, EMAIL_LIMIT
+} from '../../../constants/constants';
 import Utility from "../../../util/Utility";
 
 
 class UpdateProfileForm extends Component {
-    INV_EMAIL = 'Email is not valid';
-    FIRST_NAME_LIMIT = 256;
-    LAST_NAME_LIMIT = 256;
-    EMAIL_LIMIT = 256;
-
-
     constructor(props) {
         super(props);
 
@@ -60,7 +57,7 @@ class UpdateProfileForm extends Component {
         if (this.state.email.length !== 0) {
             let regexTest = Utility.validateEmail(this.state.email);
             if (!regexTest) {
-                errors.push(this.INV_EMAIL);
+                errors.push(INV_EMAIL_MSG);
             }
         }
 
@@ -141,7 +138,7 @@ class UpdateProfileForm extends Component {
                            onChange={this.onInputEdit}
                            name="firstName"
                     />
-                    <InputLabel>{this.state.firstName.length}/{this.FIRST_NAME_LIMIT}</InputLabel>
+                    <InputLabel>{this.state.firstName.length}/{FIRST_NAME_LIMIT}</InputLabel>
 
                     <br/>
 
@@ -155,7 +152,7 @@ class UpdateProfileForm extends Component {
                            onChange={this.onInputEdit}
                            name="lastName"
                     />
-                    <InputLabel>{this.state.lastName.length}/{this.LAST_NAME_LIMIT}</InputLabel>
+                    <InputLabel>{this.state.lastName.length}/{LAST_NAME_LIMIT}</InputLabel>
 
                     <br/>
 
@@ -169,7 +166,7 @@ class UpdateProfileForm extends Component {
                            onChange={this.onInputEdit}
                            name="email"
                     />
-                    <InputLabel>{this.state.email.length}/{this.EMAIL_LIMIT}</InputLabel>
+                    <InputLabel>{this.state.email.length}/{EMAIL_LIMIT}</InputLabel>
 
                     <br/>
 

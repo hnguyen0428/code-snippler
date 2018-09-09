@@ -22,24 +22,14 @@ import {showAlert, closeAlert} from '../../../redux/actions/alertActions';
 import {resetOverridePath} from '../../../redux/actions/routerActions';
 import Utility from "../../../util/Utility";
 
+import {
+    PASSWORD_INPUT_LABEL, USERNAME_INPUT_LABEL, REGISTER_BUTTON_LABEL, LOGIN_BUTTON_LABEL, USERNAME_CHAR_INVALID_ERR,
+    USERNAME_LENGTH_ERR, PASSWORD_LENGTH_ERR, PASSWORD_CHAR_INVALID_ERR, CONF_PW_NOT_MATCHED, WELCOME_MSG,
+    REDIRECT_MSG, PASSWORD_RANGE, USERNAME_RANGE
+} from '../../../constants/constants';
+
 
 class LoginPage extends Component {
-    PASSWORD_INPUT_LABEL = 'Password must be alphanumeric and contains between 6-20 characters';
-    USERNAME_INPUT_LABEL = 'Username must contain only the characters [a-z, A-Z, 0-9, _] and be ' +
-        'between 6-20 characters';
-    REGISTER_BUTTON_LABEL = 'Become a Code Snippler';
-    LOGIN_BUTTON_LABEL = 'Login';
-
-    USERNAME_CHAR_INVALID_ERR = 'Username must contain only [a-zA-Z0-9_].';
-    USERNAME_LENGTH_ERR = 'Username must be between 6 to 20 characters.';
-    PASSWORD_CHAR_INVALID_ERR = 'Password must be alphanumeric.';
-    PASSWORD_LENGTH_ERR = 'Password must be between 6 to 20 characters.';
-    CONF_PW_NOT_MATCHED = 'Confirmation password does not match password';
-
-    WELCOME_MSG = 'Welcome';
-    REDIRECT_MSG = 'We will redirect you to the homepage in a bit...';
-
-
     constructor(props) {
         super(props);
 
@@ -92,7 +82,7 @@ class LoginPage extends Component {
             this.props.register(this.state.registerUsername, this.state.registerPassword,
                 (res, err) => {
                     if (res) {
-                        this.props.showAlert(this.WELCOME_MSG, this.REDIRECT_MSG);
+                        this.props.showAlert(WELCOME_MSG, REDIRECT_MSG);
                         setInterval(() => {
                             this.props.closeAlert();
                             history.push('/');
@@ -128,22 +118,22 @@ class LoginPage extends Component {
         let errors = [];
         let regexTest = Utility.validateUsername(this.state.registerUsername);
         if (!regexTest)
-            errors.push(this.USERNAME_CHAR_INVALID_ERR);
+            errors.push(USERNAME_CHAR_INVALID_ERR);
 
-        let rangeTest = Utility.withinRange(this.state.registerUsername, 6, 20);
+        let rangeTest = Utility.withinRange(this.state.registerUsername, USERNAME_RANGE.low, USERNAME_RANGE.high);
         if (!rangeTest)
-            errors.push(this.USERNAME_LENGTH_ERR);
+            errors.push(USERNAME_LENGTH_ERR);
 
         regexTest = Utility.isAlphanum(this.state.registerPassword);
         if (!regexTest)
-            errors.push(this.PASSWORD_CHAR_INVALID_ERR);
+            errors.push(PASSWORD_CHAR_INVALID_ERR);
 
-        rangeTest = Utility.withinRange(this.state.registerPassword, 6, 20);
+        rangeTest = Utility.withinRange(this.state.registerPassword, PASSWORD_RANGE.low, PASSWORD_RANGE.high);
         if (!rangeTest)
-            errors.push(this.PASSWORD_LENGTH_ERR);
+            errors.push(PASSWORD_LENGTH_ERR);
 
         if (errors.length === 0 && this.state.registerPassword !== this.state.registerConfirmPassword)
-            errors.push(this.CONF_PW_NOT_MATCHED);
+            errors.push(CONF_PW_NOT_MATCHED);
 
         return errors;
     }
@@ -177,7 +167,7 @@ class LoginPage extends Component {
                                        name="registerUsername"
                                 />
                                 <InputLabel style={styles.inputLabel}>
-                                    {this.USERNAME_INPUT_LABEL}
+                                    {USERNAME_INPUT_LABEL}
                                 </InputLabel>
                             </div>
                             <div style={styles.inputCtn}>
@@ -192,7 +182,7 @@ class LoginPage extends Component {
                                        name="registerPassword"
                                 />
                                 <InputLabel style={styles.inputLabel}>
-                                    {this.PASSWORD_INPUT_LABEL}
+                                    {PASSWORD_INPUT_LABEL}
                                 </InputLabel>
                             </div>
                             <div style={styles.inputCtn}>
@@ -210,7 +200,7 @@ class LoginPage extends Component {
                             <div style={styles.registerBtnCtn}>
                                 <Button color="primary" variant="raised" onClick={this.submitRegister}
                                         fullWidth>
-                                    {this.REGISTER_BUTTON_LABEL}
+                                    {REGISTER_BUTTON_LABEL}
                                 </Button>
                             </div>
                         </div>
@@ -250,7 +240,7 @@ class LoginPage extends Component {
                                 disabled={this.state.loginUsername.length === 0 ||
                                 this.state.loginPassword.length === 0}
                             >
-                                {this.LOGIN_BUTTON_LABEL}
+                                {LOGIN_BUTTON_LABEL}
                             </Button>
                         </div>
 

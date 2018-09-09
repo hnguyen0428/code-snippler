@@ -45,6 +45,9 @@ import {fetchSnippetsByIds} from "../../../redux/actions/snippetActions";
 import {styles, materialStyles} from './styles';
 import {theme} from '../../../constants/GlobalStyles';
 import SnipplerConfig from '../../../constants/SnipplerConfig';
+import {
+    THEIR_CREATED_SNIPPETS_TAB, THEIR_SAVED_SNIPPETS_TAB, YOUR_CREATED_SNIPPETS_TAB, YOUR_SAVED_SNIPPETS_TAB
+} from '../../../constants/constants';
 
 const moment = require('moment');
 
@@ -384,9 +387,9 @@ class ProfilePage extends Component {
                             centered
                             classes={{indicator: classes.indicator}}
                         >
-                            <Tab label={isMe ? 'Snippets You Created' : 'Snippets They Created'}
+                            <Tab label={isMe ? YOUR_CREATED_SNIPPETS_TAB : THEIR_CREATED_SNIPPETS_TAB}
                                  classes={{label: classes.tabLabel}}/>
-                            <Tab label={isMe ? 'Snippets You Saved' : 'Snippets They Saved'}
+                            <Tab label={isMe ? YOUR_SAVED_SNIPPETS_TAB : THEIR_SAVED_SNIPPETS_TAB}
                                  classes={{label: classes.tabLabel}}/>
                         </Tabs>
 
