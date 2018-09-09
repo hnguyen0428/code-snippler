@@ -55,13 +55,17 @@ import 'brace/theme/xcode';
 import 'brace/theme/tomorrow';
 
 
-import {readAceConfig as aceConfig, editorTheme} from '../../../constants/AceConfig';
+import {readAceConfig as aceConfig, editorTheme, supportedThemes} from '../../../constants/AceConfig';
 import SnipplerConfig from '../../../constants/SnipplerConfig'
 
 for (let language in languagesMap) {
     let mode = languagesMap[language];
     require(`brace/mode/${mode}`);
 }
+
+supportedThemes.forEach(theme => {
+    require(`brace/theme/${theme.toLowerCase()}`);
+});
 
 const moment = require('moment');
 

@@ -20,7 +20,7 @@ import {
 } from '../../../constants/constants';
 
 import {supportedLanguages, languagesMap} from '../../../constants/languages';
-import {writeAceConfig as aceConfig, editorTheme} from '../../../constants/AceConfig';
+import {writeAceConfig as aceConfig, editorTheme, supportedThemes} from '../../../constants/AceConfig';
 import {createSnippet, updateSnippet, fetchSnippet} from '../../../redux/actions/snippetActions';
 import {showAlert, showBinaryAlert, closeBinaryAlert} from '../../../redux/actions/alertActions';
 import {resetOverridePath} from '../../../redux/actions/routerActions';
@@ -29,6 +29,10 @@ for (let language in languagesMap) {
     let mode = languagesMap[language];
     require(`brace/mode/${mode}`);
 }
+
+supportedThemes.forEach(theme => {
+    require(`brace/theme/${theme.toLowerCase()}`);
+});
 
 
 class SnippetFormPage extends Component {
