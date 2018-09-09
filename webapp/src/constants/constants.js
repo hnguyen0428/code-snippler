@@ -7,10 +7,11 @@ export const SNIPPET_DESC_PH = "Describe what your snippet is about...";
 
 // ALERT ACTIONS TITLES
 export const DISMISS_MSG = "Dismiss";
-export const SIGNIN_MSG = "Sign In";
+export const SIGNIN_MSG = "Login";
 export const DELETE_MSG = "Delete";
 export const SNIPPET_CREATE_MSG = "Post";
 
+export const CREATE_SNPT_SIGNIN_MSG = "To create a snippet, you must sign in";
 
 export const UPVOTE_CMT_SIGNIN_MSG = "To upvote the comment, you must sign in";
 export const DOWNVOTE_CMT_SIGNIN_MSG = "To downvote the comment, you must sign in";
@@ -32,6 +33,8 @@ export const LOGIN_PATH = "/login";
 
 export const snippetDetailsPath = (snippetId) => (`/snippet/${snippetId}`);
 export const editSnippetPath = (snippetId) => (`/snippet?snippetId=${snippetId}`);
+export const SNIPPET_CREATE_PATH = '/snippet';
+export const SNIPPET_SEARCH_PATH = '/search';
 
 
 export const PASSWORD_INPUT_LABEL = "Password must be alphanumeric and contains between 6-20 characters";

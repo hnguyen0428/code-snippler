@@ -49,6 +49,10 @@ import {supportedLanguages} from '../constants/languages';
 import Snippler from '../api/SnipplerClient';
 
 import {styles, textColor} from './styles';
+import {
+    SIGNIN_MSG, DISMISS_MSG, SNIPPET_CREATE_PATH, LOGIN_PATH, CREATE_SNPT_SIGNIN_MSG, MY_PROFILE_PATH,
+    SNIPPET_SEARCH_PATH
+} from '../constants/constants';
 
 
 class App extends Component {
@@ -88,23 +92,23 @@ class App extends Component {
 
 
     redirectToLogin = () => {
-        history.push('/login');
+        history.push(LOGIN_PATH);
         this.props.closeBinaryAlert();
     };
 
 
     handleAddSnippet = () => {
         if (!this.props.auth.loggedIn) {
-            let actionOne = {title: 'Dismiss'};
-            let actionTwo = {title: 'Sign In', callback: () => {
+            let actionOne = {title: DISMISS_MSG};
+            let actionTwo = {title: SIGNIN_MSG, callback: () => {
                 this.redirectToLogin();
-                this.props.overridePath('/snippet');
+                this.props.overridePath(SNIPPET_CREATE_PATH);
             }};
             if (!this.props.auth.loggedIn)
-                this.props.showBinaryAlert('Sign In?', 'To create a snippet, you must sign in', actionOne, actionTwo);
+                this.props.showBinaryAlert(`${SIGNIN_MSG}?`, CREATE_SNPT_SIGNIN_MSG, actionOne, actionTwo);
         }
         else {
-            history.push('/snippet');
+            history.push(SNIPPET_CREATE_PATH);
         }
     };
 
@@ -154,7 +158,7 @@ class App extends Component {
 
     handleProfileClick = event => {
         this.setState({ open: false });
-        history.push('/user/me');
+        history.push(MY_PROFILE_PATH);
     };
 
 
@@ -167,7 +171,7 @@ class App extends Component {
 
     handleSignIn = event => {
         this.setState({ open: false });
-        history.push('/login');
+        history.push(LOGIN_PATH);
     };
 
 
@@ -191,8 +195,8 @@ class App extends Component {
 
             this.props.searchSnippets(params);
 
-            if (this.props.router.path !== '/search') {
-                history.push('/search');
+            if (this.props.router.path !== SNIPPET_SEARCH_PATH) {
+                history.push(SNIPPET_SEARCH_PATH);
             }
         }
     };
@@ -330,7 +334,7 @@ class App extends Component {
                                                     </MenuList>
                                                 ) : (
                                                     <MenuList>
-                                                        <MenuItem onClick={this.handleSignIn}>Sign In</MenuItem>
+                                                        <MenuItem onClick={this.handleSignIn}>{SIGNIN_MSG}</MenuItem>
                                                     </MenuList>
                                                 )}
                                             </ClickAwayListener>
