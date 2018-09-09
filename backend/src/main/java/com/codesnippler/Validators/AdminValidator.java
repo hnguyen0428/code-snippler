@@ -13,8 +13,7 @@ import javax.validation.ConstraintValidatorContext;
 
 
 public class AdminValidator implements ConstraintValidator<AdminAuthorized, Object> {
-    @Value("${adminKey}")
-    private String adminKey;
+    private String adminKey = System.getenv("ADMIN_KEY_ENC");
 
 
     @Override

@@ -13,8 +13,7 @@ import javax.validation.ConstraintValidatorContext;
 
 
 public class ClientValidator implements ConstraintValidator<ClientAuthorized, Object> {
-    @Value("${clientKey}")
-    private String clientKey;
+    private String clientKey = System.getenv("CLIENT_KEY_ENC");
 
 
     @Override
