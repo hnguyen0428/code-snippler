@@ -30,14 +30,22 @@ export const styles = {
         cursor: 'pointer',
         height: '100%'
     },
+    copyBtnCtn: {
+        display: 'flex',
+        flexDirection: 'column',
+        height: '32px'
+    },
     dateCtn: {
         display: 'flex',
-        flexDirection: 'column'
+        flexDirection: 'column',
     },
     dateLabel: {
         fontSize: '12px',
         whiteSpace: 'pre-line',
         lineHeight: '1.5em',
+    },
+    copyBtn: {
+        alignSelf: 'flex-end'
     },
     metadataCtn: {
 

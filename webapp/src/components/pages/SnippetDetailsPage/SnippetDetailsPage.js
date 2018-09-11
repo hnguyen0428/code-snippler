@@ -5,6 +5,7 @@ import {withStyles} from '@material-ui/core';
 import history from '../../../root/history';
 
 import AceEditor from 'react-ace';
+import CopyToClipboard from 'react-copy-to-clipboard';
 
 import CommentsList from '../../dumb/CommentsList/CommentsList';
 
@@ -23,9 +24,8 @@ import {
 import {overridePath, resetOverridePath} from "../../../redux/actions/routerActions";
 import {showBinaryAlert, closeBinaryAlert} from '../../../redux/actions/alertActions';
 
-import Edit from '@material-ui/icons/Edit';
-import Delete from '@material-ui/icons/Delete';
 import IconButton from '@material-ui/core/IconButton';
+import Toolbar from '@material-ui/core/Toolbar';
 import Button from '@material-ui/core/Button';
 import InputLabel from '@material-ui/core/InputLabel';
 import TextField from '@material-ui/core/TextField';
@@ -37,11 +37,16 @@ import Grow from '@material-ui/core/Grow';
 import ClickAwayListener from '@material-ui/core/ClickAwayListener';
 import MenuItem from '@material-ui/core/MenuItem';
 import MenuList from '@material-ui/core/MenuList';
+import Snackbar from '@material-ui/core/Snackbar';
 
+import Edit from '@material-ui/icons/Edit';
+import Delete from '@material-ui/icons/Delete';
+import CloseIcon from '@material-ui/icons/Close';
 import ThumbDownAlt from '@material-ui/icons/ThumbDownAlt';
 import ThumbUpAlt from '@material-ui/icons/ThumbUpAlt';
 import Bookmark from '@material-ui/icons/Bookmark';
 import Settings from '@material-ui/icons/Settings';
+import SaveAlt from '@material-ui/icons/SaveAlt';
 
 import {languagesMap} from '../../../constants/languages';
 import {
@@ -89,7 +94,8 @@ class SnippetDetailsPage extends Component {
             comments: {},
             sortMode: sortMode ? sortMode : 'mostRecent',
             commentsListSettingsOpen: false,
-            doneFetchingComments: false
+            doneFetchingComments: false,
+            snackbarOpen: false
         }
     }
 
@@ -275,6 +281,14 @@ class SnippetDetailsPage extends Component {
         this.queryComments();
     };
 
+    onClickCopy = (e) => {
+        this.setState({snackbarOpen: true});
+    };
+
+    handleCloseSnackbar=  (e) => {
+        this.setState({snackbarOpen: false});
+    };
+
 
     render() {
         let snippetId = this.props.match.params.snippetId;
@@ -356,6 +370,14 @@ class SnippetDetailsPage extends Component {
                                 }
                             </div>
 
+                            <div style={styles.copyBtnCtn}>
+                                <CopyToClipboard text={snippet.code} onCopy={this.onClickCopy}>
+                                    <IconButton style={styles.copyBtn}>
+                                        <SaveAlt/>
+                                    </IconButton>
+                                </CopyToClipboard>
+                            </div>
+
                             <div style={styles.dateCtn}>
                                 { date &&
                                 <InputLabel style={styles.dateLabel}>
@@ -368,10 +390,10 @@ class SnippetDetailsPage extends Component {
                                 </InputLabel>
                                 }
                             </div>
-
                         </div>
                         <AceEditor
                             id="ace-editor"
+                            ref={(editor) => this.aceEditor = editor}
                             mode={languagesMap[snippet.languageName.toLowerCase()]}
                             theme={editorTheme}
                             readOnly
@@ -483,6 +505,31 @@ class SnippetDetailsPage extends Component {
                             </Grow>
                         )}
                     </Popper>
+
+                    <Snackbar
+                        anchorOrigin={{
+                            vertical: 'bottom',
+                            horizontal: 'left',
+                        }}
+                        open={this.state.snackbarOpen}
+                        autoHideDuration={6000}
+                        onClose={this.handleCloseSnackbar}
+                        ContentProps={{
+                            'aria-describedby': 'message-id',
+                        }}
+                        message={<span id="message-id">Copied To Clipboard (:</span>}
+                        action={[
+                            <IconButton
+                                key="close"
+                                aria-label="Close"
+                                color="inherit"
+                                className={classes.close}
+                                onClick={this.handleCloseSnackbar}
+                            >
+                                <CloseIcon />
+                            </IconButton>,
+                        ]}
+                    />
                 </div>
             );
         }
