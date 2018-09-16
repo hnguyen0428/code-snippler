@@ -11,8 +11,4 @@ RUN apt-get update && \
 
 COPY backend/build/libs/codesnippler-0.0.1-SNAPSHOT.jar /code-snippler-backend
 
-RUN cd /code-snippler-backend
-
-WORKDIR /code-snippler-backend
-
-ENTRYPOINT ["java", "-jar", "codesnippler-0.0.1-SNAPSHOT.jar"]
+ENTRYPOINT ["java", "-jar", "/code-snippler-backend.jar"]
