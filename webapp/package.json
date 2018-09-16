@@ -2,6 +2,10 @@
   "name": "code-snippler-webapp",
   "version": "0.1.0",
   "private": true,
+  "engines": {
+    "npm": "6.0.0",
+    "node": "6.11.2"
+  },
   "dependencies": {
     "@material-ui/core": "^1.4.3",
     "@material-ui/icons": "^2.0.2",
