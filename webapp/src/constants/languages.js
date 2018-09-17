@@ -3,6 +3,7 @@
 // Used to map to appropriate mode for usage with react ace
 export const languagesMap = {
     "assembly x86": "assembly_x86",
+    "batchfile": "batchfile",
     "c": "c_cpp",
     "c++": "c_cpp",
     "coffeescript": "coffee",
@@ -32,6 +33,7 @@ export const languagesMap = {
     "objectivec": "objectivec",
     "ocaml": "ocaml",
     "pascal": "pascal",
+    "perl": "perl",
     "php": "php",
     "plain text": "plain_text",
     "powershell": "powershell",
@@ -41,6 +43,7 @@ export const languagesMap = {
     "sass": "sass",
     "scala": "scala",
     "scss": "scss",
+    "sh": "sh",
     "sql": "sql",
     "swift": "swift",
     "typescript": "typescript",
@@ -52,6 +55,7 @@ export const languagesMap = {
 
 export const supportedLanguages = [
     "Assembly x86",
+    "Batchfile",
     "C",
     "C++",
     "CoffeeScript",
@@ -81,6 +85,7 @@ export const supportedLanguages = [
     "ObjectiveC",
     "OCaml",
     "Pascal",
+    "Perl",
     "PHP",
     "Plain Text",
     "PowerShell",
@@ -91,6 +96,7 @@ export const supportedLanguages = [
     "Scala",
     "SCSS",
     "SQL",
+    "sh",
     "Swift",
     "TypeScript",
     "Verilog",

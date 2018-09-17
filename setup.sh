@@ -21,18 +21,18 @@ uri="$BASE_URL$ENDPOINT"
 echo "Setting up the supported languages"
 
 langs=(
-	"Assembly x86" "C" "C++" "CoffeeScript" 
-	"C#" "CSS" "Dockerfile" "EJS" 
-	"Fortran" "Go" "HTML" "HTML Elixir" 
-	"HTML Ruby" "Haskell" "Java" "JavaScript" 
-	"JSON" "JSX" "Julia" "ReactJS" 
-	"ReactNative" "LaTex" "LESS" "Lua" 
-	"Makefile" "Matlab" "MySQL" "Objective C" 
-	"OCaml" "Pascal" "PHP" "Plain text" 
-	"PowerShell" "Python" "R" "Ruby" 
-	"SASS" "Scala" "SCSS" "SQL" 
-	"Swift" "TypeScript" "Verilog" "XML" 
-	"Yaml"
+	"Assembly x86" "Batchfile" "C" "C++" 
+	"CoffeeScript" "C#" "CSS" "Dockerfile" 
+	"EJS" "Fortran" "Go" "HTML" 
+	"HTML Elixir" "HTML Ruby" "Haskell" "Java" 
+	"JavaScript" "JSON" "JSX" "Julia" 
+	"ReactJS" "ReactNative" "LaTex" "LESS" 
+	"Lua" "Makefile" "Matlab" "MySQL" 
+	"Objective C" "OCaml" "Pascal" "Perl" 
+	"PHP" "Plain text" "PowerShell" "Python" 
+	"R" "Ruby" "SASS" "Scala" 
+	"SCSS" "sh" "SQL" "Swift" "TypeScript" 
+	"Verilog" "XML" "Yaml"
 )
 types=(
 	"language" "language" "language" "language"
@@ -46,7 +46,7 @@ types=(
 	"language" "language" "language" "language"
 	"language" "language" "language" "language"
 	"language" "language" "language" "language"
-	"language"
+	"language" "language" "language"
 )
 length=${#langs[@]}
 
