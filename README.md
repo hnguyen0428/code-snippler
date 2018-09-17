@@ -6,5 +6,10 @@ The goal of the application is to aid developers in accomplishing common simple 
 giving them the ability to search up something that has already been done before.
 
 
+## Deployment
+The application is currently deployed at 
+https://code-snippler.herokuapp.com
+
+
 ## Author
 Copyright [2018] [Daniel Nguyen]
