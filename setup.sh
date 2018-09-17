@@ -51,9 +51,10 @@ types=(
 length=${#langs[@]}
 
 i=0
+echo "" > setup.log
 while [ $i -lt $length ]
 do
-	curl --header "Admin-Key:$ADMIN_KEY" --data "name=${langs[$i]}&type=${types[$i]}" $uri &> setup.log
+	curl --header "Admin-Key:$ADMIN_KEY" --data "name=${langs[$i]}&type=${types[$i]}" $uri >> setup.log 2>&1
 	i=`expr $i + 1`
 done
 

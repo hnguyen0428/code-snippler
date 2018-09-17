@@ -29,3 +29,7 @@ backend/nbdist/
 *node_modules
 
 .DS_Store
+
+# Setup logs
+setup.log
+webapp/build
