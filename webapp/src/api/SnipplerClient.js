@@ -76,7 +76,7 @@ if (languagesFilterStr)
     languagesFilter = languagesFilterStr.split(",");
 
 const client = new SnipplerClient({
-    baseUrl: 'http://54.215.197.28:8080',
+    baseUrl: 'https://code-snippler-api.herokuapp.com',
     clientKey: 'vEysoE5HxX_rRADv1BDJ_v19KoKun6x49p4rq3ZYVxxTtYFc9r-beDh--a1Y8E5GbCpOKEHgJhCvsrnrtbFRomI8TNRNEyStBzUe6UUtgc9gsKBV8bDf6O71j6mk_WA-nYrD-AHHIhf3RI8rls7vNHmQLyPHxA2CDEjiDEkMhYA',
     languagesFilter: languagesFilter
 });
