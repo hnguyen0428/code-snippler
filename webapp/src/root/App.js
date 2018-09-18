@@ -1,4 +1,5 @@
 import React, {Component} from "react";
+import {isMobileOnly} from "react-device-detect";
 import {connect} from "react-redux";
 import AppBar from "@material-ui/core/AppBar";
 import Toolbar from "@material-ui/core/Toolbar";
@@ -208,6 +209,14 @@ class App extends Component {
 
 
     render() {
+        if (isMobileOnly)
+            return (
+                <div>
+                    <h3>We currently do not support mobile devices.</h3>
+                </div>
+            );
+
+
         const { open } = this.state;
 
         return (
