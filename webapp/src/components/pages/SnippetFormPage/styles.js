@@ -34,3 +34,23 @@ export const styles = {
         marginTop: '20px'
     }
 };
+
+
+export const materialStyles = theme => ({
+    root: {
+        display: 'flex',
+        alignItems: 'center',
+    },
+    wrapper: {
+        margin: theme.spacing.unit,
+        position: 'relative',
+        alignSelf: 'center'
+    },
+    buttonProgress: {
+        color: 'white',
+        position: 'absolute',
+        top: '50%',
+        left: '50%',
+        marginLeft: -12,
+    },
+});

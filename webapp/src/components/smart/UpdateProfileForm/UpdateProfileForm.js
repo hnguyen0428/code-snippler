@@ -1,27 +1,25 @@
-import React, { Component } from 'react';
-import PropTypes from 'prop-types';
-import {connect} from 'react-redux';
+import React, {Component} from "react";
+import PropTypes from "prop-types";
+import {connect} from "react-redux";
 
-import Dialog from '@material-ui/core/Dialog';
-import DialogTitle from '@material-ui/core/DialogTitle';
-import DialogContent from '@material-ui/core/DialogContent';
-import Button from '@material-ui/core/Button';
-import IconButton from '@material-ui/core/IconButton';
-import InputLabel from '@material-ui/core/InputLabel';
-import Input from '@material-ui/core/Input';
-import InputAdornment from '@material-ui/core/InputAdornment';
+import Dialog from "@material-ui/core/Dialog";
+import DialogTitle from "@material-ui/core/DialogTitle";
+import DialogContent from "@material-ui/core/DialogContent";
+import Button from "@material-ui/core/Button";
+import IconButton from "@material-ui/core/IconButton";
+import InputLabel from "@material-ui/core/InputLabel";
+import Input from "@material-ui/core/Input";
+import InputAdornment from "@material-ui/core/InputAdornment";
 
-import Mail from '@material-ui/icons/Mail';
-import PermContactCalendar from '@material-ui/icons/PermContactCalendar';
-import ArrowBackIos from '@material-ui/icons/ArrowBackIos';
+import Mail from "@material-ui/icons/Mail";
+import PermContactCalendar from "@material-ui/icons/PermContactCalendar";
+import ArrowBackIos from "@material-ui/icons/ArrowBackIos";
 
-import {updateProfile, fetchMe} from "../../../redux/actions/userActions";
-import {showAlert, closeAlert} from "../../../redux/actions/alertActions";
+import {fetchMe, updateProfile} from "../../../redux/actions/userActions";
+import {closeAlert, showAlert} from "../../../redux/actions/alertActions";
 
-import {styles} from './styles';
-import {
-    INV_EMAIL_MSG, FIRST_NAME_LIMIT, LAST_NAME_LIMIT, EMAIL_LIMIT
-} from '../../../constants/constants';
+import {styles} from "./styles";
+import {EMAIL_LIMIT, FIRST_NAME_LIMIT, INV_EMAIL_MSG, LAST_NAME_LIMIT} from "../../../constants/constants";
 import Utility from "../../../util/Utility";
 
 

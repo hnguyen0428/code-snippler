@@ -1,58 +1,63 @@
-import React, { Component } from 'react';
-import {connect} from 'react-redux';
-import AppBar from '@material-ui/core/AppBar';
-import Toolbar from '@material-ui/core/Toolbar';
-import Button from '@material-ui/core/Button';
-import IconButton from '@material-ui/core/IconButton';
-import ClickAwayListener from '@material-ui/core/ClickAwayListener';
-import Grow from '@material-ui/core/Grow';
-import Paper from '@material-ui/core/Paper';
-import Popper from '@material-ui/core/Popper';
-import MenuItem from '@material-ui/core/MenuItem';
-import MenuList from '@material-ui/core/MenuList';
-import Dialog from '@material-ui/core/Dialog';
-import DialogTitle from '@material-ui/core/DialogTitle';
-import DialogActions from '@material-ui/core/DialogActions';
-import DialogContent from '@material-ui/core/DialogContent';
-import DialogContentText from '@material-ui/core/DialogContentText';
-import Tooltip from '@material-ui/core/Tooltip';
-import Drawer from '@material-ui/core/Drawer';
-import InputLabel from '@material-ui/core/InputLabel';
+import React, {Component} from "react";
+import {connect} from "react-redux";
+import AppBar from "@material-ui/core/AppBar";
+import Toolbar from "@material-ui/core/Toolbar";
+import Button from "@material-ui/core/Button";
+import IconButton from "@material-ui/core/IconButton";
+import ClickAwayListener from "@material-ui/core/ClickAwayListener";
+import Grow from "@material-ui/core/Grow";
+import Paper from "@material-ui/core/Paper";
+import Popper from "@material-ui/core/Popper";
+import MenuItem from "@material-ui/core/MenuItem";
+import MenuList from "@material-ui/core/MenuList";
+import Dialog from "@material-ui/core/Dialog";
+import DialogTitle from "@material-ui/core/DialogTitle";
+import DialogActions from "@material-ui/core/DialogActions";
+import DialogContent from "@material-ui/core/DialogContent";
+import DialogContentText from "@material-ui/core/DialogContentText";
+import Tooltip from "@material-ui/core/Tooltip";
+import Drawer from "@material-ui/core/Drawer";
+import InputLabel from "@material-ui/core/InputLabel";
 
-import SearchBar from '../components/dumb/SearchBar/SearchBar';
-import SelectableChip from '../components/dumb/SelectableChip/SelectableChip';
+import SearchBar from "../components/dumb/SearchBar/SearchBar";
+import SelectableChip from "../components/dumb/SelectableChip/SelectableChip";
 
-import AccountCircle from '@material-ui/icons/AccountCircle';
-import FilterList from '@material-ui/icons/FilterList';
-import RadioButtonChecked from '@material-ui/icons/RadioButtonChecked';
-import RadioButtonUnchecked from '@material-ui/icons/RadioButtonUnchecked';
-import Add from '@material-ui/icons/Add';
+import AccountCircle from "@material-ui/icons/AccountCircle";
+import FilterList from "@material-ui/icons/FilterList";
+import RadioButtonChecked from "@material-ui/icons/RadioButtonChecked";
+import RadioButtonUnchecked from "@material-ui/icons/RadioButtonUnchecked";
+import Add from "@material-ui/icons/Add";
 
 
-import {Router, Route, Switch} from 'react-router-dom';
-import history from './history'
+import {Route, Router, Switch} from "react-router-dom";
+import history from "./history";
 
 import {logout} from "../redux/actions/authActions";
-import {closeAlert, showBinaryAlert, closeBinaryAlert} from "../redux/actions/alertActions";
+import {closeAlert, closeBinaryAlert, showBinaryAlert} from "../redux/actions/alertActions";
 import {overridePath} from "../redux/actions/routerActions";
 import {searchSnippets} from "../redux/actions/snippetActions";
 
-import SnippetFormPage from '../components/pages/SnippetFormPage/SnippetFormPage';
-import LoginPage from '../components/pages/LoginPage/LoginPage';
-import SnippetDetailsPage from '../components/pages/SnippetDetailsPage/SnippetDetailsPage';
-import HomePage from '../components/pages/HomePage/HomePage';
-import SearchPage from '../components/pages/SearchPage/SearchPage';
-import ProfilePage from '../components/pages/ProfilePage/ProfilePage';
+import SnippetFormPage from "../components/pages/SnippetFormPage/SnippetFormPage";
+import LoginPage from "../components/pages/LoginPage/LoginPage";
+import SnippetDetailsPage from "../components/pages/SnippetDetailsPage/SnippetDetailsPage";
+import HomePage from "../components/pages/HomePage/HomePage";
+import SearchPage from "../components/pages/SearchPage/SearchPage";
+import ProfilePage from "../components/pages/ProfilePage/ProfilePage";
 
-import SnipplerConfig from '../constants/SnipplerConfig';
-import {supportedLanguages} from '../constants/languages';
-import Snippler from '../api/SnipplerClient';
+import SnipplerConfig from "../constants/SnipplerConfig";
+import {supportedLanguages} from "../constants/languages";
+import Snippler from "../api/SnipplerClient";
 
-import {styles, textColor} from './styles';
+import {styles} from "./styles";
 import {
-    SIGNIN_MSG, DISMISS_MSG, SNIPPET_CREATE_PATH, LOGIN_PATH, CREATE_SNPT_SIGNIN_MSG, MY_PROFILE_PATH,
+    CREATE_SNPT_SIGNIN_MSG,
+    DISMISS_MSG,
+    LOGIN_PATH,
+    MY_PROFILE_PATH,
+    SIGNIN_MSG,
+    SNIPPET_CREATE_PATH,
     SNIPPET_SEARCH_PATH
-} from '../constants/constants';
+} from "../constants/constants";
 
 
 class App extends Component {

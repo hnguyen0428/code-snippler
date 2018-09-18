@@ -1,16 +1,16 @@
-import React, { Component } from 'react';
-import {connect} from 'react-redux';
+import React, {Component} from "react";
+import {connect} from "react-redux";
 
-import SnippetsList from '../../dumb/SnippetsList/SnippetsList';
+import SnippetsList from "../../dumb/SnippetsList/SnippetsList";
 
-import InputLabel from '@material-ui/core/InputLabel';
-import Paginator from '../../dumb/Paginator/Paginator';
+import InputLabel from "@material-ui/core/InputLabel";
+import Paginator from "../../dumb/Paginator/Paginator";
 
-import SnipplerConfig from '../../../constants/SnipplerConfig';
+import SnipplerConfig from "../../../constants/SnipplerConfig";
 
-import {searchSnippets} from '../../../redux/actions/snippetActions';
+import {searchSnippets} from "../../../redux/actions/snippetActions";
 
-import {styles} from './styles';
+import {styles} from "./styles";
 
 class SearchPage extends Component {
     constructor(props) {

@@ -1,5 +1,4 @@
 import SnipplerService from "./SnipplerService";
-import querystring from 'querystring';
 
 
 const ENDPOINTS = {

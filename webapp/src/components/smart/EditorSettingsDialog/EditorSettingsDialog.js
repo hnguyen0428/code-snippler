@@ -1,25 +1,24 @@
-import React, { Component } from 'react';
-import PropTypes from 'prop-types';
+import React, {Component} from "react";
+import PropTypes from "prop-types";
 
-import Dialog from '@material-ui/core/Dialog';
-import DialogTitle from '@material-ui/core/DialogTitle';
-import DialogContent from '@material-ui/core/DialogContent';
-import List from '@material-ui/core/List';
-import Button from '@material-ui/core/Button';
-import IconButton from '@material-ui/core/IconButton';
+import Dialog from "@material-ui/core/Dialog";
+import DialogTitle from "@material-ui/core/DialogTitle";
+import DialogContent from "@material-ui/core/DialogContent";
+import List from "@material-ui/core/List";
+import Button from "@material-ui/core/Button";
+import IconButton from "@material-ui/core/IconButton";
 
-import RadioButtonChecked from '@material-ui/icons/RadioButtonChecked';
-import RadioButtonUnchecked from '@material-ui/icons/RadioButtonUnchecked';
-import ArrowBackIos from '@material-ui/icons/ArrowBackIos';
+import RadioButtonChecked from "@material-ui/icons/RadioButtonChecked";
+import RadioButtonUnchecked from "@material-ui/icons/RadioButtonUnchecked";
+import ArrowBackIos from "@material-ui/icons/ArrowBackIos";
 
-import AceEditor from 'react-ace';
+import AceEditor from "react-ace";
 
-import SelectableChip from '../../dumb/SelectableChip/SelectableChip';
+import SelectableChip from "../../dumb/SelectableChip/SelectableChip";
 
-import {writeAceConfig as aceConfig} from '../../../constants/AceConfig';
-import {supportedThemes, editorTheme, setEditorTheme} from '../../../constants/AceConfig';
+import {editorTheme, setEditorTheme, supportedThemes, writeAceConfig as aceConfig} from "../../../constants/AceConfig";
 
-import {styles} from './styles';
+import {styles} from "./styles";
 
 supportedThemes.forEach(theme => {
     require(`brace/theme/${theme.toLowerCase()}`);

@@ -1,13 +1,11 @@
-import React, { Component } from 'react';
-import PropTypes from 'prop-types';
-import {connect} from 'react-redux';
+import React, {Component} from "react";
+import PropTypes from "prop-types";
 
-import List from '@material-ui/core/List';
-import ListItem from '@material-ui/core/ListItem';
-import CircularProgress from '@material-ui/core/CircularProgress'
-import SnippetItem from '../../smart/SnippetItem/SnippetItem';
+import List from "@material-ui/core/List";
+import CircularProgress from "@material-ui/core/CircularProgress";
+import SnippetItem from "../../smart/SnippetItem/SnippetItem";
 
-import {styles} from './styles';
+import {styles} from "./styles";
 
 
 class SnippetsList extends Component {

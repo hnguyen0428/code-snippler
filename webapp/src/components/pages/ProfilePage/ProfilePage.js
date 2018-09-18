@@ -1,53 +1,56 @@
-import React, { Component } from 'react';
-import {connect} from 'react-redux';
-import {withRouter} from 'react-router-dom';
+import React, {Component} from "react";
+import {connect} from "react-redux";
+import {withRouter} from "react-router-dom";
 
-import history from '../../../root/history';
-import {withStyles} from '@material-ui/core'
+import history from "../../../root/history";
+import {withStyles} from "@material-ui/core";
 
-import Paginator from '../../dumb/Paginator/Paginator';
-import SnippetsList from '../../dumb/SnippetsList/SnippetsList';
-import SearchBar from '../../dumb/SearchBar/SearchBar';
-import SettingsDialog from '../../dumb/SettingsDialog/SettingsDialog';
-import EditorSettingsDialog from '../../smart/EditorSettingsDialog/EditorSettingsDialog';
-import ChangePasswordForm from '../../smart/ChangePasswordForm/ChangePasswordForm';
-import UpdateProfileForm from '../../smart/UpdateProfileForm/UpdateProfileForm';
+import Paginator from "../../dumb/Paginator/Paginator";
+import SnippetsList from "../../dumb/SnippetsList/SnippetsList";
+import SearchBar from "../../dumb/SearchBar/SearchBar";
+import SettingsDialog from "../../dumb/SettingsDialog/SettingsDialog";
+import EditorSettingsDialog from "../../smart/EditorSettingsDialog/EditorSettingsDialog";
+import ChangePasswordForm from "../../smart/ChangePasswordForm/ChangePasswordForm";
+import UpdateProfileForm from "../../smart/UpdateProfileForm/UpdateProfileForm";
 
-import IconButton from '@material-ui/core/IconButton';
-import Tabs from '@material-ui/core/Tabs';
-import Tab from '@material-ui/core/Tab';
-import Toolbar from '@material-ui/core/Toolbar';
-import Avatar from '@material-ui/core/Avatar';
-import InputLabel from '@material-ui/core/InputLabel';
-import Dialog from '@material-ui/core/Dialog';
-import List from '@material-ui/core/List';
-import ListSubheader from '@material-ui/core/ListSubheader';
-import ListItem from '@material-ui/core/ListItem';
-import ListItemIcon from '@material-ui/core/ListItemIcon';
-import ListItemText from '@material-ui/core/ListItemText';
+import IconButton from "@material-ui/core/IconButton";
+import Tabs from "@material-ui/core/Tabs";
+import Tab from "@material-ui/core/Tab";
+import Toolbar from "@material-ui/core/Toolbar";
+import Avatar from "@material-ui/core/Avatar";
+import InputLabel from "@material-ui/core/InputLabel";
+import Dialog from "@material-ui/core/Dialog";
+import List from "@material-ui/core/List";
+import ListSubheader from "@material-ui/core/ListSubheader";
+import ListItem from "@material-ui/core/ListItem";
+import ListItemIcon from "@material-ui/core/ListItemIcon";
+import ListItemText from "@material-ui/core/ListItemText";
 
-import Mail from '@material-ui/icons/Mail';
-import PermContactCalendar from '@material-ui/icons/PermContactCalendar';
-import PermIdentity from '@material-ui/icons/PermIdentity';
-import Settings from '@material-ui/icons/Settings';
+import Mail from "@material-ui/icons/Mail";
+import PermContactCalendar from "@material-ui/icons/PermContactCalendar";
+import PermIdentity from "@material-ui/icons/PermIdentity";
+import Settings from "@material-ui/icons/Settings";
 
 import {
+    fetchMe,
     fetchMyCreatedSnippets,
     fetchMySavedSnippets,
+    fetchUser,
     fetchUserCreatedSnippets,
-    fetchUserSavedSnippets,
-    fetchMe,
-    fetchUser
-} from '../../../redux/actions/userActions';
+    fetchUserSavedSnippets
+} from "../../../redux/actions/userActions";
 
 import {fetchSnippetsByIds} from "../../../redux/actions/snippetActions";
 
-import {styles, materialStyles} from './styles';
-import {theme} from '../../../constants/GlobalStyles';
-import SnipplerConfig from '../../../constants/SnipplerConfig';
+import {materialStyles, styles} from "./styles";
+import {theme} from "../../../constants/GlobalStyles";
+import SnipplerConfig from "../../../constants/SnipplerConfig";
 import {
-    THEIR_CREATED_SNIPPETS_TAB, THEIR_SAVED_SNIPPETS_TAB, YOUR_CREATED_SNIPPETS_TAB, YOUR_SAVED_SNIPPETS_TAB
-} from '../../../constants/constants';
+    THEIR_CREATED_SNIPPETS_TAB,
+    THEIR_SAVED_SNIPPETS_TAB,
+    YOUR_CREATED_SNIPPETS_TAB,
+    YOUR_SAVED_SNIPPETS_TAB
+} from "../../../constants/constants";
 
 const moment = require('moment');
 

@@ -25,7 +25,6 @@ import {overridePath, resetOverridePath} from "../../../redux/actions/routerActi
 import {showBinaryAlert, closeBinaryAlert} from '../../../redux/actions/alertActions';
 
 import IconButton from '@material-ui/core/IconButton';
-import Toolbar from '@material-ui/core/Toolbar';
 import Button from '@material-ui/core/Button';
 import InputLabel from '@material-ui/core/InputLabel';
 import TextField from '@material-ui/core/TextField';

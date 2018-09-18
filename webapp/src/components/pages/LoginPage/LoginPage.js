@@ -1,32 +1,41 @@
-import React, { Component } from 'react';
-import {connect} from 'react-redux';
-import {withRouter} from 'react-router-dom';
+import React, {Component} from "react";
+import {connect} from "react-redux";
+import {withRouter} from "react-router-dom";
 
-import history from '../../../root/history';
+import history from "../../../root/history";
 
-import Card from '@material-ui/core/Card';
-import Input from '@material-ui/core/Input';
-import InputLabel from '@material-ui/core/InputLabel';
-import Button from '@material-ui/core/Button';
-import Dialog from '@material-ui/core/Dialog';
-import InputAdornment from '@material-ui/core/InputAdornment';
-import IconButton from '@material-ui/core/IconButton';
-import Lock from '@material-ui/icons/Lock';
-import PermIdentity from '@material-ui/icons/PermIdentity';
-import CheckCircle from '@material-ui/icons/CheckCircle';
+import Card from "@material-ui/core/Card";
+import Input from "@material-ui/core/Input";
+import InputLabel from "@material-ui/core/InputLabel";
+import Button from "@material-ui/core/Button";
+import Dialog from "@material-ui/core/Dialog";
+import InputAdornment from "@material-ui/core/InputAdornment";
+import Lock from "@material-ui/icons/Lock";
+import PermIdentity from "@material-ui/icons/PermIdentity";
+import CheckCircle from "@material-ui/icons/CheckCircle";
 
-import {styles} from './styles';
+import {styles} from "./styles";
 
-import {login, register} from '../../../redux/actions/authActions';
-import {showAlert, closeAlert} from '../../../redux/actions/alertActions';
-import {resetOverridePath} from '../../../redux/actions/routerActions';
+import {login, register} from "../../../redux/actions/authActions";
+import {closeAlert, showAlert} from "../../../redux/actions/alertActions";
+import {resetOverridePath} from "../../../redux/actions/routerActions";
 import Utility from "../../../util/Utility";
 
 import {
-    PASSWORD_INPUT_LABEL, USERNAME_INPUT_LABEL, REGISTER_BUTTON_LABEL, LOGIN_BUTTON_LABEL, USERNAME_CHAR_INVALID_ERR,
-    USERNAME_LENGTH_ERR, PASSWORD_LENGTH_ERR, PASSWORD_CHAR_INVALID_ERR, CONF_PW_NOT_MATCHED, WELCOME_MSG,
-    REDIRECT_MSG, PASSWORD_RANGE, USERNAME_RANGE
-} from '../../../constants/constants';
+    CONF_PW_NOT_MATCHED,
+    LOGIN_BUTTON_LABEL,
+    PASSWORD_CHAR_INVALID_ERR,
+    PASSWORD_INPUT_LABEL,
+    PASSWORD_LENGTH_ERR,
+    PASSWORD_RANGE,
+    REDIRECT_MSG,
+    REGISTER_BUTTON_LABEL,
+    USERNAME_CHAR_INVALID_ERR,
+    USERNAME_INPUT_LABEL,
+    USERNAME_LENGTH_ERR,
+    USERNAME_RANGE,
+    WELCOME_MSG
+} from "../../../constants/constants";
 
 
 class LoginPage extends Component {

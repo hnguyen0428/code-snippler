@@ -1,27 +1,37 @@
-import React, { Component } from 'react';
-import PropTypes from 'prop-types';
-import {connect} from 'react-redux';
+import React, {Component} from "react";
+import PropTypes from "prop-types";
+import {connect} from "react-redux";
 
-import InputLabel from '@material-ui/core/InputLabel';
-import Paper from '@material-ui/core/Paper';
-import Tooltip from '@material-ui/core/Tooltip';
-import Button from '@material-ui/core/Button';
-import IconButton from '@material-ui/core/IconButton';
-import ThumbDownAlt from '@material-ui/icons/ThumbDownAlt';
-import ThumbUpAlt from '@material-ui/icons/ThumbUpAlt';
-import Bookmark from '@material-ui/icons/Bookmark';
-import Visibility from '@material-ui/icons/Visibility';
+import InputLabel from "@material-ui/core/InputLabel";
+import Paper from "@material-ui/core/Paper";
+import Tooltip from "@material-ui/core/Tooltip";
+import Button from "@material-ui/core/Button";
+import IconButton from "@material-ui/core/IconButton";
+import ThumbDownAlt from "@material-ui/icons/ThumbDownAlt";
+import ThumbUpAlt from "@material-ui/icons/ThumbUpAlt";
+import Bookmark from "@material-ui/icons/Bookmark";
+import Visibility from "@material-ui/icons/Visibility";
 
-import history from '../../../root/history';
+import history from "../../../root/history";
 
-import {styles} from './styles';
+import {styles} from "./styles";
 import {
-    snippetDetailsPath, LOGIN_PATH, DISMISS_MSG, SIGNIN_MSG, SAVE_SNPT_SIGNIN_MSG, UPVOTE_SNPT_SIGNIN_MSG,
-    DOWNVOTE_SNPT_SIGNIN_MSG
-} from '../../../constants/constants';
+    DISMISS_MSG,
+    DOWNVOTE_SNPT_SIGNIN_MSG,
+    LOGIN_PATH,
+    SAVE_SNPT_SIGNIN_MSG,
+    SIGNIN_MSG,
+    snippetDetailsPath,
+    UPVOTE_SNPT_SIGNIN_MSG
+} from "../../../constants/constants";
 
-import {upvoteSnippet, downvoteSnippet, saveSnippet, setShouldIncreaseView} from '../../../redux/actions/snippetActions';
-import {showBinaryAlert, closeBinaryAlert} from '../../../redux/actions/alertActions';
+import {
+    downvoteSnippet,
+    saveSnippet,
+    setShouldIncreaseView,
+    upvoteSnippet
+} from "../../../redux/actions/snippetActions";
+import {closeBinaryAlert, showBinaryAlert} from "../../../redux/actions/alertActions";
 
 
 class SnippetItem extends Component {

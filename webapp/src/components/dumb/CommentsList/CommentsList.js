@@ -1,13 +1,11 @@
-import React, { Component } from 'react';
-import {connect} from 'react-redux';
-import PropTypes from 'prop-types';
+import React, {Component} from "react";
+import PropTypes from "prop-types";
 
-import List from '@material-ui/core/List';
-import ListItem from '@material-ui/core/ListItem';
-import CommentItem from '../../smart/CommentItem/CommentItem';
-import CircularProgress from '@material-ui/core/CircularProgress';
+import List from "@material-ui/core/List";
+import CommentItem from "../../smart/CommentItem/CommentItem";
+import CircularProgress from "@material-ui/core/CircularProgress";
 
-import {styles} from './styles';
+import {styles} from "./styles";
 
 
 class CommentsList extends Component {

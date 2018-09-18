@@ -1,38 +1,38 @@
-import React, { Component } from 'react';
-import {connect} from 'react-redux';
-import {withRouter} from 'react-router-dom';
-import history from '../../../root/history';
+import React, {Component} from "react";
+import {connect} from "react-redux";
+import {withRouter} from "react-router-dom";
+import history from "../../../root/history";
 
-import Popper from '@material-ui/core/Popper';
-import InputLabel from '@material-ui/core/InputLabel';
-import Paper from '@material-ui/core/Paper';
-import Grow from '@material-ui/core/Grow';
-import IconButton from '@material-ui/core/IconButton';
-import ClickAwayListener from '@material-ui/core/ClickAwayListener';
-import MenuItem from '@material-ui/core/MenuItem';
-import MenuList from '@material-ui/core/MenuList';
+import Popper from "@material-ui/core/Popper";
+import InputLabel from "@material-ui/core/InputLabel";
+import Paper from "@material-ui/core/Paper";
+import Grow from "@material-ui/core/Grow";
+import IconButton from "@material-ui/core/IconButton";
+import ClickAwayListener from "@material-ui/core/ClickAwayListener";
+import MenuItem from "@material-ui/core/MenuItem";
+import MenuList from "@material-ui/core/MenuList";
 
-import Settings from '@material-ui/icons/Settings';
+import Settings from "@material-ui/icons/Settings";
 
-import Paginator from '../../dumb/Paginator/Paginator';
+import Paginator from "../../dumb/Paginator/Paginator";
 
 import {
-    fetchRecentSnippets,
-    fetchPopularSnippets,
     fetchMostSavedSnippets,
-    fetchMostViewsSnippets,
     fetchMostUpvotesSnippets,
+    fetchMostViewsSnippets,
+    fetchPopularSnippets,
+    fetchRecentSnippets,
     searchSnippets
 } from "../../../redux/actions/snippetActions";
 
-import {saveSettings} from '../../../redux/actions/settingsActions';
+import {saveSettings} from "../../../redux/actions/settingsActions";
 
-import SnippetsList from '../../dumb/SnippetsList/SnippetsList';
-import FeedSettings from '../../../constants/FeedSettings';
+import SnippetsList from "../../dumb/SnippetsList/SnippetsList";
+import FeedSettings from "../../../constants/FeedSettings";
 
-import SnipplerConfig from '../../../constants/SnipplerConfig';
+import SnipplerConfig from "../../../constants/SnipplerConfig";
 
-import {styles} from './styles';
+import {styles} from "./styles";
 
 
 class HomePage extends Component {

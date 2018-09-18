@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import {connect} from 'react-redux';
 import {withRouter} from 'react-router-dom';
+import {withStyles} from '@material-ui/core';
 
 import TextField from '@material-ui/core/TextField';
 import FormHelperText from '@material-ui/core/FormHelperText';
@@ -9,9 +10,10 @@ import FormControl from '@material-ui/core/FormControl';
 import InputLabel from '@material-ui/core/InputLabel';
 import Select from '@material-ui/core/Select';
 import MenuItem from '@material-ui/core/MenuItem';
+import CircularProgress from '@material-ui/core/CircularProgress';
 import AceEditor from 'react-ace';
 
-import {styles} from './styles';
+import {styles, materialStyles} from './styles';
 import history from '../../../root/history';
 import {
     SNIPPET_TITLE_PH, SNIPPET_DESC_PH, SNIPPET_CREATE_MSG, SNIPPET_CREATE_VERIFY_MSG, SNIPPET_TITLE_LIMIT,
@@ -61,7 +63,8 @@ class SnippetFormPage extends Component {
                 errorMsg: '',
             },
             updating: snippetId !== null,
-            snippetId: snippetId
+            snippetId: snippetId,
+            loading: false
         };
     }
 
@@ -140,6 +143,7 @@ class SnippetFormPage extends Component {
 
 
     onClickSubmit = () => {
+        this.setState({loading: true});
         let passed = this.sanityCheck();
         if (!passed)
             return;
@@ -152,6 +156,7 @@ class SnippetFormPage extends Component {
         };
 
         const resCallback = (res, err) => {
+            this.setState({loading: false});
             if (res) {
                 let prevPath = this.props.router.prevPath;
                 let overridePath = this.props.router.overridePath;
@@ -166,10 +171,12 @@ class SnippetFormPage extends Component {
         };
 
         const createSnippetAction = () => {
+            this.setState({loading: true});
             this.props.createSnippet(params, resCallback);
         };
 
         const updateSnippetAction = () => {
+            this.setState({loading: true});
             this.props.updateSnippet(this.state.snippetId, params, resCallback);
         };
 
@@ -246,6 +253,8 @@ class SnippetFormPage extends Component {
 
 
     render() {
+        const {classes} = this.props;
+
         return (
             <div style={styles.rootCtn}>
                 <div style={styles.contentCtn}>
@@ -324,14 +333,18 @@ class SnippetFormPage extends Component {
                         {this.state.code.length}/{SNIPPET_CODE_LIMIT}
                     </FormHelperText>
 
-                    <Button
-                        style={styles.postBtn}
-                        variant="raised"
-                        color="primary"
-                        onClick={this.onClickSubmit}
-                    >
-                        {this.state.updating ? SNIPPET_UPDATE_BTN : SNIPPET_CREATE_BTN}
-                    </Button>
+                    <div className={classes.wrapper}>
+                        <Button
+                            style={styles.postBtn}
+                            variant="raised"
+                            color="primary"
+                            onClick={this.onClickSubmit}
+                            disabled={this.state.loading}
+                        >
+                            {this.state.updating ? SNIPPET_UPDATE_BTN : SNIPPET_CREATE_BTN}
+                        </Button>
+                        {this.state.loading && <CircularProgress size={24} className={classes.buttonProgress} />}
+                    </div>
                 </div>
             </div>
         );
@@ -356,4 +369,4 @@ export default withRouter(connect(mapStateToProps, {
     closeBinaryAlert,
     updateSnippet,
     fetchSnippet
-})(SnippetFormPage));
+})(withStyles(materialStyles)(SnippetFormPage)));

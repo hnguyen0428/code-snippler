@@ -4,20 +4,11 @@ import {connect} from 'react-redux';
 
 import Dialog from '@material-ui/core/Dialog';
 import DialogTitle from '@material-ui/core/DialogTitle';
-import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
-import DialogContentText from '@material-ui/core/DialogContentText';
-import List from '@material-ui/core/List';
-import ListItem from '@material-ui/core/ListItem';
-import ListItemIcon from '@material-ui/core/ListItemIcon';
-import ListItemText from '@material-ui/core/ListItemText';
-import Toolbar from '@material-ui/core/Toolbar';
 import Button from '@material-ui/core/Button';
 import IconButton from '@material-ui/core/IconButton';
-import InputLabel from '@material-ui/core/InputLabel';
 import Input from '@material-ui/core/Input';
 import InputAdornment from '@material-ui/core/InputAdornment';
-import TextField from '@material-ui/core/TextField';
 
 import Lock from '@material-ui/icons/Lock';
 import CheckCircle from '@material-ui/icons/CheckCircle';
@@ -25,8 +16,6 @@ import ArrowBackIos from '@material-ui/icons/ArrowBackIos';
 
 import {changePassword} from "../../../redux/actions/authActions";
 import {showAlert, closeAlert} from "../../../redux/actions/alertActions";
-
-import SnipplerConfig from '../../../constants/SnipplerConfig';
 
 import {styles} from './styles';
 import {

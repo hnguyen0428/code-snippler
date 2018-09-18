@@ -1,14 +1,14 @@
-import React, { Component } from 'react';
-import PropTypes from 'prop-types';
+import React, {Component} from "react";
+import PropTypes from "prop-types";
 
-import Chip from '@material-ui/core/Chip';
-import Checkbox from '@material-ui/core/Checkbox';
-import Toolbar from '@material-ui/core/Toolbar';
+import Chip from "@material-ui/core/Chip";
+import Checkbox from "@material-ui/core/Checkbox";
+import Toolbar from "@material-ui/core/Toolbar";
 
-import CheckBox from '@material-ui/icons/CheckBox';
-import CheckBoxOutlineBlank from '@material-ui/icons/CheckBoxOutlineBlank';
+import CheckBox from "@material-ui/icons/CheckBox";
+import CheckBoxOutlineBlank from "@material-ui/icons/CheckBoxOutlineBlank";
 
-import {styles} from './styles';
+import {styles} from "./styles";
 
 
 class SelectableChip extends Component {

@@ -1,12 +1,12 @@
-import React, { Component } from 'react';
-import PropTypes from 'prop-types';
+import React, {Component} from "react";
+import PropTypes from "prop-types";
 
-import IconButton from '@material-ui/core/IconButton';
-import Input from '@material-ui/core/Input';
+import IconButton from "@material-ui/core/IconButton";
+import Input from "@material-ui/core/Input";
 
-import Search from '@material-ui/icons/Search';
+import Search from "@material-ui/icons/Search";
 
-import {SNIPPETS_SEARCH_BAR_PH} from '../../../constants/constants';
+import {SNIPPETS_SEARCH_BAR_PH} from "../../../constants/constants";
 
 
 class SearchBar extends Component {

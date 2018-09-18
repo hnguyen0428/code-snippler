@@ -1,40 +1,39 @@
-import React, { Component } from 'react';
-import {withStyles} from '@material-ui/core';
-import {connect} from 'react-redux';
-import PropTypes from 'prop-types';
+import React, {Component} from "react";
+import {withStyles} from "@material-ui/core";
+import {connect} from "react-redux";
+import PropTypes from "prop-types";
 
-import Avatar from '@material-ui/core/Avatar';
-import ListItem from '@material-ui/core/ListItem';
-import Toolbar from '@material-ui/core/Toolbar';
-import TextField from '@material-ui/core/TextField';
-import InputLabel from '@material-ui/core/InputLabel';
-import Tooltip from '@material-ui/core/Tooltip';
-import Button from '@material-ui/core/Button';
-import IconButton from '@material-ui/core/IconButton';
-import Popper from '@material-ui/core/Popper';
-import Paper from '@material-ui/core/Paper';
-import Grow from '@material-ui/core/Grow';
-import ClickAwayListener from '@material-ui/core/ClickAwayListener';
-import Menu from '@material-ui/core/Menu';
-import MenuItem from '@material-ui/core/MenuItem';
-import MenuList from '@material-ui/core/MenuList';
+import Avatar from "@material-ui/core/Avatar";
+import ListItem from "@material-ui/core/ListItem";
+import TextField from "@material-ui/core/TextField";
+import InputLabel from "@material-ui/core/InputLabel";
+import Tooltip from "@material-ui/core/Tooltip";
+import IconButton from "@material-ui/core/IconButton";
+import Menu from "@material-ui/core/Menu";
+import MenuItem from "@material-ui/core/MenuItem";
 
-import MoreVert from '@material-ui/icons/MoreVert';
-import Edit from '@material-ui/icons/Edit';
-import Done from '@material-ui/icons/Done';
-import ThumbDownAlt from '@material-ui/icons/ThumbDownAlt';
-import ThumbUpAlt from '@material-ui/icons/ThumbUpAlt';
+import MoreVert from "@material-ui/icons/MoreVert";
+import Done from "@material-ui/icons/Done";
+import ThumbDownAlt from "@material-ui/icons/ThumbDownAlt";
+import ThumbUpAlt from "@material-ui/icons/ThumbUpAlt";
 
-import history from '../../../root/history';
+import history from "../../../root/history";
 
-import {upvoteComment, downvoteComment, updateComment, deleteComment} from '../../../redux/actions/commentActions';
-import {showBinaryAlert, closeBinaryAlert} from '../../../redux/actions/alertActions';
+import {deleteComment, downvoteComment, updateComment, upvoteComment} from "../../../redux/actions/commentActions";
+import {closeBinaryAlert, showBinaryAlert} from "../../../redux/actions/alertActions";
 
-import {styles, materialStyles} from './styles';
+import {materialStyles, styles} from "./styles";
 import {
-    SIGNIN_MSG, DISMISS_MSG, UPVOTE_CMT_SIGNIN_MSG, DOWNVOTE_CMT_SIGNIN_MSG, userProfilePath, MY_PROFILE_PATH,
-    LOGIN_PATH, DELETE_MSG, DELETE_CMT_VERIFY_MSG
-} from '../../../constants/constants';
+    DELETE_CMT_VERIFY_MSG,
+    DELETE_MSG,
+    DISMISS_MSG,
+    DOWNVOTE_CMT_SIGNIN_MSG,
+    LOGIN_PATH,
+    MY_PROFILE_PATH,
+    SIGNIN_MSG,
+    UPVOTE_CMT_SIGNIN_MSG,
+    userProfilePath
+} from "../../../constants/constants";
 
 const moment = require('moment');
 
