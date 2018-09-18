@@ -143,7 +143,6 @@ class SnippetFormPage extends Component {
 
 
     onClickSubmit = () => {
-        this.setState({loading: true});
         let passed = this.sanityCheck();
         if (!passed)
             return;
