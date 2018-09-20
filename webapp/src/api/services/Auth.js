@@ -1,5 +1,4 @@
 import SnipplerService from "./SnipplerService";
-let querystring = require('querystring');
 
 
 const ENDPOINTS = {
@@ -19,11 +18,6 @@ const ENDPOINTS = {
 
 
 export default class Auth extends SnipplerService {
-    constructor(config) {
-        super(config);
-    }
-
-
     register(authConfig, callback) {
         let config = {
             url: this.formFullUrl(this.baseUrl, ENDPOINTS.register.value),

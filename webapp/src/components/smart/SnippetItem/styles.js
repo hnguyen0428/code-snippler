@@ -26,7 +26,7 @@ export const styles = {
         marginBottom: '5px'
     },
     title: {
-        fontFamily: '\"Roboto\", \"Helvetica\", \"Arial\"',
+        fontFamily: '"Roboto", "Helvetica", "Arial"',
         fontSize: '15px',
         cursor: 'pointer',
         color: 'rgb(0, 0, 0, 0.54)',

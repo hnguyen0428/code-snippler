@@ -9,10 +9,6 @@ import {styles} from "./styles";
 
 
 class SnippetsList extends Component {
-    constructor(props) {
-        super(props);
-    }
-
     componentWillMount() {
 
     }

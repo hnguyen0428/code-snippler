@@ -10,11 +10,6 @@ const ENDPOINTS = {
 
 
 export default class Language extends SnipplerService {
-    constructor(config) {
-        super(config);
-    }
-
-
     getAllLanguages(callback) {
         let config = {
             url: this.formFullUrl(this.baseUrl, ENDPOINTS.getAllLanguages.value),

@@ -219,6 +219,8 @@ class HomePage extends Component {
                 this.props.saveSettings(FeedSettings.MOST_RECENT);
                 this.queryFeed(FeedSettings.MOST_RECENT, null, setSnippetIds);
                 break;
+            default:
+                break;
         }
     };
 

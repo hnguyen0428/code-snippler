@@ -131,9 +131,13 @@ class SnippetFormPage extends Component {
             case "title":
                 if (event.target.value.length > SNIPPET_TITLE_LIMIT)
                     return;
+                break;
             case "description":
                 if (event.target.value.length > SNIPPET_DESC_LIMIT)
                     return;
+                break;
+            default:
+                break;
         }
 
         this.setState({

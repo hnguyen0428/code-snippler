@@ -9,11 +9,6 @@ import {styles} from "./styles";
 
 
 class CommentsList extends Component {
-    constructor(props) {
-        super(props);
-    }
-
-
     isBottom = () => {
         let list = document.getElementById("commentsList");
         let bottom = document.getElementById("commentsListBottom");

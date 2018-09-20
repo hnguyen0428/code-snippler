@@ -66,7 +66,7 @@ class App extends Component {
         super(props);
 
         const languagesFilter = {};
-        supportedLanguages.map(language => {languagesFilter[language] = false});
+        supportedLanguages.forEach(language => {languagesFilter[language] = false});
 
         let languages = Snippler.getLanguagesFilter();
 
@@ -127,7 +127,7 @@ class App extends Component {
     onClickFilterChip = (chip, checked) => {
         if (chip.props.name === "All" && checked) {
             const languagesFilter = {};
-            supportedLanguages.map(language => {
+            supportedLanguages.forEach(language => {
                 languagesFilter[language] = false
             });
             Snippler.resetLanguagesFilter();

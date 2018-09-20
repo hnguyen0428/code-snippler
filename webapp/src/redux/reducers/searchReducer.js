@@ -1,4 +1,4 @@
-import {SEARCH_SNIPPETS, SEARCH_SNIPPETS_QUERY_CHANGE} from '../actions/types';
+import {SEARCH_SNIPPETS} from '../actions/types';
 
 
 const initialState = {

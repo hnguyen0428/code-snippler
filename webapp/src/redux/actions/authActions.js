@@ -47,7 +47,7 @@ export const changePassword = (currPw, newPw, callback, noResCB) => dispatch => 
         currentPassword: currPw,
         newPassword: newPw,
     }, (res, error) => {
-        let success = handleActionsResult(res, error, callback, noResCB);
+        handleActionsResult(res, error, callback, noResCB);
     });
 };
 

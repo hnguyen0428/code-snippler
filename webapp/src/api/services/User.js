@@ -34,11 +34,6 @@ const ENDPOINTS = {
 
 
 export default class User extends SnipplerService {
-    constructor(config) {
-        super(config);
-    }
-
-
     updateProfile(params, callback) {
         let config = {
             url: this.formFullUrl(this.baseUrl, ENDPOINTS.updateProfile.value),

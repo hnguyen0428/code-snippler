@@ -26,11 +26,6 @@ const ENDPOINTS = {
 
 
 export default class Comment extends SnipplerService {
-    constructor(config) {
-        super(config);
-    }
-
-
     getComments(commentIds, params, callback) {
         params = {...commentIds, ...params};
 
