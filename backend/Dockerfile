@@ -9,6 +9,10 @@ RUN apt-get update && \
     apt-get install -y oracle-java8-installer && \
     apt-get clean
 
-COPY backend/build/libs/codesnippler-0.0.1-SNAPSHOT.jar /code-snippler-backend.jar
+COPY . /codesnippler_backend
 
-ENTRYPOINT ["java", "-jar", "/code-snippler-backend.jar"]
+WORKDIR /codesnippler_backend
+
+RUN ./gradlew build
+
+ENTRYPOINT ["java", "-jar", "build/libs/codesnippler-0.0.1-SNAPSHOT.jar"]

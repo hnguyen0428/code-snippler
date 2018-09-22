@@ -1,4 +1,5 @@
 #!/bin/bash
+# Script to setup the supported languages onto the backend
 
 
 if [ -z $1 ]

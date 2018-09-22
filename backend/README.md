@@ -1,5 +1,15 @@
 # CodeSnippler Backend
 
+# Environment Variables
+In order to run the application, MongoDB configurations and Application keys must be setup.
+
+    - ADMIN_KEY_ENC: Admin key allows access to exclusive API endpoints
+    - CLIENT_KEY_ENC: Client key allows access to other request types other than GET
+    - MONGODB_URI: Mongodb URI where data is stored
+    - MONGODB_USERNAME: Mongodb username
+    - MONGODB_PASSWORD: Mongodb password
+    - MONGODB_DATABASE: Mongodb database name
+
 ## Language
 ### GET: /api/language/all
 Get all languages supported by the application
