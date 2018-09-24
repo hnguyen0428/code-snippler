@@ -13,6 +13,13 @@ COPY . /codesnippler_backend
 
 WORKDIR /codesnippler_backend
 
+ARG MONGODB_URI
+ARG MONGODB_DATABASE
+ARG MONGODB_USERNAME
+ARG MONGODB_PASSWORD
+ARG CLIENT_KEY_ENC
+ARG ADMIN_KEY_ENC
+
 RUN ./gradlew build
 
 ENTRYPOINT ["java", "-jar", "build/libs/codesnippler-0.0.1-SNAPSHOT.jar"]
