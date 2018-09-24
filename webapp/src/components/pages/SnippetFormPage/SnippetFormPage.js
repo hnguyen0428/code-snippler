@@ -43,6 +43,7 @@ class SnippetFormPage extends Component {
 
         const params = new URLSearchParams(this.props.location.search);
         let snippetId = params.get('snippetId');
+        this.posting = false;
 
         this.state = {
             language: {
@@ -151,6 +152,9 @@ class SnippetFormPage extends Component {
         if (!passed)
             return;
 
+        if (this.posting)
+            return;
+
         const params = {
             title: this.state.title.value,
             description: this.state.description.value,
@@ -160,6 +164,7 @@ class SnippetFormPage extends Component {
 
         const resCallback = (res, err) => {
             this.setState({loading: false});
+            this.posting = false;
             if (res) {
                 let prevPath = this.props.router.prevPath;
                 let overridePath = this.props.router.overridePath;
@@ -175,11 +180,13 @@ class SnippetFormPage extends Component {
 
         const createSnippetAction = () => {
             this.setState({loading: true});
+            this.posting = true;
             this.props.createSnippet(params, resCallback);
         };
 
         const updateSnippetAction = () => {
             this.setState({loading: true});
+            this.posting = true;
             this.props.updateSnippet(this.state.snippetId, params, resCallback);
         };
 
