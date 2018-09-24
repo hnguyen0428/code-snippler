@@ -142,6 +142,7 @@ class ProfilePage extends Component {
         // Trim beginning and end white spaces
         query = query.replace(/^\s+/g, '');
         query = query.replace(/\s+$/g, '');
+        query = query.replace(/[^a-zA-Z0-9_]+/g, '');
 
         query = query.split(' ');
         let regexStr = query.join('|');
