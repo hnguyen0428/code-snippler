@@ -179,15 +179,19 @@ class SnippetFormPage extends Component {
         };
 
         const createSnippetAction = () => {
-            this.setState({loading: true});
-            this.posting = true;
-            this.props.createSnippet(params, resCallback);
+            if (!this.posting) {
+                this.setState({loading: true});
+                this.posting = true;
+                this.props.createSnippet(params, resCallback);
+            }
         };
 
         const updateSnippetAction = () => {
-            this.setState({loading: true});
-            this.posting = true;
-            this.props.updateSnippet(this.state.snippetId, params, resCallback);
+            if (!this.posting) {
+                this.setState({loading: true});
+                this.posting = true;
+                this.props.updateSnippet(this.state.snippetId, params, resCallback);
+            }
         };
 
         const action = {callback: createSnippetAction};
