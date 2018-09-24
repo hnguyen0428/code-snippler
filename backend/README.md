@@ -88,6 +88,60 @@ Example Response:
         },
         "success": true
     }
+    
+    
+### POST: /api/user/changePassword
+Change password of the current account
+
+Request Parameters:
+
+    {
+        "currentPassword": <string>,
+        "newPassword": <string>
+    }
+    
+Example Response:
+
+    {
+        "data": {
+            "userId": <string>,
+            "username": <string>,
+            "savedSnippets": <array of snippet ids or objects>,
+            "createdSnippets": <array of snippet ids or objects>,
+            "createdDate": <string>
+        },
+        "success": true
+    }
+
+
+### PATCH: /api/user/profile
+Update the current user's profile
+
+Request Parameters:
+
+    {
+        "firstName": <string>,
+        "lastName": <string>,
+        "email": <string>
+    }
+    
+Example Response:
+
+    {
+        "data": {
+            "userId": <string>,
+            "username": <string>,
+            "savedSnippets": <array of snippet ids or objects>,
+            "createdSnippets": <array of snippet ids or objects>,
+            "createdDate": <string>,
+            "profile": {
+                "firstName": <string>,
+                "lastName": <string>,
+                "email": <string>
+            }
+        },
+        "success": true
+    }
 
 
 ### GET: /api/user/me, needs Authorization
@@ -452,6 +506,25 @@ Request Parameters:
         "page": <int> (page number),
         "pageSize": <int> (how many to query),
         "fields": <string> (attribute names separated by commas, possible values are title|description|code|upvotes|downvotes|viewsCount|savedCount|languageName|userId|createdDate|comments)
+    }
+    
+Example Response:
+
+    {
+        "data": <array of snippet objects>,
+        "success": true
+    }
+    
+    
+### GET: /api/snippet/recent
+Get the most recent snippets.
+
+Request Parameters:
+
+    {
+        "languages": <string> (comma separated string of languages to filter),
+        "page": <int> (page number),
+        "pageSize": <int> (how many to query),
     }
     
 Example Response:
