@@ -7,8 +7,10 @@ COPY package*.json ./
 RUN npm install && npm install -g serve
 COPY . .
 
+ARG CLIENT_KEY
+ARG CODE_SNIPPLER_BASEURL
+
 RUN npm run build
 
-EXPOSE 3000
 ENTRYPOINT [ "serve", "-s" ]
 CMD [ "build" ]
