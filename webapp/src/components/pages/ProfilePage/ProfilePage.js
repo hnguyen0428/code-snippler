@@ -142,7 +142,7 @@ class ProfilePage extends Component {
         // Trim beginning and end white spaces
         query = query.replace(/^\s+/g, '');
         query = query.replace(/\s+$/g, '');
-        query = query.replace(/[^a-zA-Z0-9_]+/g, '');
+        query = query.replace(/[^a-zA-Z0-9_ ]+/g, '');
 
         query = query.split(' ');
         let regexStr = query.join('|');
@@ -270,7 +270,7 @@ class ProfilePage extends Component {
 
             if (this.state.searchQuery !== '') {
                 snippets = this.filterByQuery(snippets, this.state.searchQuery);
-                maxPage = Math.ceil(snippets.length / SnipplerConfig.PROFILE_PAGE_SIZE);
+                maxPage = snippets.length !== 0 ? Math.ceil(snippets.length / SnipplerConfig.PROFILE_PAGE_SIZE) : 1;
                 snippets = this.paginate(snippets, this.state.page, SnipplerConfig.PROFILE_PAGE_SIZE);
             }
             else if (snippets.length !== 0) {
