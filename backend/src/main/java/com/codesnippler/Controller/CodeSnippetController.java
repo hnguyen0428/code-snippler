@@ -580,9 +580,7 @@ public class CodeSnippetController {
                     Aggregation.project(fields)
                             .andExpression("add(add(viewsCount, subtract(upvotes, downvotes)), savedCount)")
                             .as("popularityScore"),
-                    Aggregation.sort(new Sort(Sort.Direction.DESC, "popularityScore")),
-                    Aggregation.skip((long)page * pageSize),
-                    Aggregation.limit(pageSize)
+                    Aggregation.sort(new Sort(Sort.Direction.DESC, "popularityScore"))
             );
         }
         else {
@@ -590,14 +588,14 @@ public class CodeSnippetController {
                     Aggregation.project(fields)
                             .andExpression("add(add(viewsCount, subtract(upvotes, downvotes)), savedCount)")
                             .as("popularityScore"),
-                    Aggregation.sort(new Sort(Sort.Direction.DESC, "popularityScore")),
-                    Aggregation.skip((long)page * pageSize),
-                    Aggregation.limit(pageSize)
+                    Aggregation.sort(new Sort(Sort.Direction.DESC, "popularityScore"))
             );
         }
 
         AggregationResults<CodeSnippet> results = mongoTemplate.aggregate(aggregation, CodeSnippet.class, CodeSnippet.class);
         List<CodeSnippet> snippets = results.getMappedResults();
+
+        snippets = GeneralUtility.paginate(snippets, page, pageSize);
 
         if (authorizedUser.isAuthenticated())
             for (CodeSnippet snippet: snippets)
